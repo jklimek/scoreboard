@@ -1,0 +1,143 @@
+@font-face {
+    font-family: 'premier_leagueregular';
+    src: url('../fonts/premierleague-webfont.woff2') format('woff2'),
+    url('../fonts/premierleague-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+body {
+
+    font-family: 'premier_leagueregular';
+    font-size: 20pt;
+    background-color: #c8c8c8;
+    /*background-color: magenta;*/
+
+    background-size: cover;
+
+}
+
+.content {
+    /* little centering for ease of cropping (1280 x 720)*/
+    margin-left: 50px;
+    margin-top: 60px;
+}
+
+.board {
+    letter-spacing: -1pt;
+    width: calc(2 * 138px + 130px);
+    display: grid;
+    grid-template-columns: 138px 130px 138px;
+    grid-template-areas: "team-home score team-away" "......... time  .........";
+}
+
+.board__box {
+    text-align: center;
+    background-color: white;
+    width: 130px;
+    height: 40px;
+}
+
+.team-home {
+    grid-area: team-home;
+    border-left: 8px solid white;
+}
+
+.team-away {
+    grid-area: team-away;
+    border-right: 8px solid white;
+}
+
+.score {
+    grid-area: score;
+    z-index: 9999; /* heh */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.time {
+    grid-area: time;
+}
+
+@keyframes score-ease-out {
+    0% {
+        background-color: #01fe82;
+    }
+    100% {
+        background-color: white;
+    }
+}
+
+.team-score-animation {
+    animation: score-ease-out 8s;
+}
+
+.team-score {
+    background-color: #01fe82;
+}
+
+.names {
+    position: fixed;
+    bottom: 10vh;
+}
+
+.names__box {
+    background-color: white;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-top: 10px;
+}
+
+.assist-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100vw;
+    height: 60px;
+}
+
+#assist {
+    position: absolute;
+    height: 40px;
+    font-size: 16pt;
+    width: fit-content;
+    background-color: #01fe82;
+    color: white;
+    bottom: -60px;
+    transition: all .25s ease;
+}
+
+#assist.active {
+    transition: all .25s ease;
+    bottom: 0;
+}
+
+.scorer-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100vw;
+    height: 70px;
+}
+
+#scorer {
+    position: absolute;
+    height: 60px;
+    font-size: 22pt;
+    border-right: 8px solid #01fe82;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 -6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 9998;
+    left: -70%;
+    transition: all .75s ease;
+}
+
+#scorer.active {
+    transition: all .75s ease;
+    left: 0;
+}
+
+
+.scorer-animation {
+    animation: scorer-slide-right 1s infinite;
+}
+
+
+
