@@ -1,27 +1,39 @@
 /* global $ */
 
 
-
+var time = 0;
 var awayScore = 0;
 var homeScore = 0;
 var players = {};
 var events = [];
 
 var awayTeam = getAllUrlParams().a.toUpperCase();
-var ta = $("#ta");
 
 var homeTeam = getAllUrlParams().h.toUpperCase();
-var th = $("#th");
+
+
+var teams = {
+    a: {
+        name: awayTeam.toString().split("-")[0],
+        jerseys: awayTeam,
+        handle: $("#ta"),
+    },
+    h: {
+        name: homeTeam.toString().split("-")[0],
+        jerseys: homeTeam,
+        handle: $("#th")
+    }
+};
 
 var game = getAllUrlParams().game;
 setTeams();
 getPlayers();
 
 function setTeams() {
-    th.text(homeTeam.toString().split("-")[0]);
-    th.addClass(homeTeam);
-    ta.text(awayTeam.toString().split("-")[0]);
-    ta.addClass(awayTeam);
+    teams.h.handle.text(teams.h.name);
+    teams.h.handle.addClass(teams.h.jerseys);
+    teams.a.handle.text(teams.a.name);
+    teams.a.handle.addClass(teams.a.jerseys);
 }
 
 function getPlayers() {
@@ -41,6 +53,9 @@ function getPlayers() {
         },
         success: function (data) {
             players = data.p
+        },
+        complete: function() {
+            scoresAjax();
         }
     });
 }
@@ -81,22 +96,56 @@ function parseScoresLiveData(data) {
         var newEventsIndex = events.length - 1;
         var newEventsCount = data.e.length - events.length;
         console.log(newEventsCount, newEventsIndex);
+
+
     } else {
         events = data.e;
         for (var i = 0, len = events.length; i < len; i++) {
-            //switch()
-            console.log(events[i]);
+            var event = events[i];
+            console.log(event);
+            eventsSwitch(event);
 
-            switch(events[i].y) {
-                case "O": {
-
-                }
-            }
         }
     }
 
     setScores(awayScore, homeScore);
-    score(ta, "JAKUB KLIMEK", "PIOTR WRZASZCZ");
+
+}
+
+function eventsSwitch(event) {
+    switch (event.y) {
+        case "O": {
+            if (time == 0) {
+                // Update the count down every 1 second
+                setInterval(setTimer, 1000);
+                console.log(teams[event.e] + " ZACZYNA W ATAKU");
+            }
+            break;
+        }
+
+        // TURNOVER
+        case "T": {
+            console.log(teams[event.e] + " STRATA");
+            break;
+        }
+
+        case "S": {
+            if (event.a != -1) {
+                var assist = players[event.e][event.a].escapeDiacritics().toUpperCase();
+            } else {
+                assist = "";
+            }
+            if (event.s != -1) {
+                var scorer = players[event.e][event.s].escapeDiacritics().toUpperCase();
+            } else {
+                scorer = "";
+            }
+            console.log(teams[event.e] + " PUNKT a:" + assist + " s:" + scorer);
+            score(teams[event.e]["handle"], assist, scorer);
+            break;
+        }
+
+    }
 }
 
 function setScores(a,h) {
@@ -123,7 +172,6 @@ function scoresAjax() {
         },
         success: function (data) {
             parseScoresLiveData(data);
-            console.log(data);
         },
         complete: function () {
             //setTimeout(scoresAjax, ajaxInterval);
@@ -229,13 +277,14 @@ function animateScorerOut(team) {
     $("#scorer").removeClass("active");
     team.addClass("team-score-animation");
     team.removeClass("team-score");
+    setTimeout(function () {
+        team.removeClass("team-score-animation");
+    }, 8000);
 }
 
-// Set the date we're counting down to
-var time = 0;
 
-// Update the count down every 1 second
-setInterval(function () {
+function setTimer() {
+
 
     time++;
     var minutes = Math.floor(time / 60);
@@ -250,7 +299,7 @@ setInterval(function () {
 
     $("#timer").text(minutes + ":" + seconds + "");
 
-}, 1000);
+}
 
 //var p = 1;
 //setInterval(function () {
@@ -258,6 +307,17 @@ setInterval(function () {
 //}, 20000);
 
 
-
+String.prototype.escapeDiacritics = function()
+{
+    return this.replace(/ą/g, 'a').replace(/Ą/g, 'A')
+        .replace(/ć/g, 'c').replace(/Ć/g, 'C')
+        .replace(/ę/g, 'e').replace(/Ę/g, 'E')
+        .replace(/ł/g, 'l').replace(/Ł/g, 'L')
+        .replace(/ń/g, 'n').replace(/Ń/g, 'N')
+        .replace(/ó/g, 'o').replace(/Ó/g, 'O')
+        .replace(/ś/g, 's').replace(/Ś/g, 'S')
+        .replace(/ż/g, 'z').replace(/Ż/g, 'Z')
+        .replace(/ź/g, 'z').replace(/Ź/g, 'Z');
+}
 
 
