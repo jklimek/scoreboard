@@ -92,20 +92,15 @@ function parseScoresLiveData(data) {
     homeScore = data.h;
 
     // Set events and check for diff
-    if (events.length != 0 && events.length != data.e.length) {
-        var newEventsIndex = events.length - 1;
-        var newEventsCount = data.e.length - events.length;
-        console.log(newEventsCount, newEventsIndex);
+    if (events.length < data.e.length) {
+        var newEventsIndex = events.length;
 
-
-    } else {
-        events = data.e;
-        for (var i = 0, len = events.length; i < len; i++) {
-            var event = events[i];
-            console.log(event);
+        for (newEventsIndex; newEventsIndex <= data.e.length - 1; newEventsIndex++) {
+            var event = data.e[newEventsIndex];
             eventsSwitch(event);
-
         }
+        events = data.e;
+
     }
 
     setScores(awayScore, homeScore);
@@ -114,21 +109,35 @@ function parseScoresLiveData(data) {
 
 function eventsSwitch(event) {
     switch (event.y) {
+
+        // START OF THE MATCH
         case "O": {
             if (time == 0) {
                 // Update the count down every 1 second
                 setInterval(setTimer, 1000);
-                console.log(teams[event.e] + " ZACZYNA W ATAKU");
+                console.log(teams[event.e]["name"] + " ZACZYNA W ATAKU");
             }
             break;
         }
 
         // TURNOVER
         case "T": {
-            console.log(teams[event.e] + " STRATA");
+            console.log(teams[event.e]["name"] + " STRATA");
             break;
         }
 
+        // TIMEOUT
+        case "TO": {
+            console.log(teams[event.e]["name"] + " TIMEOUT");
+            setAssistAndScorerTexts("", "TIMEOUT");
+            animateScorerIn(teams[event.e]["handle"], score);
+            setTimeout(function () {
+                animateScorerOut(teams[event.e]["handle"])
+            }, 30000);
+            break;
+        }
+
+        // SCORE
         case "S": {
             if (event.a != -1) {
                 var assist = players[event.e][event.a].escapeDiacritics().toUpperCase();
@@ -140,9 +149,14 @@ function eventsSwitch(event) {
             } else {
                 scorer = "";
             }
-            console.log(teams[event.e] + " PUNKT a:" + assist + " s:" + scorer);
+            console.log(teams[event.e]["name"] + " PUNKT a:" + assist + " s:" + scorer);
             score(teams[event.e]["handle"], assist, scorer);
             break;
+        }
+
+        // END OF THE MATCH
+        case "E": {
+            console.log("KONIEC MECZU");
         }
 
     }
@@ -157,8 +171,8 @@ var ajaxInterval = 2000;
 
 function scoresAjax() {
     $.ajax({
-        //url: 'http://0.0.0.0:8888/api/match.php',
-        url: 'http://scores.frisbee.pl/ext/watchlive.php',
+        url: 'http://0.0.0.0:8888/api/match.json',
+        //url: 'http://scores.frisbee.pl/ext/watchlive.php',
         data: {
             game: game,
             update: "true"
