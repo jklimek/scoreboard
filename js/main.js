@@ -66,17 +66,11 @@ function getPlayers() {
             console.log(data);
             players = data.p;
         },
-        complete: function() {
+        complete: function () {
             scoresAjax();
         }
     });
 }
-
-
-$('.score').click(function (event) {
-    event.preventDefault();
-    scoresAjax();
-});
 
 
 /*
@@ -105,7 +99,6 @@ function parseScoresLiveData(data) {
     console.log(data);
 
 
-
     // Set events and check for diff
     if (events.length < data.e.length) {
         var newEventsIndex = events.length;
@@ -115,8 +108,6 @@ function parseScoresLiveData(data) {
                 events.push(event);
             }
         }
-        //events = data.e;
-
     }
 
     setScores(awayScore, homeScore);
@@ -128,33 +119,36 @@ function eventsSwitch(event) {
     switch (event.y) {
 
         // START OF THE MATCH
-        case "O": {
+        case "O":
+        {
             //if (time == 0) {
-                // Update the count down every 1 second
-                timerIntervalId = setInterval(setTimer, 1000);
-                console.log(teams[event.e]["name"] + " ZACZYNA W ATAKU");
+            // Update the count down every 1 second
+            timerIntervalId = setInterval(setTimer, 1000);
+            console.log(teams[event.e]["name"] + " ZACZYNA W ATAKU");
 
-                setAssistAndScorerTexts("", "START");
-                $("#scorer").addClass("active");
-                timerHandle.addClass("team-score-animation");
-                setTimeout(function () {
-                    timerHandle.removeClass("team-score-animation");
-                }, 8000);
-                setTimeout(function () {
-                    $("#scorer").removeClass("active");
-                }, 4000);
+            setAssistAndScorerTexts("", "START");
+            $("#scorer").addClass("active");
+            timerHandle.addClass("team-score-animation");
+            setTimeout(function () {
+                timerHandle.removeClass("team-score-animation");
+            }, 8000);
+            setTimeout(function () {
+                $("#scorer").removeClass("active");
+            }, 4000);
             //}
             return true;
         }
 
         // TURNOVER
-        case "T": {
+        case "T":
+        {
             console.log(teams[event.e]["name"] + " STRATA");
             return true;
         }
 
         // TIMEOUT
-        case "TO": {
+        case "TO":
+        {
             console.log(teams[event.e]["name"] + " TIMEOUT");
             setAssistAndScorerTexts("", "TIMEOUT");
             animateScorerIn(teams[event.e]["handle"], score);
@@ -165,7 +159,8 @@ function eventsSwitch(event) {
         }
 
         // SCORE
-        case "S": {
+        case "S":
+        {
             if (event.a != -1) {
                 var assist = players[event.e][event.a].escapeDiacritics().toUpperCase();
             } else {
@@ -188,14 +183,17 @@ function eventsSwitch(event) {
         }
 
         // END OF THE MATCH
-        case "E": {
+        case "E":
+        {
             console.log("KONIEC MECZU");
             clearInterval(timerIntervalId);
             clearTimeout(scoresTimeoutId);
+
             time = event.t;
             setTimer();
-            timerHandle.addClass("team-score");
+
             setAssistAndScorerTexts("", "END OF THE MATCH");
+            timerHandle.addClass("team-score");
             scorerHandle.addClass("active");
             setTimeout(function () {
                 scorerHandle.removeClass("active");
@@ -206,7 +204,7 @@ function eventsSwitch(event) {
     }
 }
 
-function setScores(a,h) {
+function setScores(a, h) {
     $("#ta-score").text(a.toString());
     $("#th-score").text(h.toString());
 }
@@ -236,27 +234,22 @@ function scoresAjax() {
 
 }
 
-// score("ta", p++, "JAKUB KLIMEK", "KATARZYNA KOMOROWSKA");
 
 function getAllUrlParams(url) {
 
     // get query string from url (optional) or window
     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
 
-    // we'll store the parameters here
     var obj = {};
 
-    // if query string exists
     if (queryString) {
 
         // stuff after # is not part of query string, so get rid of it
         queryString = queryString.split('#')[0];
 
-        // split our query string into its component parts
         var arr = queryString.split('&');
 
         for (var i = 0; i < arr.length; i++) {
-            // separate the keys and the values
             var a = arr[i].split('=');
 
             // in case params look like: list[]=thing1&list[]=thing2
@@ -269,24 +262,19 @@ function getAllUrlParams(url) {
             // set parameter value (use 'true' if empty)
             var paramValue = typeof(a[1]) === 'undefined' ? true : a[1];
 
-            // (optional) keep case consistent
             paramName = paramName.toLowerCase();
             paramValue = paramValue.toLowerCase();
 
             // if parameter name already exists
             if (obj[paramName]) {
-                // convert value to array (if still string)
                 if (typeof obj[paramName] === 'string') {
                     obj[paramName] = [obj[paramName]];
                 }
-                // if no array index number specified...
                 if (typeof paramNum === 'undefined') {
                     // put the value on the end of the array
                     obj[paramName].push(paramValue);
                 }
-                // if array index number specified...
                 else {
-                    // put the value at that index number
                     obj[paramName][paramNum] = paramValue;
                 }
             }
@@ -358,9 +346,7 @@ function setTimer() {
 }
 
 
-
-String.prototype.escapeDiacritics = function()
-{
+String.prototype.escapeDiacritics = function () {
     return this.replace(/ą/g, 'a').replace(/Ą/g, 'A')
         .replace(/ć/g, 'c').replace(/Ć/g, 'C')
         .replace(/ę/g, 'e').replace(/Ę/g, 'E')

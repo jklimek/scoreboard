@@ -134,7 +134,6 @@ body {
     left: 0;
 }
 
-
 .scorer-animation {
     animation: scorer-slide-right 1s infinite;
 }
