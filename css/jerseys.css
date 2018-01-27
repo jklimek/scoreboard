@@ -1,22 +1,37 @@
-.SZC-A {
-  border-color: #0088ff;
-}
-.SZC-B {
-  border-color: #e3e3e3;
-}
+/* Jerseys colors */
 
+/* Szczupaki Olsztyn */
+.SZC-A {border-color: #0088ff;}
+.SZC-B {border-color: #e3e3e3;}
 
-.NHL-A {
-  border-color: #0088ff;
-}
-.NHL-B {
-  border-color: #e3e3e3;
-}
+/* Albatros Ultimate Szczecin */
+.ALB-A {border-color: #2c54ff;}
+.ALB-B {border-color: #e3e3e3;}
 
+/* KS Nine Hills Chełmno */
+.NHL-A {border-color: #e3e3e3;}
+.NHL-B {border-color: #3b3b3b;}
 
-.ULT-A {
-  border-color: #57bf34;
-}
-.ULT-B {
-  border-color: #e3e3e3;
-}
+/* Ultimatum Sztorm */
+.ULT-A {border-color: #0c0c0c;}
+.ULT-B {border-color: #0c0c0c;}
+
+/* Ultimatum Szkwał */
+.ULK-A {border-color: #e3e3e3;}
+.ULK-B {border-color: #e3e3e3;}
+
+/* Brave Beavers */
+.BRA-A {border-color: #e3e3e3;}
+.BRA-B {border-color: #f18327;}
+
+/* Uwaga Pies */
+.UWG-A {border-color: #b8b8b8;}
+.UWG-B {border-color: #272e65;}
+
+/* North Dragons */
+.NOR-A {border-color: #94d6ff;}
+.NOR-B {border-color: #94d6ff;}
+
+/* #967 */
+.\967-A {border-color: #b53531;}
+.\967-B {border-color: #c5c5c5;}
