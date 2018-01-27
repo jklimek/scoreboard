@@ -2,21 +2,32 @@
 
 
 var time = 0;
+
+var timerIntervalId = 0;
+var ajaxInterval = 1000;
+var scoresTimeoutId = 0;
+
 var awayScore = 0;
 var homeScore = 0;
 var players = {};
 var events = [];
 
-var awayTeam = getAllUrlParams().a.toUpperCase();
+var timerHandle = $("#timer");
+var scorerHandle = $("#scorer");
+var assistHandle = $("#assist");
 
+var awayTeam = getAllUrlParams().a.toUpperCase();
 var homeTeam = getAllUrlParams().h.toUpperCase();
 
+if (getAllUrlParams().time) {
+    time = getAllUrlParams().time;
+}
 
 var teams = {
     a: {
         name: awayTeam.toString().split("-")[0],
         jerseys: awayTeam,
-        handle: $("#ta"),
+        handle: $("#ta")
     },
     h: {
         name: homeTeam.toString().split("-")[0],
@@ -52,7 +63,8 @@ function getPlayers() {
             console.log(error);
         },
         success: function (data) {
-            players = data.p
+            console.log(data);
+            players = data.p;
         },
         complete: function() {
             scoresAjax();
@@ -90,16 +102,20 @@ ts - time
 function parseScoresLiveData(data) {
     awayScore = data.a;
     homeScore = data.h;
+    console.log(data);
+
+
 
     // Set events and check for diff
     if (events.length < data.e.length) {
         var newEventsIndex = events.length;
-
         for (newEventsIndex; newEventsIndex <= data.e.length - 1; newEventsIndex++) {
             var event = data.e[newEventsIndex];
-            eventsSwitch(event);
+            if (eventsSwitch(event)) {
+                events.push(event);
+            }
         }
-        events = data.e;
+        //events = data.e;
 
     }
 
@@ -108,22 +124,33 @@ function parseScoresLiveData(data) {
 }
 
 function eventsSwitch(event) {
+    console.log(event);
     switch (event.y) {
 
         // START OF THE MATCH
         case "O": {
-            if (time == 0) {
+            //if (time == 0) {
                 // Update the count down every 1 second
-                setInterval(setTimer, 1000);
+                timerIntervalId = setInterval(setTimer, 1000);
                 console.log(teams[event.e]["name"] + " ZACZYNA W ATAKU");
-            }
-            break;
+
+                setAssistAndScorerTexts("", "START");
+                $("#scorer").addClass("active");
+                timerHandle.addClass("team-score-animation");
+                setTimeout(function () {
+                    timerHandle.removeClass("team-score-animation");
+                }, 8000);
+                setTimeout(function () {
+                    $("#scorer").removeClass("active");
+                }, 4000);
+            //}
+            return true;
         }
 
         // TURNOVER
         case "T": {
             console.log(teams[event.e]["name"] + " STRATA");
-            break;
+            return true;
         }
 
         // TIMEOUT
@@ -134,7 +161,7 @@ function eventsSwitch(event) {
             setTimeout(function () {
                 animateScorerOut(teams[event.e]["handle"])
             }, 30000);
-            break;
+            return true;
         }
 
         // SCORE
@@ -144,19 +171,36 @@ function eventsSwitch(event) {
             } else {
                 assist = "";
             }
+
             if (event.s != -1) {
                 var scorer = players[event.e][event.s].escapeDiacritics().toUpperCase();
             } else {
                 scorer = "";
             }
-            console.log(teams[event.e]["name"] + " PUNKT a:" + assist + " s:" + scorer);
-            score(teams[event.e]["handle"], assist, scorer);
-            break;
+            if (event.a == -1 && event.s == -1) {
+                console.log(teams[event.e]["name"] + " PUNKT");
+                return false;
+            } else {
+                console.log(teams[event.e]["name"] + " PUNKT a:" + assist + " s:" + scorer);
+                score(teams[event.e]["handle"], assist, scorer);
+                return true;
+            }
         }
 
         // END OF THE MATCH
         case "E": {
             console.log("KONIEC MECZU");
+            clearInterval(timerIntervalId);
+            clearTimeout(scoresTimeoutId);
+            time = event.t;
+            setTimer();
+            timerHandle.addClass("team-score");
+            setAssistAndScorerTexts("", "END OF THE MATCH");
+            scorerHandle.addClass("active");
+            setTimeout(function () {
+                scorerHandle.removeClass("active");
+            }, 10000);
+            return true;
         }
 
     }
@@ -167,12 +211,11 @@ function setScores(a,h) {
     $("#th-score").text(h.toString());
 }
 
-var ajaxInterval = 2000;
 
 function scoresAjax() {
     $.ajax({
-        url: 'http://0.0.0.0:8888/api/match.json',
-        //url: 'http://scores.frisbee.pl/ext/watchlive.php',
+        //url: 'http://0.0.0.0:8888/api/match.json',
+        url: 'http://scores.frisbee.pl/ext/watchlive.php',
         data: {
             game: game,
             update: "true"
@@ -180,16 +223,15 @@ function scoresAjax() {
         dataType: 'json',
         type: 'POST',
         error: function (request, status, error) {
-            console.log(request);
             console.log(status);
-            console.log(error);
         },
         success: function (data) {
             parseScoresLiveData(data);
         },
         complete: function () {
-            //setTimeout(scoresAjax, ajaxInterval);
-        }
+            scoresTimeoutId = setTimeout(scoresAjax, ajaxInterval);
+        },
+        timeout: 4000 // sets timeout to 3 seconds
     });
 
 }
@@ -270,25 +312,25 @@ function score(team, assist, scorer) {
 }
 
 function setAssistAndScorerTexts(assist, scorer) {
-    $("#assist").html(assist.toString());
-    $("#scorer").html(scorer.toString());
+    assistHandle.html(assist.toString());
+    scorerHandle.html(scorer.toString());
 }
 
 function animateScorerIn(team) {
     team.addClass("team-score");
-    $("#scorer").addClass("active");
+    scorerHandle.addClass("active");
 }
 
 function animateAssistIn() {
-    $("#assist").addClass("active");
+    assistHandle.addClass("active");
 }
 
 function animateAssistOut() {
-    $("#assist").removeClass("active");
+    assistHandle.removeClass("active");
 }
 
 function animateScorerOut(team) {
-    $("#scorer").removeClass("active");
+    scorerHandle.removeClass("active");
     team.addClass("team-score-animation");
     team.removeClass("team-score");
     setTimeout(function () {
@@ -315,10 +357,6 @@ function setTimer() {
 
 }
 
-//var p = 1;
-//setInterval(function () {
-//    score("ta", p++, "JAKUB KLIMEK", "PIOTR WRZASZCZ");
-//}, 20000);
 
 
 String.prototype.escapeDiacritics = function()
@@ -332,6 +370,6 @@ String.prototype.escapeDiacritics = function()
         .replace(/ś/g, 's').replace(/Ś/g, 'S')
         .replace(/ż/g, 'z').replace(/Ż/g, 'Z')
         .replace(/ź/g, 'z').replace(/Ź/g, 'Z');
-}
+};
 
 
