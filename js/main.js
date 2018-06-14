@@ -49,7 +49,7 @@ function setTeams() {
 
 function getPlayers() {
     $.ajax({
-        url: 'http://scores.frisbee.pl/ext/watchlive.php',
+        url: 'http://test.ultiscores.com/ext/watchlive.php',
         data: {
             game: game,
             update: "true",
@@ -162,13 +162,15 @@ function eventsSwitch(event) {
         case "S":
         {
             if (event.a != -1) {
-                var assist = players[event.e][event.a].escapeDiacritics().toUpperCase();
+                //var assist = players[event.e][event.a].escapeDiacritics().toUpperCase();
+                var assist = "ASYSTENT";
             } else {
                 assist = "";
             }
 
             if (event.s != -1) {
-                var scorer = players[event.e][event.s].escapeDiacritics().toUpperCase();
+                //var scorer = players[event.e][event.s].escapeDiacritics().toUpperCase();
+                var scorer = "PUNKTARZ";
             } else {
                 scorer = "";
             }
@@ -212,8 +214,8 @@ function setScores(a, h) {
 
 function scoresAjax() {
     $.ajax({
-        //url: 'http://0.0.0.0:8888/api/match.json',
-        url: 'http://scores.frisbee.pl/ext/watchlive.php',
+        //url: 'http://0.0.0.0:8000/api/match.json',
+        url: 'http://test.ultiscores.com/ext/watchlive.php',
         data: {
             game: game,
             update: "true"
@@ -221,7 +223,9 @@ function scoresAjax() {
         dataType: 'json',
         type: 'POST',
         error: function (request, status, error) {
+            console.log(request);
             console.log(status);
+            console.log(error);
         },
         success: function (data) {
             parseScoresLiveData(data);

@@ -1,7 +1,7 @@
 @font-face {
-    font-family: 'premier_leagueregular';
-    src: url('../fonts/premierleague-webfont.woff2') format('woff2'),
-    url('../fonts/premierleague-webfont.woff') format('woff');
+    font-family: 'clemente';
+    src: url('../fonts/ClementePDai-Regular.woff') format('woff'),
+    url('../fonts/ClementePDai-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 
@@ -9,10 +9,10 @@
 
 body {
 
-    font-family: 'premier_leagueregular';
+    font-family: 'clemente';
     font-size: 20pt;
     /*background-color: #c8c8c8;*/
-    background-color: magenta;
+    background-color: #f5bfff;
 
     background-size: cover;
 
@@ -29,14 +29,16 @@ body {
     width: calc(2 * 138px + 130px);
     display: grid;
     grid-template-columns: 138px 130px 138px;
-    grid-template-areas: "team-home score team-away" "......... time  .........";
+    grid-template-areas:
+            "team-home score-home time"
+            "team-away score-away time";
 }
 
 .board__box {
     text-align: center;
     background-color: white;
     width: 130px;
-    height: 40px;
+    /*height: 40px;*/
 }
 
 .team-home {
@@ -52,7 +54,7 @@ body {
 .score {
     grid-area: score;
     z-index: 9999; /* heh */
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
 }
 
 .time {
@@ -134,9 +136,9 @@ body {
     left: 0;
 }
 
-.scorer-animation {
-    animation: scorer-slide-right 1s infinite;
-}
+/*.scorer-animation {*/
+    /*animation: scorer-slide-right 1s infinite;*/
+/*}*/
 
 
 
