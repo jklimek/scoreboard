@@ -7,6 +7,7 @@ from pprint import pprint
 from flask_cors import CORS
 from time import sleep
 from threading import Thread
+from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 import logging
 
 # logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)-10s) %(message)s')
@@ -22,6 +23,20 @@ players = {}
 home_score = 0
 away_score = 0
 # ======== ========= ========
+
+
+class WebSocketHandler(WebSocket):
+
+    def handleMessage(self):
+        # echo message back to client
+        print(self.data)
+        self.sendMessage(self.data)
+
+    def handleConnected(self):
+        print(self.address, 'ws connected')
+
+    def handleClose(self):
+        print(self.address, 'ws closed')
 
 
 def scores_update():
@@ -134,11 +149,9 @@ def prepare_event(event):
     return prepared_event
 
 
-def webapp():
-    pass
-    # while True:
-    #     print(".")
-    #     sleep(1)
+def websocket_thread():
+    server = SimpleWebSocketServer('', 5001, WebSocketHandler)
+    server.serveforever()
 
 
 def send_event(event):
@@ -173,6 +186,8 @@ def set_game():
 if __name__ == '__main__':
     scores_thread = Thread(target=scores_update)
     scores_thread.start()
+    websocket_thread = Thread(target=websocket_thread)
+    websocket_thread.start()
     application.run(host='0.0.0.0', debug=True, port=5000, use_reloader=False)
 
 

@@ -4,3 +4,4 @@ requests
 gunicorn
 asyncio
 websockets
+git+https://github.com/dpallot/simple-websocket-server.git
