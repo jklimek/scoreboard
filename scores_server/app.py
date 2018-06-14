@@ -25,12 +25,17 @@ away_score = 0
 # ======== ========= ========
 
 
+def handle_team_setting_message(data):
+    print("TEAM SETTING:")
+    pprint(data)
+
+
 class WebSocketHandler(WebSocket):
 
     def handleMessage(self):
-        # echo message back to client
-        print(self.data)
-        self.sendMessage(self.data)
+        data = json.loads(self.data)
+        if data["type"] == "team":
+            handle_team_setting_message(data)
 
     def handleConnected(self):
         print(self.address, 'ws connected')
