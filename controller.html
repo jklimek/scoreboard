@@ -6,7 +6,8 @@
     <title>CONTROLLER</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
     <link rel="manifest" href="site.webmanifest">
 
@@ -16,37 +17,47 @@
 <!--<div id="output"></div>-->
 <div class="container-fluid">
     <div class="row">
-        <div class="col-4">
-            <h2>Websockets</h2>
-            <form name="myform">
-                <div class="form-group">
-                    <!--<label for="wsLogTextarea">Websocket log:</label>-->
-                    <textarea class="form-control" id="wsLogTextarea" name="wslog" rows="20"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="wsUrl">Websocket url</label>
-                    <input type="url" name="url" class="form-control" id="wsUrl" placeholder="ws://localhost:5001/">
-                </div>
-                <div class="form-group">
-                    <button type="button" name=clearButton value="Clear" onClick="clearText();" class="btn btn-secondary btn-sm">Clear</button>
-                    <button type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();" class="btn btn-danger btn-sm">Disconnect</button>
-                    <button type="button" name=connectButton value="Connect" onClick="doConnect();" class="btn btn-success btn-sm">Connect</button>
-                </div>
 
-
-            </form>
-        </div>
         <div class="col-8">
+            <h2>Game</h2>
             <div class="row">
                 <div class="col">
-                    <h2>Game</h2>
                     <form>
                         <div class="form-group">
                             <label for="gameNumber">Game number</label>
                             <input type="text" class="form-control" id="gameNumber" placeholder="Enter game number...">
-                            <button type="button" onClick="setGame();" class="btn btn-success btn-block">Set the game</button>
+                            <button type="button" onClick="setGame();" class="btn btn-success btn-block">Set the game
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <form>
+                        <div class="form-group">
+                            <label for="gameNumber">Offence team</label>
+                            <select class="form-control" id="teamOffenceSelect">
+                                <option value="" disabled selected>Select offence</option>
+                                <option value="A">Team A</option>
+                                <option value="A">Team B</option>
+                            </select>
+                            <button type="button" onClick="setOffenceTeam();" class="btn btn-primary btn-block">Set
+                                offence team
+                            </button>
                         </div>
                     </form>
+                </div>
+                <div class="col-6">
+                    <label for="timerControls">Timer controls</label>
+                    <div id="timerControls">
+                        <button class="btn startButton">Start</button>
+                        <button class="btn pauseButton">Pause</button>
+                        <button class="btn stopButton">Stop</button>
+                        <button class="btn resetButton">Reset</button>
+                    </div>
+
                 </div>
             </div>
 
@@ -79,25 +90,122 @@
                                 <option value="UWG">Uwaga Pies</option>
                                 <option value="ZAW">Zawierucha</option>
                             </select>
-                            <button type="button" onClick="setTeamName('A');" class="btn btn-success btn-block">Set team A</button>
+                            <button type="button" onClick="setTeamName('A');" class="btn btn-primary btn-block">Set team
+                                A
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label for="jerseyInputA">Jerseys color</label>
+                            <input id="jerseyInputA" class="jscolor form-control"
+                                   onchange="jerseysColor(this.jscolor, 'A')" value="FFFFFF">
                         </div>
                     </form>
-                    <label for="jerseyInputA">Jerseys color</label>
-                    <input id="jerseyInputA" class="jscolor form-control"
-                           onchange="jerseysColor(this.jscolor, 'A')" value="FFFFFF">
 
                 </div>
                 <div class="col-6">
                     <h3>Team B</h3>
+                    <form>
+                        <div class="form-group">
+                            <label for="teamNameSelectB">Team name</label>
+                            <select class="form-control" id="teamNameSelectB">
+                                <option value="" disabled selected>Select team</option>
+                                <option value="967">#967</option>
+                                <option value="2OB">2obvious</option>
+                                <option value="4HA">4hands</option>
+                                <option value="71W">71 Wratislavia</option>
+                                <option value="ALB">Albatros</option>
+                                <option value="FLW">AZS AWF Flow Wrocław</option>
+                                <option value="BCK">BC Kosmodysk</option>
+                                <option value="BBV">Brave Beavers</option>
+                                <option value="CKM">Czarna Kompania</option>
+                                <option value="DYS">Dysko Polot</option>
+                                <option value="EGE">Egeszsegedre</option>
+                                <option value="FRI">Frisbnik</option>
+                                <option value="GMF">Grandmaster Flash</option>
+                                <option value="GUN">Gunslingers</option>
+                                <option value="MJH">mJAH</option>
+                                <option value="RJP">RJP</option>
+                                <option value="SZC">Szczupaki</option>
+                                <option value="ULT">Ultimatum</option>
+                                <option value="UWG">Uwaga Pies</option>
+                                <option value="ZAW">Zawierucha</option>
+                            </select>
+                            <button type="button" onClick="setTeamName('B');" class="btn btn-primary btn-block">Set team
+                                B
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label for="jerseyInputB">Jerseys color</label>
+                            <input id="jerseyInputB" class="jscolor form-control"
+                                   onchange="jerseysColor(this.jscolor, 'B')" value="FFFFFF">
+                        </div>
+                    </form>
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                    <h2>Graphics controls</h2>
+                    <div id="graphicsControls">
+                        <div class="btn-ctrl-group">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn ">Show score</button>
+                                <button type="button" class="btn btn-secondary">Hide score</button>
+                            </div>
+                        </div>
+                        <div class="btn-ctrl-group">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn">Show rosters</button>
+                                <button type="button" class="btn btn-secondary">Hide rosters</button>
+                            </div>
+                        </div>
+                        <div class="btn-ctrl-group">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn">Show leaderboard</button>
+                                <button type="button" class="btn btn-secondary">Hide leaderboard</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <h2>Websockets</h2>
+            <form name="myform">
+                <div class="form-group">
+                    <!--<label for="wsLogTextarea">Websocket log:</label>-->
+                    <textarea class="form-control" id="wsLogTextarea" name="wslog" rows="20"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="wsUrl">Websocket url</label>
+                    <input type="url" name="url" class="form-control" id="wsUrl" placeholder="ws://localhost:5001/">
+                </div>
+                <div class="form-group">
+                    <button type="button" name=clearButton value="Clear" onClick="clearText();"
+                            class="btn btn-secondary btn-sm">Clear
+                    </button>
+                    <button type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();"
+                            class="btn btn-danger btn-sm">Disconnect
+                    </button>
+                    <button type="button" name=connectButton value="Connect" onClick="doConnect();"
+                            class="btn btn-success btn-sm">Connect
+                    </button>
+                </div>
+
+
+            </form>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+        integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+        crossorigin="anonymous"></script>
 
 <script src="js/jscolor.js"></script>
 <script src="js/controller.js"></script>

@@ -22,12 +22,31 @@ game_events = []
 players = {}
 home_score = 0
 away_score = 0
+home_team_name = ""
+away_team_name = ""
+
 # ======== ========= ========
 
 
+def set_game(data):
+    global game_number
+
+    if "game_number" in data:
+        game_number = data["game_number"]
+        get_players_list(data["game_number"])
+        # pprint(players)
+
+
 def handle_team_setting_message(data):
-    print("TEAM SETTING:")
     pprint(data)
+    team_side = data["team"]
+    # if "team_name" in data:
+
+
+def handle_game_setting_message(data):
+    pprint(data)
+    if "game_number" in data:
+        set_game(data)
 
 
 class WebSocketHandler(WebSocket):
@@ -36,6 +55,8 @@ class WebSocketHandler(WebSocket):
         data = json.loads(self.data)
         if data["type"] == "team":
             handle_team_setting_message(data)
+        elif data["type"] == "game":
+            handle_game_setting_message(data)
 
     def handleConnected(self):
         print(self.address, 'ws connected')
@@ -172,20 +193,7 @@ def proper_event(event):
         return False
 
 
-@application.route('/set_game', methods=['POST'])
-def set_game():
-    global game_number
-    if not request.data:
-        abort(400)
-    # pprint(json.loads(request.data))
-    data = json.loads(request.data)
-    if "game_number" in data:
-        game_number = data["game_number"]
-        get_players_list(data["game_number"])
-        # pprint(players)
-    response = application.make_response(json.dumps({"status": "ok"}))
-    response.headers['Content-Type'] = "application/json"
-    return response
+
 
 
 if __name__ == '__main__':
@@ -193,7 +201,7 @@ if __name__ == '__main__':
     scores_thread.start()
     websocket_thread = Thread(target=websocket_thread)
     websocket_thread.start()
-    application.run(host='0.0.0.0', debug=True, port=5000, use_reloader=False)
+    # application.run(host='0.0.0.0', debug=True, port=5000, use_reloader=False)
 
 
 

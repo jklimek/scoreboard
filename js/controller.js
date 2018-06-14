@@ -20,19 +20,19 @@ function doConnect() {
 }
 
 function onOpen(evt) {
-    writeToScreen("connected\n");
+    writeToScreen("Websocket connected\n");
     document.myform.connectButton.disabled = true;
     document.myform.disconnectButton.disabled = false;
 }
 
 function onClose(evt) {
-    writeToScreen("disconnected\n");
+    writeToScreen("Websocket disconnected\n");
     document.myform.connectButton.disabled = false;
     document.myform.disconnectButton.disabled = true;
 }
 
 function onMessage(evt) {
-    writeToScreen("response: " + evt.data + '\n');
+    writeToScreen("event: " + evt.data + '\n');
 }
 
 function onError(evt) {
@@ -47,7 +47,7 @@ function doSend(message) {
         writeToScreen("sent: " + message.toString() + '\n');
         websocket.send(message);
     } else {
-        writeToScreen("Connect to Websocket server first");
+        writeToScreen("Connect to Websocket server first" + '\n');
     }
 }
 
@@ -57,10 +57,6 @@ function writeToScreen(message) {
 }
 
 window.addEventListener("load", init, false);
-
-function sendText() {
-    doSend(document.myform.inputtext.value);
-}
 
 function clearText() {
     document.myform.wslog.value = "";
@@ -84,14 +80,14 @@ function jerseysColor(color, team) {
     var message = JSON.stringify({
         "type": "team",
         "team": team,
-        "jersey_color": "#"+color.toString()
+        "jersey_color": "#" + color.toString()
     });
     doSend(message);
 
 }
 
 function setTeamName(team) {
-    var teamName = $("#teamNameSelect"+team).val();
+    var teamName = $("#teamNameSelect" + team).val();
     var message = JSON.stringify({
         "type": "team",
         "team": team,
