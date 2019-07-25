@@ -1,18 +1,93 @@
+
 @font-face {
-    font-family: 'clemente';
-    src: url('../fonts/ClementePDai-Regular.woff') format('woff'),
-    url('../fonts/ClementePDai-Regular.woff') format('woff');
+    font-family: 'Myriad Pro It';
+    src: url('../fonts/MyriadPro-It.woff2') format('woff2'),
+    url('../fonts/MyriadPro-It.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Cond It';
+    src: url('../fonts/MyriadPro-CondIt.woff2') format('woff2'),
+    url('../fonts/MyriadPro-CondIt.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Semibold';
+    src: url('../fonts/MyriadPro-Semibold.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Semibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Bold It';
+    src: url('../fonts/MyriadPro-BoldIt.woff2') format('woff2'),
+    url('../fonts/MyriadPro-BoldIt.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Bold Cond';
+    src: url('../fonts/MyriadPro-BoldCond.woff2') format('woff2'),
+    url('../fonts/MyriadPro-BoldCond.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Cond';
+    src: url('../fonts/MyriadPro-Cond.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Cond.woff') format('woff');
     font-weight: normal;
     font-style: normal;
-
 }
+
+@font-face {
+    font-family: 'Myriad Pro';
+    src: url('../fonts/MyriadPro-BoldCondIt.woff2') format('woff2'),
+    url('../fonts/MyriadPro-BoldCondIt.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Bold';
+    src: url('../fonts/MyriadPro-Bold.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Semibold It';
+    src: url('../fonts/MyriadPro-SemiboldIt.woff2') format('woff2'),
+    url('../fonts/MyriadPro-SemiboldIt.woff') format('woff');
+    font-weight: 600;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro';
+    src: url('../fonts/MyriadPro-Regular.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 
 body {
 
-    font-family: 'clemente';
+    font-family: 'Myriad Pro Bold', sans-serif;
     font-size: 20pt;
+    color: #434242;
     /*background-color: #c8c8c8;*/
-    background-color: #f5bfff;
+    background-color: #ff00ff;
+    /*background-image: url("./bggg.png");*/
 
     background-size: cover;
 
@@ -24,20 +99,29 @@ body {
     margin-top: 60px;
 }
 
+/*.board {*/
+/*letter-spacing: -1pt;*/
+/*width: calc(2 * 138px + 130px);*/
+/*display: grid;*/
+/*grid-template-columns: 138px 130px 138px;*/
+/*grid-template-areas:*/
+/*"team-home score-home time"*/
+/*"team-away score-away time";*/
+/*}*/
+
 .board {
     letter-spacing: -1pt;
     width: calc(2 * 138px + 130px);
     display: grid;
     grid-template-columns: 138px 130px 138px;
-    grid-template-areas:
-            "team-home score-home time"
-            "team-away score-away time";
+    grid-template-areas: "team-home score team-away" "......... time  .........";
 }
 
 .board__box {
     text-align: center;
-    background-color: white;
+    background-color: #f0deb2;
     width: 130px;
+    padding: 4px;
     /*height: 40px;*/
 }
 
@@ -63,10 +147,10 @@ body {
 
 @keyframes score-ease-out {
     0% {
-        background-color: #01fe82;
+        background-color: #ec6e1f;
     }
     100% {
-        background-color: white;
+        background-color: #f0deb2;
     }
 }
 
@@ -75,7 +159,7 @@ body {
 }
 
 .team-score {
-    background-color: #01fe82;
+    background-color: #ec6e1f;
 }
 
 .names {
@@ -84,10 +168,10 @@ body {
 }
 
 .names__box {
-    background-color: white;
+    background-color: #f0deb2;
     padding-left: 40px;
     padding-right: 40px;
-    padding-top: 10px;
+    padding-top: 20px;
 }
 
 .assist-wrapper {
@@ -102,8 +186,8 @@ body {
     height: 40px;
     font-size: 16pt;
     width: fit-content;
-    background-color: #01fe82;
-    color: white;
+    background-color: #ec6e1f;
+    color: #f0deb2;
     bottom: -60px;
     transition: all .25s ease;
 }
@@ -124,7 +208,7 @@ body {
     position: absolute;
     height: 60px;
     font-size: 22pt;
-    border-right: 8px solid #01fe82;
+    border-right: 8px solid #ec6e1f;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 -6px 20px 0 rgba(0, 0, 0, 0.19);
     z-index: 9998;
     left: -70%;
@@ -136,8 +220,12 @@ body {
     left: 0;
 }
 
+.logo {
+    margin-top: 50px;
+}
+
 /*.scorer-animation {*/
-    /*animation: scorer-slide-right 1s infinite;*/
+/*animation: scorer-slide-right 1s infinite;*/
 /*}*/
 
 

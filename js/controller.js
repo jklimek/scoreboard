@@ -1,5 +1,5 @@
 function init() {
-    document.myform.url.value = "ws://localhost:5001/";
+    document.myform.url.value = "ws://localhost:5005/";
     document.myform.disconnectButton.disabled = true;
 }
 
@@ -33,6 +33,17 @@ function onClose(evt) {
 
 function onMessage(evt) {
     writeToScreen("event: " + evt.data + '\n');
+    var eventData = {};
+    eventData = JSON.parse(evt.data);
+    if (eventData["type"] === "team") {
+        if (eventData["team"] === "h") {
+            $("#teamHomeName").html(eventData["team_name"])
+        }
+        if (eventData["team"] === "a") {
+            $( "#teamAwayName" ).html(eventData["team_name"])
+        }
+    }
+
 }
 
 function onError(evt) {
@@ -94,4 +105,24 @@ function setTeamName(team) {
         "team_name": teamName
     });
     doSend(message);
+}
+
+function setOffenceTeam() {
+    var team = $("#teamOffenceSelect").val();
+    var message = JSON.stringify({
+        "type": "game",
+        "offence_team": team
+    });
+    doSend(message);
+}
+
+function resetTimer() {
+    if (confirm("Are you sure? You are resetting stream timer!")) {
+        var message = JSON.stringify({
+            "type": "game",
+            "timer_reset": 1
+        });
+        doSend(message);
+    }
+
 }

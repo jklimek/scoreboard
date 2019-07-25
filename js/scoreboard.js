@@ -1,6 +1,7 @@
 /* global $ */
 
-
+websocketConnection();
+var timer = new Timer();
 var time = 0;
 
 var timerIntervalId = 0;
@@ -16,12 +17,8 @@ var timerHandle = $("#timer");
 var scorerHandle = $("#scorer");
 var assistHandle = $("#assist");
 
-var awayTeam = getAllUrlParams().a.toUpperCase();
-var homeTeam = getAllUrlParams().h.toUpperCase();
-
-if (getAllUrlParams().time) {
-    time = getAllUrlParams().time;
-}
+var awayTeam = "AWA";
+var homeTeam = "HOM";
 
 var teams = {
     a: {
@@ -36,174 +33,80 @@ var teams = {
     }
 };
 
-var game = getAllUrlParams().game;
-setTeams();
-getPlayers();
-
-function setTeams() {
-    teams.h.handle.text(teams.h.name);
-    teams.h.handle.addClass(teams.h.jerseys);
-    teams.a.handle.text(teams.a.name);
-    teams.a.handle.addClass(teams.a.jerseys);
-}
-
-function getPlayers() {
-    $.ajax({
-        url: 'http://test.ultiscores.com/ext/watchlive.php',
-        data: {
-            game: game,
-            update: "true",
-            players: "true"
-        },
-        dataType: 'json',
-        type: 'POST',
-        error: function (request, status, error) {
-            console.log(request);
-            console.log(status);
-            console.log(error);
-        },
-        success: function (data) {
-            console.log(data);
-            players = data.p;
-        },
-        complete: function () {
-            scoresAjax();
-        }
-    });
+function websocketConnection() {
+    websocket = new WebSocket("ws://192.168.1.86:5005/");
+    websocket.onopen = function (evt) {
+        onOpen(evt)
+    };
+    websocket.onclose = function (evt) {
+        onClose(evt)
+    };
+    websocket.onmessage = function (evt) {
+        onMessage(evt)
+    };
+    websocket.onerror = function (evt) {
+        onError(evt)
+    };
 }
 
 
-/*
-a - away score
-h - home score
-e - events
-    t - time
-    e - team side
-        a - away
-        h - home
-    y - event
-        T - turn
-        S - score
-        O - offence start
-        E - end of a match
-        TO - timeout
-    a - assist
-    s - scorer
-ts - time
+function onOpen(evt) {
+    console.log("Websocket connected\n");
+}
 
- */
+function onClose(evt) {
+    console.log("Websocket disconnected\n");
+}
 
-function parseScoresLiveData(data) {
-    awayScore = data.a;
-    homeScore = data.h;
+function onMessage(evt) {
+    console.log("event: " + evt.data + '\n');
+    parseEvent(JSON.parse(evt.data));
+}
+
+function onError(evt) {
+    console.log('error: ' + evt.error + '\n');
+    websocket.close();
+}
+
+function parseEvent(data) {
     console.log(data);
-
-
-    // Set events and check for diff
-    if (events.length < data.e.length) {
-        var newEventsIndex = events.length;
-        for (newEventsIndex; newEventsIndex <= data.e.length - 1; newEventsIndex++) {
-            var event = data.e[newEventsIndex];
-            if (eventsSwitch(event)) {
-                events.push(event);
-            }
+    if (data.hasOwnProperty("jersey_color")) {
+        setTeamJerseyColor(data["team"], data["jersey_color"])
+    } else if (data.hasOwnProperty("team_name")) {
+        setTeamName(data["team"], data["team_name"])
+    } else if (data.hasOwnProperty("timer_reset")) {
+        resetTimer();
+    } else if (data.hasOwnProperty("running_timer_set")) {
+        startTimer(data["timer_offset"]);
+    } else if (data.hasOwnProperty("timer_set")) {
+        setTimer(data["timer_offset"]);
+    } else if (data.hasOwnProperty("score_reset")) {
+        setScores(0, 0);
+    } else if (data.hasOwnProperty("score_set")) {
+        setScores(data["data"]["a_score"], data["data"]["h_score"]);
+    } else if (data.hasOwnProperty("subtype")) {
+        if (data["subtype"] === "score") {
+            score(teams[data["side"]]["handle"], data["data"]["assist"], data["data"]["scorer"]);
+            setScores(data["data"]["a_score"], data["data"]["h_score"]);
+        } else if (data["subtype"] === "offence") {
+            startOffence();
+        } else if (data["subtype"] === "timeout") {
+            timeout(data["side"]);
+        } else if (data["subtype"] === "start") {
+            startMatch(data["timer_offset"]);
+        } else if (data["subtype"] === "end") {
+            end();
         }
     }
-
-    setScores(awayScore, homeScore);
-
 }
 
-function eventsSwitch(event) {
-    console.log(event);
-    switch (event.y) {
+function setTeamName(team, name) {
+    teams[team]["handle"].text(name);
+}
 
-        // START OF THE MATCH
-        case "O":
-        {
-            //if (time == 0) {
-            // Update the count down every 1 second
-            timerIntervalId = setInterval(setTimer, 1000);
-            console.log(teams[event.e]["name"] + " ZACZYNA W ATAKU");
-
-            setAssistAndScorerTexts("", "START");
-            $("#scorer").addClass("active");
-            timerHandle.addClass("team-score-animation");
-            setTimeout(function () {
-                timerHandle.removeClass("team-score-animation");
-            }, 8000);
-            setTimeout(function () {
-                $("#scorer").removeClass("active");
-            }, 4000);
-            //}
-            return true;
-        }
-
-        // TURNOVER
-        case "T":
-        {
-            console.log(teams[event.e]["name"] + " STRATA");
-            return true;
-        }
-
-        // TIMEOUT
-        case "TO":
-        {
-            console.log(teams[event.e]["name"] + " TIMEOUT");
-            setAssistAndScorerTexts("", "TIMEOUT");
-            animateScorerIn(teams[event.e]["handle"], score);
-            setTimeout(function () {
-                animateScorerOut(teams[event.e]["handle"])
-            }, 30000);
-            return true;
-        }
-
-        // SCORE
-        case "S":
-        {
-            if (event.a != -1) {
-                //var assist = players[event.e][event.a].escapeDiacritics().toUpperCase();
-                var assist = "ASYSTENT";
-            } else {
-                assist = "";
-            }
-
-            if (event.s != -1) {
-                //var scorer = players[event.e][event.s].escapeDiacritics().toUpperCase();
-                var scorer = "PUNKTARZ";
-            } else {
-                scorer = "";
-            }
-            if (event.a == -1 && event.s == -1) {
-                console.log(teams[event.e]["name"] + " PUNKT");
-                return false;
-            } else {
-                console.log(teams[event.e]["name"] + " PUNKT a:" + assist + " s:" + scorer);
-                score(teams[event.e]["handle"], assist, scorer);
-                return true;
-            }
-        }
-
-        // END OF THE MATCH
-        case "E":
-        {
-            console.log("KONIEC MECZU");
-            clearInterval(timerIntervalId);
-            clearTimeout(scoresTimeoutId);
-
-            time = event.t;
-            setTimer();
-
-            setAssistAndScorerTexts("", "END OF THE MATCH");
-            timerHandle.addClass("team-score");
-            scorerHandle.addClass("active");
-            setTimeout(function () {
-                scorerHandle.removeClass("active");
-            }, 10000);
-            return true;
-        }
-
-    }
+function setTeamJerseyColor(team, color) {
+    console.log(team, color);
+    teams[team]["handle"].css("border-color", color);
 }
 
 function setScores(a, h) {
@@ -211,87 +114,44 @@ function setScores(a, h) {
     $("#th-score").text(h.toString());
 }
 
-
-function scoresAjax() {
-    $.ajax({
-        //url: 'http://0.0.0.0:8000/api/match.json',
-        url: 'http://test.ultiscores.com/ext/watchlive.php',
-        data: {
-            game: game,
-            update: "true"
-        },
-        dataType: 'json',
-        type: 'POST',
-        error: function (request, status, error) {
-            console.log(request);
-            console.log(status);
-            console.log(error);
-        },
-        success: function (data) {
-            parseScoresLiveData(data);
-        },
-        complete: function () {
-            scoresTimeoutId = setTimeout(scoresAjax, ajaxInterval);
-        },
-        timeout: 4000 // sets timeout to 3 seconds
-    });
+function startOffence() {
 
 }
 
-
-function getAllUrlParams(url) {
-
-    // get query string from url (optional) or window
-    var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
-
-    var obj = {};
-
-    if (queryString) {
-
-        // stuff after # is not part of query string, so get rid of it
-        queryString = queryString.split('#')[0];
-
-        var arr = queryString.split('&');
-
-        for (var i = 0; i < arr.length; i++) {
-            var a = arr[i].split('=');
-
-            // in case params look like: list[]=thing1&list[]=thing2
-            var paramNum = undefined;
-            var paramName = a[0].replace(/\[\d*\]/, function (v) {
-                paramNum = v.slice(1, -1);
-                return '';
-            });
-
-            // set parameter value (use 'true' if empty)
-            var paramValue = typeof(a[1]) === 'undefined' ? true : a[1];
-
-            paramName = paramName.toLowerCase();
-            paramValue = paramValue.toLowerCase();
-
-            // if parameter name already exists
-            if (obj[paramName]) {
-                if (typeof obj[paramName] === 'string') {
-                    obj[paramName] = [obj[paramName]];
-                }
-                if (typeof paramNum === 'undefined') {
-                    // put the value on the end of the array
-                    obj[paramName].push(paramValue);
-                }
-                else {
-                    obj[paramName][paramNum] = paramValue;
-                }
-            }
-            // if param name doesn't exist yet, set it
-            else {
-                obj[paramName] = paramValue;
-            }
-        }
-    }
-
-    return obj;
+function startMatch(offset) {
+    startTimer(offset);
+    setAssistAndScorerTexts("", "START");
+    $("#scorer").addClass("active");
+    timerHandle.addClass("team-score-animation");
+    setTimeout(function () {
+        timerHandle.removeClass("team-score-animation");
+    }, 8000);
+    setTimeout(function () {
+        $("#scorer").removeClass("active");
+    }, 4000);
 }
 
+function end() {
+    stopTimer();
+    setAssistAndScorerTexts("", "END OF THE MATCH");
+    timerHandle.addClass("team-score-animation");
+    setTimeout(function () {
+        timerHandle.removeClass("team-score-animation");
+    }, 8000);
+    scorerHandle.addClass("active");
+    setTimeout(function () {
+        scorerHandle.removeClass("active");
+    }, 10000);
+}
+
+
+function timeout(team) {
+    setAssistAndScorerTexts("", "TIMEOUT");
+    animateScorerIn(teams[team]["handle"], score);
+    setTimeout(function () {
+        animateScorerOut(teams[team]["handle"])
+    }, 50000);
+}
 
 function score(team, assist, scorer) {
     setAssistAndScorerTexts(assist, scorer);
@@ -304,8 +164,8 @@ function score(team, assist, scorer) {
 }
 
 function setAssistAndScorerTexts(assist, scorer) {
-    assistHandle.html(assist.toString());
-    scorerHandle.html(scorer.toString());
+    assistHandle.html(assist.toString().toUpperCase());
+    scorerHandle.html(scorer.toString().toUpperCase());
 }
 
 function animateScorerIn(team) {
@@ -331,22 +191,42 @@ function animateScorerOut(team) {
 }
 
 
-function setTimer() {
+function startTimer(offset = 0) {
+    stopTimer();
+    timer.start({startValues: {seconds: offset}});
+    timer.addEventListener('secondsUpdated', function (e) {
+        var timeString = timer.getTimeValues().toString();
+        var secondsString = addPrefixZeroToTime(timer.getTimeValues().seconds);
+        var minutesString = addPrefixZeroToTime(timer.getTotalTimeValues().minutes);
+        $("#timer-minutes").text(minutesString);
+        $("#timer-seconds").text(secondsString);
+    });
+}
 
+// lazy shit, should've divide and set just strings
+function setTimer(offset = 0) {
+    stopTimer();
+    var secondsString = addPrefixZeroToTime(offset % 60);
+    var minutesString = addPrefixZeroToTime(Math.floor(offset / 60));
+    $("#timer-minutes").text(minutesString);
+    $("#timer-seconds").text(secondsString);
+}
 
-    time++;
-    var minutes = Math.floor(time / 60);
-    var seconds = time - minutes * 60;
-
-    if (minutes.toString().length < 2) {
-        minutes = "0" + minutes
+function addPrefixZeroToTime(time) {
+    if (time < 10) {
+        return "0" + time.toString();
     }
-    if (seconds.toString().length < 2) {
-        seconds = "0" + seconds
-    }
+    return time.toString();
+}
 
-    $("#timer").text(minutes + ":" + seconds + "");
+function stopTimer() {
+    timer.stop();
+}
 
+function resetTimer() {
+    timer.stop();
+    $("#timer-minutes").text("00");
+    $("#timer-seconds").text("00");
 }
 
 
