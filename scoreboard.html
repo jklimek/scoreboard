@@ -20,13 +20,14 @@
 <div class="content">
     <div class="board">
         <div id="th" class="board__box team-home">HOM</div>
-        <div class="board__box score-home"><span id="th-score">0</span></div>
+        <div class="board__box score"><span id="th-score">0</span> - <span id="ta-score">0</span></div>
         <div id="ta" class="board__box team-away">AWA</div>
-        <div class="board__box score-away"><span id="ta-score">0</span></div>
 
-        <div id="timer" class="board__box time">00:00</div>
+        <div id="timer" class="board__box time"><span id="timer-minutes">00</span>:<span id="timer-seconds">00</span></div>
     </div>
-
+    <!--<div class="logo">-->
+        <!--<img src="img/logo_small_opque_web.png" alt="">-->
+    <!--</div>-->
     <div class="names">
         <div class="assist-wrapper">
             <div id="assist" class="names__box">-</div>
@@ -39,10 +40,8 @@
 </div>
 
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"
-        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous">
-</script>
-
+<script src="js/jquery.js"></script>
+<script src="js/easytimer.min.js"></script>
 <script src="js/scoreboard.js"></script>
 </body>
 </html>

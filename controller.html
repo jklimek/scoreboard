@@ -33,67 +33,38 @@
                     </form>
                 </div>
             </div>
+            <!--<div class="row">-->
+                <!--<div class="col-6">-->
+                    <!--<form>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="gameNumber">Offence team</label>-->
+                            <!--<select class="form-control" id="teamOffenceSelect">-->
+                                <!--<option value="" disabled selected>Select offence</option>-->
+                                <!--<option value="A">Team A</option>-->
+                                <!--<option value="B">Team B</option>-->
+                            <!--</select>-->
+                            <!--<button type="button" onClick="setOffenceTeam();" class="btn btn-primary btn-block">Set-->
+                                <!--offence team-->
+                            <!--</button>-->
+                        <!--</div>-->
+                    <!--</form>-->
+                <!--</div>-->
+                <!--<div class="col-6">-->
+                    <!--<label for="timerControls">Timer controls</label>-->
+                    <!--<div id="timerControls">-->
+                        <!--<button class="btn startButton">Start</button>-->
+                        <!--<button class="btn pauseButton">Pause</button>-->
+                        <!--<button class="btn stopButton">Stop</button>-->
+                        <!--<button class="btn resetButton">Reset</button>-->
+                    <!--</div>-->
+
+                <!--</div>-->
+            <!--</div>-->
+
             <div class="row">
                 <div class="col-6">
+                    <h3 id="teamHomeName">Team HOME</h3>
                     <form>
-                        <div class="form-group">
-                            <label for="gameNumber">Offence team</label>
-                            <select class="form-control" id="teamOffenceSelect">
-                                <option value="" disabled selected>Select offence</option>
-                                <option value="A">Team A</option>
-                                <option value="A">Team B</option>
-                            </select>
-                            <button type="button" onClick="setOffenceTeam();" class="btn btn-primary btn-block">Set
-                                offence team
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-6">
-                    <label for="timerControls">Timer controls</label>
-                    <div id="timerControls">
-                        <button class="btn startButton">Start</button>
-                        <button class="btn pauseButton">Pause</button>
-                        <button class="btn stopButton">Stop</button>
-                        <button class="btn resetButton">Reset</button>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-6">
-                    <h3>Team A</h3>
-                    <form>
-                        <div class="form-group">
-                            <label for="teamNameSelectA">Team name</label>
-                            <select class="form-control" id="teamNameSelectA">
-                                <option value="" disabled selected>Select team</option>
-                                <option value="967">#967</option>
-                                <option value="2OB">2obvious</option>
-                                <option value="4HA">4hands</option>
-                                <option value="71W">71 Wratislavia</option>
-                                <option value="ALB">Albatros</option>
-                                <option value="FLW">AZS AWF Flow Wrocław</option>
-                                <option value="BCK">BC Kosmodysk</option>
-                                <option value="BBV">Brave Beavers</option>
-                                <option value="CKM">Czarna Kompania</option>
-                                <option value="DYS">Dysko Polot</option>
-                                <option value="EGE">Egeszsegedre</option>
-                                <option value="FRI">Frisbnik</option>
-                                <option value="GMF">Grandmaster Flash</option>
-                                <option value="GUN">Gunslingers</option>
-                                <option value="MJH">mJAH</option>
-                                <option value="RJP">RJP</option>
-                                <option value="SZC">Szczupaki</option>
-                                <option value="ULT">Ultimatum</option>
-                                <option value="UWG">Uwaga Pies</option>
-                                <option value="ZAW">Zawierucha</option>
-                            </select>
-                            <button type="button" onClick="setTeamName('A');" class="btn btn-primary btn-block">Set team
-                                A
-                            </button>
-                        </div>
                         <div class="form-group">
                             <label for="jerseyInputA">Jerseys color</label>
                             <input id="jerseyInputA" class="jscolor form-control"
@@ -103,37 +74,8 @@
 
                 </div>
                 <div class="col-6">
-                    <h3>Team B</h3>
+                    <h3 id="teamAwayName">Team AWAY</h3>
                     <form>
-                        <div class="form-group">
-                            <label for="teamNameSelectB">Team name</label>
-                            <select class="form-control" id="teamNameSelectB">
-                                <option value="" disabled selected>Select team</option>
-                                <option value="967">#967</option>
-                                <option value="2OB">2obvious</option>
-                                <option value="4HA">4hands</option>
-                                <option value="71W">71 Wratislavia</option>
-                                <option value="ALB">Albatros</option>
-                                <option value="FLW">AZS AWF Flow Wrocław</option>
-                                <option value="BCK">BC Kosmodysk</option>
-                                <option value="BBV">Brave Beavers</option>
-                                <option value="CKM">Czarna Kompania</option>
-                                <option value="DYS">Dysko Polot</option>
-                                <option value="EGE">Egeszsegedre</option>
-                                <option value="FRI">Frisbnik</option>
-                                <option value="GMF">Grandmaster Flash</option>
-                                <option value="GUN">Gunslingers</option>
-                                <option value="MJH">mJAH</option>
-                                <option value="RJP">RJP</option>
-                                <option value="SZC">Szczupaki</option>
-                                <option value="ULT">Ultimatum</option>
-                                <option value="UWG">Uwaga Pies</option>
-                                <option value="ZAW">Zawierucha</option>
-                            </select>
-                            <button type="button" onClick="setTeamName('B');" class="btn btn-primary btn-block">Set team
-                                B
-                            </button>
-                        </div>
                         <div class="form-group">
                             <label for="jerseyInputB">Jerseys color</label>
                             <input id="jerseyInputB" class="jscolor form-control"
@@ -147,23 +89,24 @@
                     <h2>Graphics controls</h2>
                     <div id="graphicsControls">
                         <div class="btn-ctrl-group">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn ">Show score</button>
-                                <button type="button" class="btn btn-secondary">Hide score</button>
-                            </div>
+<!--                            <div class="btn-group" role="group">-->
+<!--                                <button type="button" class="btn ">Show score</button>-->
+<!--                                <button type="button" class="btn btn-secondary">Hide score</button>-->
+<!--                            </div>-->
+                            <button class="btn" onClick="resetTimer();">Reset timer</button>
                         </div>
-                        <div class="btn-ctrl-group">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn">Show rosters</button>
-                                <button type="button" class="btn btn-secondary">Hide rosters</button>
-                            </div>
-                        </div>
-                        <div class="btn-ctrl-group">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn">Show leaderboard</button>
-                                <button type="button" class="btn btn-secondary">Hide leaderboard</button>
-                            </div>
-                        </div>
+<!--                        <div class="btn-ctrl-group">-->
+<!--                            <div class="btn-group" role="group">-->
+<!--                                <button type="button" class="btn btn">Show rosters</button>-->
+<!--                                <button type="button" class="btn btn-secondary">Hide rosters</button>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="btn-ctrl-group">-->
+<!--                            <div class="btn-group" role="group">-->
+<!--                                <button type="button" class="btn btn">Show leaderboard</button>-->
+<!--                                <button type="button" class="btn btn-secondary">Hide leaderboard</button>-->
+<!--                            </div>-->
+<!--                        </div>-->
                     </div>
                 </div>
             </div>
@@ -177,7 +120,7 @@
                 </div>
                 <div class="form-group">
                     <label for="wsUrl">Websocket url</label>
-                    <input type="url" name="url" class="form-control" id="wsUrl" placeholder="ws://localhost:5001/">
+                    <input type="url" name="url" class="form-control" id="wsUrl" placeholder="ws://localhost:5005/">
                 </div>
                 <div class="form-group">
                     <button type="button" name=clearButton value="Clear" onClick="clearText();"
