@@ -34,7 +34,7 @@ var teams = {
 };
 
 function websocketConnection() {
-    websocket = new WebSocket("ws://192.168.1.86:5005/");
+    websocket = new WebSocket("ws://localhost:5005/");
     websocket.onopen = function (evt) {
         onOpen(evt)
     };

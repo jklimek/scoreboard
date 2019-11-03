@@ -7,9 +7,6 @@ from flask_cors import CORS
 import time
 from threading import Thread
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
-import logging
-
-# logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)-10s) %(message)s')
 
 application = Flask(__name__)
 CORS(application)
@@ -27,20 +24,29 @@ away_team_name = ""
 home_away = {"A": "h", "B": "a"}
 
 teams_abv = {
-    "Jucha": "JCH",
+    "4hands": "4HA",
+    "BC Kosmodysk": "BCK",
+    "Brave Beavers": "BBV",
+    "Flow": "FLW",
+    "Frisbnik": "FRI",
+    "Grandmaster Flash": "GMF",
+    "krakUF": "KRK",
     "KWR Knury": "KWR",
-    "Mojra": "MJR",
-    "Partisans": "PAR",
-    "Perun": "PER",
-    "The Bridge": "BRG",
+    "mJAH": "MJH",
+    "RJP": "RJP",
+    "Uwaga Pies": "UWG",
+    "Zawierucha": "ZWR",
+    "042": "042",
+    "2obvious": "2OB",
+    "71 Wratislavia": "71W",
+    "Albatros": "ALB",
+    "Czarna Kompania": "CZK",
+    "Dysko Polot": "DPL",
+    "Mad Hatters": "MHT",
+    "Ohana": "OHN",
+    "Szczupaki": "SZC",
     "Ultimatum": "ULT",
-    "Uprising": "UPR",
-    "Uprising II": "UP2",
-
-    "Flowers": "FLW",
-    "Frelki": "FRL",
-    "Lost'n'found": "LNF",
-    "Troubles": "TRB"
+    "Wrocław Południe": "WRP",
 }
 
 scores_url = "https://scores.frisbee.pl/ext/watchlive.php/"
@@ -404,6 +410,7 @@ if __name__ == '__main__':
 #         S - score
 #         O - offence set
 #         E - end of a match
+#         H - halftime
 #         TO - timeout
 #     a - assist
 #     s - scorer

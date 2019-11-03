@@ -81,12 +81,29 @@
 
 
 body {
+    --main-bg-color: #ff00ff;
+    --box-bg-color: #394d4a;
+    --box-font-color: #fff0f8;
+
+    --box-point-accent-color: #79a6a3;
+    --box-point-accent-fade-color: var(--box-bg-color);
+
+    --names-point-bg-color: var(--box-bg-color);
+    --names-point-accent-color: var(--box-point-accent-color);
+    --names-point-font-color: var(--box-font-color);
+
+    --names-assist-bg-color: var(--box-point-accent-color);
+    --names-assist-font-color: var(--box-bg-color);
+
+
+
 
     font-family: 'Myriad Pro Bold', sans-serif;
     font-size: 20pt;
-    color: #434242;
-    /*background-color: #c8c8c8;*/
-    background-color: #ff00ff;
+    color: var(--box-font-color);
+    background-color: var(--main-bg-color);
+    /*background-color: #ff00ff;*/
+
     /*background-image: url("./bggg.png");*/
 
     background-size: cover;
@@ -99,58 +116,75 @@ body {
     margin-top: 60px;
 }
 
-/*.board {*/
-/*letter-spacing: -1pt;*/
-/*width: calc(2 * 138px + 130px);*/
-/*display: grid;*/
-/*grid-template-columns: 138px 130px 138px;*/
-/*grid-template-areas:*/
-/*"team-home score-home time"*/
-/*"team-away score-away time";*/
-/*}*/
-
 .board {
-    letter-spacing: -1pt;
-    width: calc(2 * 138px + 130px);
+    /*letter-spacing: -1pt;*/
+    width: calc(130px);
     display: grid;
-    grid-template-columns: 138px 130px 138px;
-    grid-template-areas: "team-home score team-away" "......... time  .........";
+    /*grid-template-columns: 138px 50px;*/
+    /*grid-template-areas: "team-home score team-away" "......... time  .........";*/
+
+    grid-template-areas:    "team-home  score-h"
+                            "team-away  score-a"
+                            "time   .........";
 }
 
 .board__box {
     text-align: center;
-    background-color: #f0deb2;
-    width: 130px;
-    padding: 4px;
+    background-color: var(--box-bg-color);
+    /*width: 130px;*/
+    padding: 8px 4px 4px;
     /*height: 40px;*/
 }
 
 .team-home {
     grid-area: team-home;
     border-left: 8px solid white;
+    width: 130px;
+
 }
 
 .team-away {
     grid-area: team-away;
-    border-right: 8px solid white;
+    border-left: 8px solid white;
+    background-color: var(--box-bg-color);
+    width: 130px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /*filter: brightness(85%);*/
+
 }
 
-.score {
-    grid-area: score;
+/*.score {*/
+/*    grid-area: score;*/
+/*    z-index: 9999; !* heh *!*/
+/*    !*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*!*/
+/*}*/
+
+.score-home {
+    grid-area: score-h;
+    width: 50px;
     z-index: 9999; /* heh */
-    /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.score-away {
+    grid-area: score-a;
+    width: 50px;
+    z-index: 9999; /* heh */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .time {
     grid-area: time;
+    width: 80px;
+    font-size: 14pt;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 @keyframes score-ease-out {
     0% {
-        background-color: #ec6e1f;
+        background-color: var(--box-point-accent-color);
     }
     100% {
-        background-color: #f0deb2;
+        background-color: var(--box-point-accent-fade-color);
     }
 }
 
@@ -159,7 +193,7 @@ body {
 }
 
 .team-score {
-    background-color: #ec6e1f;
+    background-color: var(--box-point-accent-color);
 }
 
 .names {
@@ -168,7 +202,8 @@ body {
 }
 
 .names__box {
-    background-color: #f0deb2;
+    background-color: var(--names-point-bg-color);
+    color: var(--names-point-font-color);
     padding-left: 40px;
     padding-right: 40px;
     padding-top: 20px;
@@ -186,8 +221,8 @@ body {
     height: 40px;
     font-size: 16pt;
     width: fit-content;
-    background-color: #ec6e1f;
-    color: #f0deb2;
+    background-color: var(--names-assist-bg-color);
+    color: var(--names-assist-font-color);
     bottom: -60px;
     transition: all .25s ease;
 }
@@ -208,7 +243,7 @@ body {
     position: absolute;
     height: 60px;
     font-size: 22pt;
-    border-right: 8px solid #ec6e1f;
+    border-right: 8px solid var(--names-point-accent-color);
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 -6px 20px 0 rgba(0, 0, 0, 0.19);
     z-index: 9998;
     left: -70%;
