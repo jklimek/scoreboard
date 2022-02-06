@@ -1,13 +1,13 @@
-from flask import Flask, abort
-import requests
-import json
 import unicodedata
+import json
+import time
+import requests
+from flask import Flask, abort
 from pprint import pprint
 from flask_cors import CORS
-import time
 from threading import Thread
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
-import teams_abv
+from teams_abv import teams_abv
 
 application = Flask(__name__)
 CORS(application)
@@ -369,9 +369,10 @@ def set_team_names(home_name, away_name):
 if __name__ == '__main__':
     scores_thread = Thread(target=scores_update)
     scores_thread.start()
-    websocket_thread = Thread(target=websocket_thread)
-    websocket_thread.start()
-    application.run(host='0.0.0.0', debug=True, port=5000, use_reloader=True)
+    websocket_thread()
+    # websocket_thread = Thread(target=websocket_thread)
+    # websocket_thread.start()
+    application.run(host='0.0.0.0', debug=True, port=5666, use_reloader=True)
 
 # a - away score
 # h - home score
