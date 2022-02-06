@@ -28,6 +28,9 @@ teams_abv = {
     "Tychy Claws": "TCH",
     "Ultimatum Szkwał": "ULS",
     "Ultimatum Sztorm": "ULT",
+    "Sarny Północy": "SRN",
+    "AKS Złe": "AKS",
+
     
 }
 

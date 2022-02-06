@@ -37,10 +37,10 @@ function onMessage(evt) {
     eventData = JSON.parse(evt.data);
     if (eventData["type"] === "team") {
         if (eventData["team"] === "h") {
-            $("#teamHomeName").html(eventData["team_name"])
+            $("#teamHomeName").html(eventData["team_name_full"]+"("+ eventData["team_name"] +")")
         }
         if (eventData["team"] === "a") {
-            $( "#teamAwayName" ).html(eventData["team_name"])
+            $( "#teamAwayName" ).html(eventData["team_name_full"]+"("+ eventData["team_name"] +")")
         }
     }
 

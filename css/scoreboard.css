@@ -79,13 +79,22 @@
 }
 
 
+@font-face {
+    font-family: 'Kiona Bold';
+    src: url('../fonts/Kiona-Bold.woff') format('woff'),
+    url('../fonts/Kiona-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
 body {
     opacity: 0.9;
-    --main-bg-color: #ff00ff;
-    --box-bg-color: #183085;
-    --box-font-color: #c2d5ec;
+    --main-bg-color: #3a4d3a;
 
-    --box-point-accent-color: #6a9ce6;
+    --box-bg-color: rgba(255, 255, 255, 0.84);
+    --box-font-color: #3f2c37;
+    --box-point-accent-color: #e66ae4;
+
     --box-point-accent-fade-color: var(--box-bg-color);
 
     --names-point-bg-color: var(--box-bg-color);
@@ -104,7 +113,7 @@ body {
     background-color: var(--main-bg-color);
     /*background-color: #ff00ff;*/
 
-    background-image: url("./bgg.png");
+    background-image: url("../bg.png");
 
     background-size: cover;
 }

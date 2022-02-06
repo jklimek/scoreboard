@@ -16,6 +16,7 @@ CORS(application)
 game_number = 0
 game_events = []
 game_time = 0
+stopped_game = False
 players = {}
 home_score = 0
 away_score = 0
@@ -34,6 +35,7 @@ def set_game(data):
     global game_number
     global game_events
     global players
+    global stopped_game
 
     if "game_number" in data:
         if game_number != data["game_number"] and game_number != 0:
@@ -55,6 +57,7 @@ def reset_game():
     home_score = 0
     away_score = 0
     game_time = 0
+    stopped_game = False
     reset_score()
     reset_timer()
 
@@ -115,7 +118,7 @@ class WebSocketHandler(WebSocket):
 def scores_update():
     while True:
 
-        if any(players) and int(game_number) > 0:
+        if any(players) and int(game_number) > 0 and not stopped_game:
 
             payload = {
                 "game": game_number,
@@ -135,14 +138,22 @@ def scores_update():
                 result_data = r.json()
                 pprint(result_data)
                 set_timer(result_data["ts"])
+                check_and_set_stopped_game_status(result_data["ts"])
                 parse_scores_events(result_data["e"])
             except requests.exceptions:
                 print("Connection refused")
                 pass
-        elif int(game_number) > 0:
+        elif int(game_number) > 0 and not stopped_game:
             get_match_info(game_number)
 
         time.sleep(4)
+
+
+# Check if game clock is moving and api calls are still necessary
+def check_and_set_stopped_game_status(ts):
+    global stopped_game
+    if ts['stop'] and not stopped_game:
+        stopped_game = True
 
 
 def get_match_info(passed_game_number):
@@ -355,14 +366,16 @@ def set_team_names(home_name, away_name):
     send_message_to_all({
         "type": "team",
         "team": "h",
-        "team_name": teams_abv[home_team_name]
+        "team_name": teams_abv[home_team_name],
+        "team_name_full": home_team_name
     })
 
     # away team scoreboard
     send_message_to_all({
         "type": "team",
         "team": "a",
-        "team_name": teams_abv[away_team_name]
+        "team_name": teams_abv[away_team_name],
+        "team_name_full": away_team_name
     })
 
 
