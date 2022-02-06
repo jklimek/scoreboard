@@ -133,7 +133,7 @@ function startMatch(offset) {
 
 function end() {
     stopTimer();
-    setAssistAndScorerTexts("", "END OF THE MATCH");
+    setAssistAndScorerTexts("", "KONIEC MECZU");
     timerHandle.addClass("team-score-animation");
     setTimeout(function () {
         timerHandle.removeClass("team-score-animation");

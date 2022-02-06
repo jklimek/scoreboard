@@ -1,4 +1,3 @@
-
 @font-face {
     font-family: 'Myriad Pro It';
     src: url('../fonts/MyriadPro-It.woff2') format('woff2'),
@@ -81,11 +80,12 @@
 
 
 body {
+    opacity: 0.9;
     --main-bg-color: #ff00ff;
-    --box-bg-color: #394d4a;
-    --box-font-color: #fff0f8;
+    --box-bg-color: #183085;
+    --box-font-color: #c2d5ec;
 
-    --box-point-accent-color: #79a6a3;
+    --box-point-accent-color: #6a9ce6;
     --box-point-accent-fade-color: var(--box-bg-color);
 
     --names-point-bg-color: var(--box-bg-color);
@@ -96,36 +96,42 @@ body {
     --names-assist-font-color: var(--box-bg-color);
 
 
-
-
+    margin: 0;
     font-family: 'Myriad Pro Bold', sans-serif;
     font-size: 20pt;
+    text-transform: uppercase;
     color: var(--box-font-color);
     background-color: var(--main-bg-color);
     /*background-color: #ff00ff;*/
 
-    /*background-image: url("./bggg.png");*/
+    background-image: url("./bgg.png");
 
     background-size: cover;
+}
 
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .content {
     /* little centering for ease of cropping (1280 x 720)*/
     margin-left: 50px;
+    margin-right: 50px;
     margin-top: 60px;
+    /*width: 100%;*/
 }
 
 .board {
-    /*letter-spacing: -1pt;*/
-    width: calc(130px);
+    width: 204px;
     display: grid;
-    /*grid-template-columns: 138px 50px;*/
-    /*grid-template-areas: "team-home score team-away" "......... time  .........";*/
-
-    grid-template-areas:    "team-home  score-h"
-                            "team-away  score-a"
-                            "time   .........";
+    grid-template-areas: "team-home  score-h" "team-away  score-a" "time   .........";
 }
 
 .board__box {
@@ -165,6 +171,7 @@ body {
     z-index: 9999; /* heh */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+
 .score-away {
     grid-area: score-a;
     width: 50px;
@@ -255,9 +262,107 @@ body {
     left: 0;
 }
 
-.logo {
-    margin-top: 50px;
+.roster, .stats {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 1600px;
+    font-size: 16pt;
+    display: grid;
+
 }
+
+.roster {
+    grid-template-areas: "roster-th-name  roster-ta-name"
+                         "roster-th-content  roster-ta-content"
+                         "roster-info  roster-info";
+}
+.stats {
+    grid-template-areas: "stats-th-name  stats-ta-name"
+                         "stats-th-content  stats-ta-content"
+                         "stats-info  stats-info";
+}
+
+.roster__name, .stats__name {
+    background-color: var(--box-bg-color);
+    font-size: 24pt;
+    padding-top: 24px;
+    padding-bottom: 20px;
+}
+
+.roster__th-name {
+    grid-area: roster-th-name;
+    border-left: 8px solid white;
+}
+
+.roster__ta-name {
+    grid-area: roster-ta-name;
+    border-right: 8px solid white;
+}
+
+.roster__roster-container {
+    width: 800px;
+    background-color: var(--box-point-accent-color);
+    color: var(--box-bg-color);
+}
+
+.roster__ta-roster-list, .roster__th-roster-list {
+    padding-bottom: 20px;
+    columns: 2;
+    -webkit-columns: 2;
+    -moz-columns: 2;
+}
+
+.roster__ta-roster-list li:nth-child(2n), .roster__th-roster-list li:nth-child(2n) {
+    filter: brightness(50%);
+}
+
+#roster__th-roster {
+    border-right: 2px solid var(--box-bg-color);
+}
+
+.roster__roster-item {
+    padding-top: 12px;
+}
+
+.roster__roster-item__number {
+    color: var(--box-bg-color);
+    font-size: 14pt;
+}
+
+#roster__th-roster {
+    grid-area: roster-th-content;
+}
+
+#roster__ta-roster {
+    grid-area: roster-ta-content;
+}
+
+#stats__th-stats {
+    grid-area: stats-th-content;
+}
+
+#stats__ta-stats {
+    grid-area: stats-ta-content;
+}
+
+#roster__info, #stats__info  {
+    background-color: var(--box-font-color);
+    color: var(--box-bg-color);
+    padding-top: 10px;
+    padding-bottom: 8px;
+}
+
+#roster__info {
+    grid-area: roster-info;
+}
+#stats__info {
+    grid-area: stats-info;
+}
+
 
 /*.scorer-animation {*/
 /*animation: scorer-slide-right 1s infinite;*/

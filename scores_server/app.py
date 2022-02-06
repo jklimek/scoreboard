@@ -7,6 +7,7 @@ from flask_cors import CORS
 import time
 from threading import Thread
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
+import teams_abv
 
 application = Flask(__name__)
 CORS(application)
@@ -22,32 +23,6 @@ home_team_name = ""
 away_team_name = ""
 
 home_away = {"A": "h", "B": "a"}
-
-teams_abv = {
-    "4hands": "4HA",
-    "BC Kosmodysk": "BCK",
-    "Brave Beavers": "BBV",
-    "Flow": "FLW",
-    "Frisbnik": "FRI",
-    "Grandmaster Flash": "GMF",
-    "krakUF": "KRK",
-    "KWR Knury": "KWR",
-    "mJAH": "MJH",
-    "RJP": "RJP",
-    "Uwaga Pies": "UWG",
-    "Zawierucha": "ZWR",
-    "042": "042",
-    "2obvious": "2OB",
-    "71 Wratislavia": "71W",
-    "Albatros": "ALB",
-    "Czarna Kompania": "CZK",
-    "Dysko Polot": "DPL",
-    "Mad Hatters": "MHT",
-    "Ohana": "OHN",
-    "Szczupaki": "SZC",
-    "Ultimatum": "ULT",
-    "Wrocław Południe": "WRP",
-}
 
 scores_url = "https://scores.frisbee.pl/ext/watchlive.php/"
 
