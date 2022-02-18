@@ -48,6 +48,7 @@ def set_game(data):
 def reset_game():
     global game_events
     global game_time
+    global stopped_game
     global players
     global home_score
     global away_score
