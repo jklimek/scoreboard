@@ -9,9 +9,6 @@ from threading import Thread
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 from teams_abv import teams_abv
 
-application = Flask(__name__)
-CORS(application)
-
 # ======== GAME DATA ========
 game_number = 0
 game_events = []
@@ -262,7 +259,7 @@ def prepare_event(event):
     return prepared_event
 
 
-def websocket_thread():
+def websocket_server():
     server = SimpleWebSocketServer('', 5005, WebSocketHandler)
     server.serveforever()
 
@@ -380,13 +377,22 @@ def set_team_names(home_name, away_name):
     })
 
 
-if __name__ == '__main__':
+# App generator for WSGI daemon (gunicorn)
+def generate_app():
+    tmp_app = Flask(__name__)
     scores_thread = Thread(target=scores_update)
     scores_thread.start()
-    websocket_thread()
-    # websocket_thread = Thread(target=websocket_thread)
-    # websocket_thread.start()
-    application.run(host='0.0.0.0', debug=True, port=5666, use_reloader=True)
+    websocket_thread = Thread(target=websocket_server)
+    websocket_thread.start()
+
+    return tmp_app
+
+
+app = generate_app()
+CORS(app)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True, port=5000, use_reloader=True)
 
 # a - away score
 # h - home score

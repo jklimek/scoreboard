@@ -11,7 +11,7 @@
 
     <link rel="manifest" href="site.webmanifest">
 
-    <link rel="stylesheet" href="css/controller.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/controller.css') }}">
 </head>
 
 <!--<div id="output"></div>-->
@@ -96,7 +96,7 @@
                 </div>
                 <div class="form-group">
                     <label for="wsUrl">Websocket url</label>
-                    <input type="url" name="url" class="form-control" id="wsUrl" placeholder="ws://localhost:5005/">
+                    <input type="url" name="url" class="form-control" id="wsUrl" value="ws://localhost:5005/">
                 </div>
                 <div class="form-group">
                     <button type="button" name=clearButton value="Clear" onClick="clearText();"
@@ -126,6 +126,7 @@
         integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
         crossorigin="anonymous"></script>
 
-<script src="js/jscolor.js"></script>
-<script src="js/controller.js"></script>
+<script src="../static/js/jscolor.js"></script>
+<script src="{{ url_for('static',filename='js/jscolor.js') }}"></script>
+<script src="{{ url_for('static',filename='js/controller.js') }}"></script>
 </html>
