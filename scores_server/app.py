@@ -115,8 +115,7 @@ class WebSocketHandler(WebSocket):
 
 def scores_update():
     while True:
-
-        if any(players) and int(game_number) > 0 and not stopped_game:
+        if any(players) and int(game_number) >= 1000 and not stopped_game:
 
             payload = {
                 "game": game_number,
@@ -141,10 +140,13 @@ def scores_update():
             except requests.exceptions:
                 print("Connection refused")
                 pass
-        elif int(game_number) > 0 and not stopped_game:
+        elif int(game_number) >= 1000 and not stopped_game:
             get_match_info(game_number)
+        else:
+            pass
 
         time.sleep(4)
+
 
 
 # Check if game clock is moving and api calls are still necessary

@@ -79,12 +79,17 @@ function doDisconnect() {
 
 function setGame() {
     var gameNumber = $("#gameNumber").val();
-    var message = JSON.stringify({
-        "type": "game",
-        "game_number": gameNumber
-    });
+    if (gameNumber) {
+        var message = JSON.stringify({
+            "type": "game",
+            "game_number": gameNumber
+        });
 
-    doSend(message);
+        doSend(message);
+    } else {
+        writeToScreen("Provide proper game number\n");
+    }
+
 }
 
 function jerseysColor(color, team) {
