@@ -4,6 +4,6 @@ services:
   scoreboard:
     image: scoreboard:1.0
     ports:
-      - "8000:8000"
+      - "80:8000"
       - "5005:5005"
       - "5000:5000"
