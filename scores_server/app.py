@@ -365,12 +365,12 @@ def set_team_names(home_name, away_name):
     if home_team_name in teams_abv:
         home_team_name_abv = teams_abv[home_team_name]
     else:
-        home_team_name_abv = home_team_name[0:2]
+        home_team_name_abv = home_team_name[0:3]
 
     if away_team_name in teams_abv:
         away_team_name_abv = teams_abv[away_team_name]
     else:
-        away_team_name_abv = away_team_name[0:2]
+        away_team_name_abv = away_team_name[0:3]
 
     # home team scoreboard
     send_message_to_all({
