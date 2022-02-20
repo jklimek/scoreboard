@@ -362,11 +362,21 @@ def set_team_names(home_name, away_name):
     home_team_name = home_name
     away_team_name = away_name
 
+    if home_team_name in teams_abv:
+        home_team_name_abv = teams_abv[home_team_name]
+    else:
+        home_team_name_abv = home_team_name[0:2]
+
+    if away_team_name in teams_abv:
+        away_team_name_abv = teams_abv[away_team_name]
+    else:
+        away_team_name_abv = away_team_name[0:2]
+
     # home team scoreboard
     send_message_to_all({
         "type": "team",
         "team": "h",
-        "team_name": teams_abv[home_team_name],
+        "team_name": home_team_name_abv,
         "team_name_full": home_team_name
     })
 
@@ -374,7 +384,7 @@ def set_team_names(home_name, away_name):
     send_message_to_all({
         "type": "team",
         "team": "a",
-        "team_name": teams_abv[away_team_name],
+        "team_name": away_team_name_abv,
         "team_name_full": away_team_name
     })
 

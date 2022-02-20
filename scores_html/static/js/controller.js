@@ -1,5 +1,5 @@
 function init() {
-    document.myform.url.value = "ws://0.0.0.0:5005/";
+    document.myform.url.value = "ws://klimek.jakub.tech:5005/";
     document.myform.disconnectButton.disabled = true;
 }
 
