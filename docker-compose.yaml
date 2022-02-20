@@ -2,7 +2,7 @@ version: '3'
 
 services:
   scoreboard:
-    image: scoreboard:1.0
+    image: scoreboard:1.1
     ports:
       - "80:8000"
       - "5005:5005"
