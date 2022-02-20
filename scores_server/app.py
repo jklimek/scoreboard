@@ -39,7 +39,9 @@ def set_game(data):
         if game_number != data["game_number"] and game_number != 0:
             reset_game()
         game_number = data["game_number"]
+        stopped_game = False
         get_match_info(data["game_number"])
+        print("Players: ")
         pprint(players)
 
 
@@ -74,6 +76,7 @@ def handle_team_setting_message(data):
 
 
 def handle_game_setting_message(data):
+    print("Game settings: ")
     pprint(data)
     if "game_number" in data:
         set_game(data)
@@ -132,8 +135,8 @@ def scores_update():
                     headers=headers,
                     timeout=10
                 )
-                print(".")
                 result_data = r.json()
+                print("Scores request: ")
                 pprint(result_data)
                 set_timer(result_data["ts"])
                 check_and_set_stopped_game_status(result_data["ts"])
@@ -149,11 +152,10 @@ def scores_update():
         time.sleep(4)
 
 
-
 # Check if game clock is moving and api calls are still necessary
 def check_and_set_stopped_game_status(ts):
     global stopped_game
-    if ts['stop'] and not stopped_game:
+    if ts['stop'] and not stopped_game and int(ts['time']) > 0:
         stopped_game = True
 
 
@@ -176,8 +178,8 @@ def get_match_info(passed_game_number):
             headers=headers,
             timeout=10
         )
-        print("match request")
         result_data = r.json()
+        print("Match info request:")
         pprint(result_data)
         set_team_names(result_data["hn"], result_data["an"])
         set_timer(result_data["ts"], True)
@@ -192,6 +194,7 @@ def get_match_info(passed_game_number):
 
 
 def parse_scores_events(events_array):
+    print("Events difference: ")
     print(len(events_array) - len(game_events))
     if len(game_events) < len(events_array):
         for i in range(len(game_events), len(events_array)):
@@ -268,6 +271,7 @@ def websocket_server():
 
 
 def send_message_to_all(message):
+    print("Send ws message: ")
     pprint(message)
     WebSocketHandler.send_websocket_message_to_all(json.dumps(message))
 
@@ -283,7 +287,7 @@ def proper_event(event):
 
 def detect_start(time_data):
     global game_time
-    print(calculate_timer_offset(time_data["ds"]))
+    print("Timer offset: " + str(calculate_timer_offset(time_data["ds"])))
     if game_time == 0 and time_data["stop"] is False and calculate_timer_offset(time_data["ds"]) < 60:
         return True
     else:
@@ -304,7 +308,7 @@ def set_timer(time_data, match_info=False):
     if match_info and time_data["stop"] is False:
         set_running_timer_event(timer_offset)
     elif match_info and time_data["stop"] is True:
-        set_timer_event(int(time_data["time"]))
+        set_timer_event(int(time_data["time"])/10)
 
 
 def start_match_event(offset):

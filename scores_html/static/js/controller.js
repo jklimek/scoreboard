@@ -1,5 +1,6 @@
 function init() {
     document.myform.url.value = "ws://klimek.jakub.tech:5005/";
+    // document.myform.url.value = "ws://172.17.143.200:5005/";
     document.myform.disconnectButton.disabled = true;
 }
 
@@ -37,10 +38,10 @@ function onMessage(evt) {
     eventData = JSON.parse(evt.data);
     if (eventData["type"] === "team") {
         if (eventData["team"] === "h") {
-            $("#teamHomeName").html(eventData["team_name_full"]+"("+ eventData["team_name"] +")")
+            $("#teamHomeName").html(eventData["team_name_full"] + "(" + eventData["team_name"] + ")")
         }
         if (eventData["team"] === "a") {
-            $( "#teamAwayName" ).html(eventData["team_name_full"]+"("+ eventData["team_name"] +")")
+            $("#teamAwayName").html(eventData["team_name_full"] + "(" + eventData["team_name"] + ")")
         }
     }
 
@@ -68,6 +69,14 @@ function writeToScreen(message) {
 }
 
 window.addEventListener("load", init, false);
+
+$(document).keypress(
+    function (event) {
+        if (event.which == '13') {
+            event.preventDefault();
+        }
+    });
+
 
 function clearText() {
     document.myform.wslog.value = "";
