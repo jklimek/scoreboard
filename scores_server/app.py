@@ -1,5 +1,6 @@
 import unicodedata
 import json
+import os
 import time
 import requests
 from flask import Flask, abort
@@ -22,7 +23,7 @@ away_team_name = ""
 
 home_away = {"A": "h", "B": "a"}
 
-scores_url = "https://scores.frisbee.pl/ext/watchlive.php/"
+scores_url = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
 
 
 # ======== ========= ========
