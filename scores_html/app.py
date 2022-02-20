@@ -1,9 +1,4 @@
-import unicodedata
-import json
-import time
-import requests
-from flask import Flask, abort, render_template
-from pprint import pprint
+from flask import Flask, render_template
 from flask_cors import CORS
 
 app = Flask(__name__)
