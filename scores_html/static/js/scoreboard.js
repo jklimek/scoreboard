@@ -24,12 +24,14 @@ var teams = {
     a: {
         name: awayTeam.toString().split("-")[0],
         jerseys: awayTeam,
-        handle: $("#ta")
+        handle: $("#ta"),
+        score_handle: $("#ta-score-box")
     },
     h: {
         name: homeTeam.toString().split("-")[0],
         jerseys: homeTeam,
-        handle: $("#th")
+        handle: $("#th"),
+        score_handle: $("#th-score-box")
     }
 };
 
@@ -89,8 +91,11 @@ function parseEvent(data) {
         if (data["subtype"] === "score") {
             score(teams[data["side"]]["handle"], data["data"]["assist"], data["data"]["scorer"]);
             setScores(data["data"]["a_score"], data["data"]["h_score"]);
+            discPossessionChange(data["side"]);
         } else if (data["subtype"] === "offence") {
-            startOffence();
+            discPossessionChange(data["side"], true);
+        } else if (data["subtype"] === "turnover") {
+            discPossessionChange(data["side"]);
         } else if (data["subtype"] === "timeout") {
             timeout(data["side"]);
         } else if (data["subtype"] === "start") {
@@ -134,6 +139,8 @@ function startMatch(offset) {
 
 function end() {
     stopTimer();
+    teams["a"]["score_handle"].removeClass("disc-possession");
+    teams["h"]["score_handle"].removeClass("disc-possession");
     setAssistAndScorerTexts("", "KONIEC MECZU");
     timerHandle.addClass("team-score-animation");
     setTimeout(function () {
@@ -143,6 +150,21 @@ function end() {
     setTimeout(function () {
         scorerHandle.removeClass("active");
     }, 10000);
+}
+
+function discPossessionChange(team, offence=false) {
+    if (offence) {
+        teams[team]["score_handle"].addClass("disc-possession");
+    } else {
+        if (team === 'a') {
+            teams[team]["score_handle"].removeClass("disc-possession");
+            teams["h"]["score_handle"].addClass("disc-possession");
+        }
+        if (team === 'h') {
+            teams[team]["score_handle"].removeClass("disc-possession");
+            teams["a"]["score_handle"].addClass("disc-possession");
+        }
+    }
 }
 
 

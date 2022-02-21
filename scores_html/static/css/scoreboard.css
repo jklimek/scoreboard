@@ -139,7 +139,9 @@ li {
 .board {
     width: 204px;
     display: grid;
-    grid-template-areas: "team-home  score-h" "team-away  score-a" "time   .........";
+    grid-template-areas: "team-home  score-h"
+                         "team-away  score-a"
+                         "time       .......";
 }
 
 .board__box {
@@ -148,6 +150,13 @@ li {
     /*width: 130px;*/
     padding: 8px 4px 4px;
     /*height: 40px;*/
+}
+
+
+.disc-possession {
+    /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19), inset -5px 0 0 0 rgb(255 255 255);*/
+    border-right: solid rgb(255 255 255) 5px;
+    transition: border-right 0.3s cubic-bezier(0, 0, 0, 1);;
 }
 
 .team-home {
@@ -167,11 +176,6 @@ li {
 
 }
 
-/*.score {*/
-/*    grid-area: score;*/
-/*    z-index: 9999; !* heh *!*/
-/*    !*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*!*/
-/*}*/
 
 .score-home {
     grid-area: score-h;
@@ -193,6 +197,7 @@ li {
     font-size: 14pt;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+
 
 @keyframes score-ease-out {
     0% {
@@ -288,6 +293,7 @@ li {
                          "roster-th-content  roster-ta-content"
                          "roster-info  roster-info";
 }
+
 .stats {
     grid-template-areas: "stats-th-name  stats-ta-name"
                          "stats-th-content  stats-ta-content"
@@ -357,7 +363,7 @@ li {
     grid-area: stats-ta-content;
 }
 
-#roster__info, #stats__info  {
+#roster__info, #stats__info {
     background-color: var(--box-font-color);
     color: var(--box-bg-color);
     padding-top: 10px;
@@ -367,6 +373,7 @@ li {
 #roster__info {
     grid-area: roster-info;
 }
+
 #stats__info {
     grid-area: stats-info;
 }
