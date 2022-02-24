@@ -5,9 +5,9 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/board')
-def board():
-    return render_template('board.html')
+# @app.route('/board')
+# def board():
+#     return render_template('board.html')
 
 
 @app.route('/controller')
