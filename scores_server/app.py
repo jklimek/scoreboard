@@ -117,6 +117,32 @@ class WebSocketHandler(WebSocket):
             client.sendMessage(message)
 
 
+def board_update():
+    while True:
+        payload = {
+            "schedule": True,
+            "date": "2022-02-23",
+        }
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+
+        try:
+            r = requests.post(
+                scores_url,
+                data=payload,
+                headers=headers,
+                timeout=10
+            )
+            result_data = r.json()
+            print("Scores request: ")
+            pprint(result_data)
+        except requests.exceptions:
+            print("Connection refused")
+            pass
+
+        time.sleep(10)
+
+
 def scores_update():
     while True:
         if any(players) and int(game_number) >= 1000 and not stopped_game:
@@ -308,7 +334,7 @@ def set_timer(time_data, match_info=False):
     if match_info and time_data["stop"] is False:
         set_running_timer_event(timer_offset)
     elif match_info and time_data["stop"] is True:
-        set_timer_event(int(time_data["time"])/10)
+        set_timer_event(int(time_data["time"]) / 10)
 
 
 def start_match_event(offset):
@@ -397,6 +423,8 @@ def set_team_names(home_name, away_name):
 # App generator for WSGI daemon (gunicorn)
 def generate_app():
     tmp_app = Flask(__name__)
+    # board_thread = Thread(target=board_update)
+    # board_thread.start()
     scores_thread = Thread(target=scores_update)
     scores_thread.start()
     websocket_thread = Thread(target=websocket_server)

@@ -1,0 +1,209 @@
+@font-face {
+    font-family: 'Myriad Pro It';
+    src: url('../fonts/MyriadPro-It.woff2') format('woff2'),
+    url('../fonts/MyriadPro-It.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Cond It';
+    src: url('../fonts/MyriadPro-CondIt.woff2') format('woff2'),
+    url('../fonts/MyriadPro-CondIt.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Semibold';
+    src: url('../fonts/MyriadPro-Semibold.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Semibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Bold It';
+    src: url('../fonts/MyriadPro-BoldIt.woff2') format('woff2'),
+    url('../fonts/MyriadPro-BoldIt.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Bold Cond';
+    src: url('../fonts/MyriadPro-BoldCond.woff2') format('woff2'),
+    url('../fonts/MyriadPro-BoldCond.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Cond';
+    src: url('../fonts/MyriadPro-Cond.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Cond.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Myriad Pro';
+    src: url('../fonts/MyriadPro-BoldCondIt.woff2') format('woff2'),
+    url('../fonts/MyriadPro-BoldCondIt.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Bold';
+    src: url('../fonts/MyriadPro-Bold.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Myriad Pro Semibold It';
+    src: url('../fonts/MyriadPro-SemiboldIt.woff2') format('woff2'),
+    url('../fonts/MyriadPro-SemiboldIt.woff') format('woff');
+    font-weight: 600;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Myriad Pro';
+    src: url('../fonts/MyriadPro-Regular.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'Kiona Bold';
+    src: url('../fonts/Kiona-Bold.woff') format('woff'),
+    url('../fonts/Kiona-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+body {
+    opacity: 0.9;
+    --main-bg-color: white;
+
+    --box-bg-color: rgba(255, 255, 255, 0.84);
+    --box-font-color: #3f2c37;
+    --box-point-accent-color: #e66ae4;
+
+    --box-point-accent-fade-color: var(--box-bg-color);
+
+    --names-point-bg-color: var(--box-bg-color);
+    --names-point-accent-color: var(--box-point-accent-color);
+    --names-point-font-color: var(--box-font-color);
+
+    --names-assist-bg-color: var(--box-point-accent-color);
+    --names-assist-font-color: var(--box-bg-color);
+
+
+    margin: 0;
+    font-family: 'Myriad Pro Bold', sans-serif;
+    font-size: 20pt;
+    text-transform: uppercase;
+    color: var(--box-font-color);
+    background-color: var(--main-bg-color);
+    /*background-color: #ff00ff;*/
+
+
+    background-size: cover;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    /* little centering for ease of cropping (1280 x 720)*/
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-top: 60px;
+    /*width: 100%;*/
+}
+
+
+.board {
+    width: 600px;
+    display: grid;
+    grid-template-areas: "field field field field"
+                         "board-th-name board-th-score  board-ta-score  board-ta-name"
+                         "board-info . . .";
+    align-content: center;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+}
+
+.field {
+    grid-area: field;
+    background-color: var(--box-bg-color);
+    color: var(--box-font-color);
+}
+
+
+.board-th-name, .board-ta-name {
+    background-color: var(--box-bg-color);
+    color: var(--box-font-color);
+    width: 260px;
+    font-size: 16px;
+}
+
+.board-th-name {
+    text-align: right;
+}
+
+.board-ta-name {
+    text-align: left;
+}
+
+
+.board-th-score, .board-ta-score {
+    background-color: var(--box-bg-color);
+    color: var(--box-font-color);
+    justify-self: center;
+    width: 40px;
+    text-align: center;
+}
+
+.score {
+    background-color: var(--box-bg-color);
+    color: var(--box-font-color);
+    justify-self: center;
+    align-content: center;
+}
+
+.board-th-name {
+    grid-area: board-th-name;
+}
+
+.board-ta-name {
+    grid-area: board-ta-name;
+}
+
+.board-th-score {
+    grid-area: board-th-score;
+}
+
+.board-ta-score {
+    grid-area: board-ta-score;
+}
+
+.board-info {
+    grid-area: board-info;
+}
+
