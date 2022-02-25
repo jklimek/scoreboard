@@ -37,7 +37,7 @@ def matches():
     except requests.exceptions:
         print("Connection refused")
         return ""
-    return result_data
+    return str(result_data)
 
 
 
