@@ -394,12 +394,12 @@ def set_team_names(home_name, home_abv, away_name, away_abv):
     away_team_name = away_name
 
     if home_abv:
-        home_team_name_abv = str(home_abv)
+        home_team_name_abv = str(home_abv).upper()
     else:
         home_team_name_abv = home_team_name[0:3].upper()
 
     if away_abv:
-        away_team_name_abv = str(away_abv)
+        away_team_name_abv = str(away_abv).upper()
     else:
         away_team_name_abv = away_team_name[0:3].upper()
 
