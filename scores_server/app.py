@@ -207,7 +207,7 @@ def get_match_info(passed_game_number):
         result_data = r.json()
         print("Match info request:")
         pprint(result_data)
-        set_team_names(result_data["hn"], result_data["an"])
+        set_team_names(result_data["hn"], result_data["ha"], result_data["an"], result_data["aa"])
         set_timer(result_data["ts"], True)
         set_score(result_data["a"], result_data["h"])
         if any(result_data["p"]["a"]) and any(result_data["p"]["h"]):
@@ -386,20 +386,20 @@ def set_score(a_score, h_score):
     })
 
 
-def set_team_names(home_name, away_name):
+def set_team_names(home_name, home_abv, away_name, away_abv):
     global home_team_name
     global away_team_name
 
     home_team_name = home_name
     away_team_name = away_name
 
-    if home_team_name in teams_abv:
-        home_team_name_abv = teams_abv[home_team_name]
+    if home_abv:
+        home_team_name_abv = str(home_abv)
     else:
         home_team_name_abv = home_team_name[0:3]
 
-    if away_team_name in teams_abv:
-        away_team_name_abv = teams_abv[away_team_name]
+    if away_abv:
+        away_team_name_abv = str(away_abv)
     else:
         away_team_name_abv = away_team_name[0:3]
 
