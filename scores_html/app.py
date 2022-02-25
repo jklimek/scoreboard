@@ -14,7 +14,7 @@ CORS(app)
 
 
 
-@app.route('/matches')
+@app.route('/matches', methods=['POST'])
 def matches():
     date = request.args.get('date')
     payload = {
@@ -36,7 +36,8 @@ def matches():
         pprint(result_data)
     except requests.exceptions:
         print("Connection refused")
-        pass
+        return ""
+    return result_data
 
 
 
