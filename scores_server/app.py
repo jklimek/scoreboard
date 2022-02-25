@@ -396,12 +396,12 @@ def set_team_names(home_name, home_abv, away_name, away_abv):
     if home_abv:
         home_team_name_abv = str(home_abv)
     else:
-        home_team_name_abv = home_team_name[0:3]
+        home_team_name_abv = home_team_name[0:3].upper()
 
     if away_abv:
         away_team_name_abv = str(away_abv)
     else:
-        away_team_name_abv = away_team_name[0:3]
+        away_team_name_abv = away_team_name[0:3].upper()
 
     # home team scoreboard
     send_message_to_all({
