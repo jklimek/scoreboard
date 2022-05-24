@@ -12,8 +12,11 @@ var awayScore = 0;
 var homeScore = 0;
 var players = {};
 var events = [];
+var windAngle = 0;
+
 
 var timerHandle = $("#timer");
+var windArrowHandle = $("#wind-direction-arrow");
 var scorerHandle = $("#scorer");
 var assistHandle = $("#assist");
 
@@ -35,9 +38,11 @@ var teams = {
     }
 };
 
+windChange(windAngle);
+
 function websocketConnection() {
-    websocket = new WebSocket("ws://klimek.jakub.tech:5005/");
-    // websocket = new WebSocket("ws://172.17.143.200:5005/");
+    // websocket = new WebSocket("ws://klimek.jakub.tech:5005/");
+    websocket = new WebSocket("ws://192.168.143.222:5005/");
     websocket.onopen = function (evt) {
         onOpen(evt)
     };
@@ -152,7 +157,7 @@ function end() {
     }, 10000);
 }
 
-function discPossessionChange(team, offence=false) {
+function discPossessionChange(team, offence = false) {
     if (offence) {
         teams[team]["score_handle"].addClass("disc-possession");
     } else {
@@ -167,6 +172,28 @@ function discPossessionChange(team, offence=false) {
     }
 }
 
+
+function windChange(windAngleTarget) {
+
+    $({rotation: windAngle}).animate({rotation: windAngleTarget}, {
+        duration: 500,
+        easing: 'swing',
+        step: function (now, fx) {
+            // console.log((easeInOutBack(fx.pos)));
+            windArrowHandle.css({transform: 'rotate(' + (this.rotation - 45) % 360 + 'deg)'});
+        }
+    });
+    windAngle = windAngleTarget
+}
+
+function easeInOutBack(x) {
+    const c1 = 1.70158;
+    const c2 = c1 * 1.525;
+
+    return x < 0.5
+        ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+        : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+}
 
 function timeout(team) {
     setAssistAndScorerTexts("", "TIMEOUT");

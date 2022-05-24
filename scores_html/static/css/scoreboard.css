@@ -89,11 +89,11 @@
 
 body {
     opacity: 0.9;
-    --main-bg-color: magenta;
+    --main-bg-color: #ff00ff;
 
     --box-bg-color: rgba(255, 255, 255, 0.84);
-    --box-font-color: #3f2c37;
-    --box-point-accent-color: #e66ae4;
+    --box-font-color: #0e5a2f;
+    --box-point-accent-color: #f18682;
 
     --box-point-accent-fade-color: var(--box-bg-color);
 
@@ -111,7 +111,7 @@ body {
     text-transform: uppercase;
     color: var(--box-font-color);
     background-color: var(--main-bg-color);
-    /*background-color: #ff00ff;*/
+    background-image: url("../images/bg2.jpg");
 
 
     background-size: cover;
@@ -136,15 +136,26 @@ li {
     /*width: 100%;*/
 }
 
+.wind {
+    width: 200px;
+    display:grid;
+    position: absolute;
+    right: 0;
+    margin-right: 50px;
+    grid-template-areas: "wind-icon wind-direction  wind-speed"
+}
+
+
 .board {
     width: 204px;
     display: grid;
+    position: absolute;
     grid-template-areas: "team-home  score-h"
                          "team-away  score-a"
                          "time       .......";
 }
 
-.board__box {
+.board__box, .wind__box {
     text-align: center;
     background-color: var(--box-bg-color);
     /*width: 130px;*/
@@ -152,6 +163,27 @@ li {
     /*height: 40px;*/
 }
 
+.wind-icon {
+    background-color: var(--box-font-color);
+    color: var(--box-bg-color)
+}
+
+.wind-direction__arrow {
+    /*transform: rotateX(360deg);*/
+    transform: rotate(45deg);
+}
+
+.wind-speed {
+    text-transform: lowercase;
+    font-size: 14pt;
+}
+
+.wind-speed__data {
+    margin: 0;
+    display: inline;
+    padding-right: 4px;
+    font-size: 20pt;
+}
 
 .disc-possession {
     /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19), inset -5px 0 0 0 rgb(255 255 255);*/
@@ -299,6 +331,7 @@ li {
                          "stats-th-content  stats-ta-content"
                          "stats-info  stats-info";
 }
+
 
 .roster__name, .stats__name {
     background-color: var(--box-bg-color);

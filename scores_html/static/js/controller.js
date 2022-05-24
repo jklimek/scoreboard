@@ -1,6 +1,6 @@
 function init() {
-    document.myform.url.value = "ws://klimek.jakub.tech:5005/";
-    // document.myform.url.value = "ws://172.17.143.200:5005/";
+    // document.myform.url.value = "ws://klimek.jakub.tech:5005/";
+    document.myform.url.value = "ws://192.168.143.222:5005/";
     document.myform.disconnectButton.disabled = true;
 }
 

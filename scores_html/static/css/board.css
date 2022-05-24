@@ -92,8 +92,8 @@ body {
     --main-bg-color: white;
 
     --box-bg-color: rgba(255, 255, 255, 0.84);
-    --box-font-color: #3f2c37;
-    --box-point-accent-color: #e66ae4;
+    --box-font-color: #0e5a2f;
+    --box-point-accent-color: #f18682;
 
     --box-point-accent-fade-color: var(--box-bg-color);
 

@@ -7,7 +7,7 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='images/favicon.ico') }}">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <script src="https://kit.fontawesome.com/e939364dd5.js" crossorigin="anonymous"></script>
     <link rel="manifest" href="site.webmanifest">
 
     <link rel="stylesheet" href="../static/css/scoreboard.css">
@@ -25,6 +25,19 @@
         <div id="ta" class="board__box team-away">AWA</div>
 
         <div id="timer" class="board__box time"><span id="timer-minutes">00</span>:<span id="timer-seconds">00</span></div>
+    </div>
+
+    <div class="wind">
+        <div class="wind__box wind-icon">
+            <i class="fa-solid fa-wind"></i>
+        </div>
+        <div class="wind__box wind-direction">
+            <i id="wind-direction-arrow" class="wind-direction__arrow fa-solid fa-location-arrow"></i>
+        </div>
+        <div class="wind__box wind-speed">
+            <p class="wind-speed__data">13</p>m/s
+        </div>
+
     </div>
 
 <!--    <div class="roster">-->
@@ -163,23 +176,23 @@
 <!--        </div>-->
 <!--    </div>-->
 
-<!--    <div class="stats">
-        <div id="stats__th-name" class="stats__name stats__th-name">
-            Ultimatum Gdańsk
-        </div>
-        <div id="stats__ta-name" class="stats__name stats__ta-name">
-            Szczupaki Olsztyn
-        </div>
-        <div id="stats__th-stats" class="stats__stats-container">
+<!--    <div class="stats">-->
+<!--        <div id="stats__th-name" class="stats__name stats__th-name">-->
+<!--            Ultimatum Gdańsk-->
+<!--        </div>-->
+<!--        <div id="stats__ta-name" class="stats__name stats__ta-name">-->
+<!--            Szczupaki Olsztyn-->
+<!--        </div>-->
+<!--        <div id="stats__th-stats" class="stats__stats-container">-->
 
-        </div>
-        <div id="stats__ta-stats" class="stats__stats-container">
+<!--        </div>-->
+<!--        <div id="stats__ta-stats" class="stats__stats-container">-->
 
-        </div>
-        <div id="stats__info">
-            Gdańsk Stogi, Boisko 1
-        </div>
-    </div>-->
+<!--        </div>-->
+<!--        <div id="stats__info">-->
+<!--            Gdańsk Stogi, Boisko 1 <i class="fa-solid fa-wind"></i>-->
+<!--        </div>-->
+<!--    </div>-->
 
 
     <div class="names">
