@@ -24,6 +24,7 @@ away_team_name = ""
 home_away = {"A": "h", "B": "a"}
 
 scores_url = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
+wind_url = os.getenv("WIND_URL", "http://wind.lol")
 
 
 # ======== ========= ========
@@ -117,30 +118,20 @@ class WebSocketHandler(WebSocket):
             client.sendMessage(message)
 
 
-def board_update():
+def wind_update():
     while True:
-        payload = {
-            "schedule": True,
-            "date": "2022-02-23",
-        }
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-
         try:
-            r = requests.post(
-                scores_url,
-                data=payload,
-                headers=headers,
-                timeout=10
-            )
-            result_data = r.json()
-            print("Scores request: ")
-            pprint(result_data)
+            wind_request = requests.get(wind_url, timeout=1)
+            result_data = wind_request.json()
+            wind_angle = result_data["a"]
+            wind_speed = result_data["s"]
+            set_wind(wind_angle, wind_speed)
+            print("Wind request: ", result_data)
         except requests.exceptions:
             print("Connection refused")
             pass
 
-        time.sleep(10)
+        time.sleep(0.5)
 
 
 def scores_update():
@@ -386,6 +377,17 @@ def set_score(a_score, h_score):
     })
 
 
+def set_wind(wind_angle, wind_speed):
+    send_message_to_all({
+        "type": "wind",
+        "wind_update": 1,
+        "data": {
+            "wind_angle": wind_angle,
+            "wind_speed": wind_speed
+        }
+    })
+
+
 def set_team_names(home_name, away_name):
     global home_team_name
     global away_team_name
@@ -395,13 +397,17 @@ def set_team_names(home_name, away_name):
 
     if home_team_name in teams_abv:
         home_team_name_abv = teams_abv[home_team_name]
-    else:
+    elif home_team_name:
         home_team_name_abv = home_team_name[0:3]
+    else:
+        home_team_name_abv = "HOM"
 
     if away_team_name in teams_abv:
         away_team_name_abv = teams_abv[away_team_name]
-    else:
+    elif away_team_name:
         away_team_name_abv = away_team_name[0:3]
+    else:
+        away_team_name_abv = "AWA"
 
     # home team scoreboard
     send_message_to_all({
@@ -423,8 +429,8 @@ def set_team_names(home_name, away_name):
 # App generator for WSGI daemon (gunicorn)
 def generate_app():
     tmp_app = Flask(__name__)
-    # board_thread = Thread(target=board_update)
-    # board_thread.start()
+    wind_thread = Thread(target=wind_update)
+    wind_thread.start()
     scores_thread = Thread(target=scores_update)
     scores_thread.start()
     websocket_thread = Thread(target=websocket_server)

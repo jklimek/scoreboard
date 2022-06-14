@@ -5,11 +5,6 @@ app = Flask(__name__)
 CORS(app)
 
 
-# @app.route('/board')
-# def board():
-#     return render_template('board.html')
-
-
 @app.route('/controller')
 def controller():
     return render_template('controller.html')
