@@ -203,6 +203,7 @@ def get_match_info(passed_game_number):
         set_score(result_data["a"], result_data["h"])
         if any(result_data["p"]["a"]) and any(result_data["p"]["h"]):
             players = result_data["p"]
+            set_players(players)
 
     except requests.exceptions.ConnectionError:
         print("Connection refused")
@@ -349,6 +350,14 @@ def set_timer_event(offset):
         "type": "game",
         "timer_set": 1,
         "timer_offset": offset
+    })
+
+
+def set_players(players):
+    send_message_to_all({
+        "type": "players",
+        "players_set": 1,
+        "players": players
     })
 
 

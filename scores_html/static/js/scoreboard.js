@@ -15,7 +15,6 @@ var events = [];
 var windAngle = 0;
 var windSpeed = "-";
 
-
 var timerHandle = $("#timer");
 var windArrowHandle = $("#wind-direction-arrow");
 var windSpeedHandle = $("#wind-speed");
@@ -39,8 +38,6 @@ var teams = {
         score_handle: $("#th-score-box")
     }
 };
-
-windAngleUpdate(windAngle);
 
 function websocketConnection() {
     // websocket = new WebSocket("ws://klimek.jakub.tech:5005/");
@@ -90,6 +87,8 @@ function parseEvent(data) {
         startTimer(data["timer_offset"]);
     } else if (data.hasOwnProperty("timer_set")) {
         setTimer(data["timer_offset"]);
+    } else if (data.hasOwnProperty("players_set")) {
+        setPlayers(data["players"]);
     } else if (data.hasOwnProperty("wind_update")) {
         windUpdate(data["data"]["wind_angle"], data["data"]["wind_speed"]);
     } else if (data.hasOwnProperty("score_reset")) {
@@ -136,7 +135,7 @@ function startOffence() {
 function startMatch(offset) {
     startTimer(offset);
     setAssistAndScorerTexts("", "START");
-    $("#scorer").addClass("active");
+    scorerHandle.addClass("active");
     timerHandle.addClass("team-score-animation");
     setTimeout(function () {
         timerHandle.removeClass("team-score-animation");
@@ -177,11 +176,10 @@ function discPossessionChange(team, offence = false) {
 }
 
 
-
 function windAngleUpdate(windAngleTarget) {
 
     $({rotation: windAngle}).animate({rotation: windAngleTarget}, {
-        duration: 500,
+        duration: 300,
         easing: 'swing',
         step: function (now, fx) {
             windArrowHandle.css({transform: 'rotate(' + (this.rotation - 45) % 360 + 'deg)'});
@@ -195,6 +193,10 @@ function windSpeedUpdate(windSpeedTarget) {
     windSpeed = windSpeedTarget
 }
 
+function setPlayers(players_data) {
+    players = players_data;
+
+}
 
 function windUpdate(windAngle, windSpeed) {
     windAngleUpdate(windAngle);

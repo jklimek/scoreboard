@@ -352,7 +352,7 @@ li {
 
 .roster__roster-container {
     width: 800px;
-    background-color: var(--box-point-accent-color);
+    background-color: var(--box-font-color);
     color: var(--box-bg-color);
 }
 
@@ -363,9 +363,9 @@ li {
     -moz-columns: 2;
 }
 
-.roster__ta-roster-list li:nth-child(2n), .roster__th-roster-list li:nth-child(2n) {
-    filter: brightness(50%);
-}
+/*.roster__ta-roster-list li:nth-child(2n), .roster__th-roster-list li:nth-child(2n) {*/
+/*    filter: brightness(50%);*/
+/*}*/
 
 #roster__th-roster {
     border-right: 2px solid var(--box-bg-color);
@@ -397,7 +397,7 @@ li {
 }
 
 #roster__info, #stats__info {
-    background-color: var(--box-font-color);
+    background-color: var(--box-point-accent-color);
     color: var(--box-bg-color);
     padding-top: 10px;
     padding-bottom: 8px;
