@@ -3,6 +3,7 @@ import json
 import os
 import time
 import requests
+import stats
 from flask import Flask, abort
 from pprint import pprint
 from flask_cors import CORS
@@ -24,7 +25,7 @@ away_team_name = ""
 home_away = {"A": "h", "B": "a"}
 
 scores_url = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
-wind_url = os.getenv("WIND_URL", "http://wind.lol")
+wind_url = os.getenv("WIND_URL", "http://localhost:4000/wind")
 
 
 # ======== ========= ========
@@ -86,6 +87,25 @@ def handle_game_setting_message(data):
         send_message_to_all(data)
 
 
+def handle_wind_setting_message(data):
+    print("Wind settings: ")
+    pprint(data)
+    if "wind_toggle" in data:
+        send_message_to_all(data)
+
+
+def handle_stats_setting_message(data):
+    print("Stats settings: ")
+    pprint(data)
+    if "roster_toggle" in data:
+        send_message_to_all(data)
+    elif "leaderboard_toggle" in data:
+        send_message_to_all(data)
+    elif "stats_toggle" in data:
+        send_message_to_all(data)
+
+
+
 clients = []
 
 
@@ -97,6 +117,10 @@ class WebSocketHandler(WebSocket):
             handle_team_setting_message(data)
         elif data["type"] == "game":
             handle_game_setting_message(data)
+        elif data["type"] == "wind":
+            handle_wind_setting_message(data)
+        elif data["type"] == "stats":
+            handle_stats_setting_message(data)
 
     def handleConnected(self):
         print(self.address, 'connected')
@@ -123,15 +147,16 @@ def wind_update():
         try:
             wind_request = requests.get(wind_url, timeout=1)
             result_data = wind_request.json()
-            wind_angle = result_data["a"]
-            wind_speed = result_data["s"]
-            set_wind(wind_angle, wind_speed)
             print("Wind request: ", result_data)
+            wind_angle = result_data["a"]
+            wind_speed = round(float(result_data["s"]), 1)
+            set_wind(wind_angle, wind_speed)
+
         except requests.exceptions:
             print("Connection refused")
             pass
 
-        time.sleep(0.5)
+        time.sleep(5)
 
 
 def scores_update():
@@ -198,7 +223,7 @@ def get_match_info(passed_game_number):
         result_data = r.json()
         print("Match info request:")
         pprint(result_data)
-        set_team_names(result_data["hn"], result_data["an"])
+        set_team_names(result_data["hn"], result_data["ha"], result_data["an"], result_data["aa"])
         set_timer(result_data["ts"], True)
         set_score(result_data["a"], result_data["h"])
         if any(result_data["p"]["a"]) and any(result_data["p"]["h"]):
@@ -217,10 +242,13 @@ def parse_scores_events(events_array):
     if len(game_events) < len(events_array):
         for i in range(len(game_events), len(events_array)):
             event = events_array[i]
+            # as = away score, doesn't matter which, all two are included for score events
             if "as" in event:
                 set_score(event["as"], event["hs"])
             if proper_event(event):
                 game_events.append(event)
+                # Recount stats only on new proper events
+                count_stats(game_events, players)
                 send_message_to_all(prepare_event(event))
     # else Correct event
 
@@ -229,6 +257,25 @@ def strip_accents(s):
     s = s.replace("ł", "l")
     return ''.join(c for c in unicodedata.normalize('NFD', s)
                    if unicodedata.category(c) != 'Mn')
+
+
+def count_stats(events_data, players_data):
+    # {'a': {'offence_points': 7, 'defence_points': 8}, 'h': {'offence_points': 6, 'defence_points': 3}}
+    d_o_points = stats.count_d_o_points(events_data)
+
+    # {'a': 37.4, 'h': 62.6, 'total': 5111}
+    disc_possession = stats.count_disc_possession(events_data)
+
+    # {'a': 26, 'h': 31}
+    turnovers = stats.count_turnovers(events_data)
+
+    # {'a': 0, 'h': 0}
+    timeouts_used = stats.count_timeouts(events_data)
+
+    # {'a': {   'total': [{'scores': 0, 'assists': 6, 'name': 'Piotr Wrzaszcz', 'no': '21'},
+    #           'assists': [{'scores': 0, 'assists': 6, 'name': 'Piotr Wrzaszcz', 'no': '21'},
+    #           'points': [{'scores': 3, 'assists': 1, 'name': 'Bartłomiej Skopiński', 'no': '9'},
+    points_per_player = stats.count_points_per_player(events_data, players_data)
 
 
 def prepare_event(event):
@@ -397,26 +444,22 @@ def set_wind(wind_angle, wind_speed):
     })
 
 
-def set_team_names(home_name, away_name):
+def set_team_names(home_name, home_abv, away_name, away_abv):
     global home_team_name
     global away_team_name
 
     home_team_name = home_name
     away_team_name = away_name
 
-    if home_team_name in teams_abv:
-        home_team_name_abv = teams_abv[home_team_name]
-    elif home_team_name:
+    if home_abv:
+        home_team_name_abv = home_abv
+    else:
         home_team_name_abv = home_team_name[0:3]
-    else:
-        home_team_name_abv = "HOM"
 
-    if away_team_name in teams_abv:
-        away_team_name_abv = teams_abv[away_team_name]
-    elif away_team_name:
-        away_team_name_abv = away_team_name[0:3]
+    if away_abv:
+        away_team_name_abv = away_abv
     else:
-        away_team_name_abv = "AWA"
+        away_team_name_abv = away_team_name[0:3]
 
     # home team scoreboard
     send_message_to_all({
@@ -452,7 +495,7 @@ app = generate_app()
 CORS(app)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=5000, use_reloader=True)
+    app.run(host='0.0.0.0', debug=False, port=5000, use_reloader=False)
 
 # a - away score
 # h - home score

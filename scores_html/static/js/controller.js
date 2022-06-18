@@ -1,6 +1,6 @@
 function init() {
     // document.myform.url.value = "ws://klimek.jakub.tech:5005/";
-    document.myform.url.value = "ws://192.168.143.222:5005/";
+    document.myform.url.value = "ws://172.30.49.171:5005/";
     document.myform.disconnectButton.disabled = true;
 }
 
@@ -56,8 +56,8 @@ function onError(evt) {
 
 function doSend(message) {
     if (typeof websocket !== 'undefined') {
-        writeToScreen("sent: " + message.toString() + '\n');
         websocket.send(message);
+        writeToScreen("sent: " + message.toString() + '\n');
     } else {
         writeToScreen("Connect to Websocket server first" + '\n');
     }
@@ -138,5 +138,33 @@ function resetTimer() {
         });
         doSend(message);
     }
+}
 
+function toggleWind(toggle) {
+    var message = JSON.stringify({
+        "type": "wind",
+        "wind_toggle": toggle
+    });
+    doSend(message);
+}
+function toggleRoster(toggle) {
+    var message = JSON.stringify({
+        "type": "stats",
+        "roster_toggle": toggle
+    });
+    doSend(message);
+}
+function toggleLeaderboard(toggle) {
+    var message = JSON.stringify({
+        "type": "stats",
+        "leaderboard_toggle": toggle
+    });
+    doSend(message);
+}
+function toggleStats(toggle) {
+    var message = JSON.stringify({
+        "type": "stats",
+        "stats_toggle": toggle
+    });
+    doSend(message);
 }

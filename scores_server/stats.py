@@ -136,7 +136,7 @@ game_events = json_data["e"]
 players = json_data["p"]
 
 
-def count_d_o_points():
+def count_d_o_points(game_events):
     d_o_game_events = list(filter(lambda ev: ev["y"] in ["S", "O", "H"], game_events))
     d_o_points = {
         "a": {
@@ -168,7 +168,7 @@ def count_d_o_points():
     return d_o_points
 
 
-def count_disc_possession():
+def count_disc_possession(game_events):
     possession_game_events = list(filter(lambda ev: ev["y"] in ["T", "S", "O", "H"], game_events))
     disc_possession = {
         "a": 0,
@@ -197,7 +197,7 @@ def count_disc_possession():
     return disc_possession
 
 
-def count_turnovers():
+def count_turnovers(game_events):
     turnover_stats = {
         "a": len(list(filter(lambda ev: ev["y"] == "T" and ev["e"] == "a", game_events))),
         "h": len(list(filter(lambda ev: ev["y"] == "T" and ev["e"] == "h", game_events)))
@@ -205,7 +205,7 @@ def count_turnovers():
     return turnover_stats
 
 
-def count_timeouts():
+def count_timeouts(game_events):
     timeout_stats = {
         "a": len(list(filter(lambda ev: ev["y"] == "TO" and ev["e"] == "a", game_events))),
         "h": len(list(filter(lambda ev: ev["y"] == "TO" and ev["e"] == "h", game_events)))
@@ -213,7 +213,7 @@ def count_timeouts():
     return timeout_stats
 
 
-def count_points_per_player():
+def count_points_per_player(game_events, players):
     points_stats = {
         "a": {},
         "h": {}
@@ -256,8 +256,8 @@ def count_points_per_player():
     return point_stats_sorted
 
 
-print(count_d_o_points())
-print(count_disc_possession())
-print(count_turnovers())
-print(count_timeouts())
-print(count_points_per_player())
+print(count_d_o_points(game_events))
+print(count_disc_possession(game_events))
+print(count_turnovers(game_events))
+print(count_timeouts(game_events))
+print(count_points_per_player(game_events, players))
