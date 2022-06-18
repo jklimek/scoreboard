@@ -278,6 +278,9 @@ def count_stats(events_data, players_data):
     points_per_player = stats.count_points_per_player(events_data, players_data)
 
 
+    # HERE SEND WEBSOCKET MSG TO SCOREBOARD
+
+
 def prepare_event(event):
     prepared_event = {"type": "scoreboard", "subtype": "", "data": {}}
 
