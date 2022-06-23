@@ -105,7 +105,6 @@ def handle_stats_setting_message(data):
         send_message_to_all(data)
 
 
-
 clients = []
 
 
@@ -145,7 +144,7 @@ class WebSocketHandler(WebSocket):
 def wind_update():
     while True:
         try:
-            wind_request = requests.get(wind_url, timeout=1)
+            wind_request = requests.get(wind_url, timeout=5)
             result_data = wind_request.json()
             print("Wind request: ", result_data)
             wind_angle = result_data["a"]
@@ -156,7 +155,7 @@ def wind_update():
             print("Connection refused")
             pass
 
-        time.sleep(5)
+        time.sleep(1000)
 
 
 def scores_update():
@@ -237,6 +236,8 @@ def get_match_info(passed_game_number):
 
 
 def parse_scores_events(events_array):
+    global home_score
+    global away_score
     print("Events difference: ")
     print(len(events_array) - len(game_events))
     if len(game_events) < len(events_array):
@@ -245,6 +246,9 @@ def parse_scores_events(events_array):
             # as = away score, doesn't matter which, all two are included for score events
             if "as" in event:
                 set_score(event["as"], event["hs"])
+                away_score = event["as"]
+                home_score = event["hs"]
+
             if proper_event(event):
                 game_events.append(event)
                 # Recount stats only on new proper events
@@ -260,25 +264,102 @@ def strip_accents(s):
 
 
 def count_stats(events_data, players_data):
+    stats_data = {}
+
+    # POINTS
+    s_away_score = int(away_score)
+    s_home_score = int(home_score)
+    stats_data["points"] = {
+        "a": away_score,
+        "h": home_score
+    }
+    if (s_away_score+s_home_score) > 0:
+        stats_data["points"]["ap"] = round(s_away_score/(s_away_score+s_home_score) * 100)
+        stats_data["points"]["hp"] = round(s_home_score/(s_away_score+s_home_score) * 100)
+    else:
+        stats_data["points"]["ap"] = 0
+        stats_data["points"]["hp"] = 0
+
     # {'a': {'offence_points': 7, 'defence_points': 8}, 'h': {'offence_points': 6, 'defence_points': 3}}
     d_o_points = stats.count_d_o_points(events_data)
+    pprint(d_o_points)
+
+    # OFFENCE POINTS
+    stats_data["o_points"] = {
+        "a": d_o_points["a"]["offence_points"],
+        "h": d_o_points["h"]["offence_points"]
+    }
+    if (d_o_points["a"]["offence_points"]+d_o_points["h"]["offence_points"]) > 0:
+        stats_data["o_points"]["ap"] = round(d_o_points["a"]["offence_points"]/(d_o_points["a"]["offence_points"]+d_o_points["h"]["offence_points"]) * 100)
+        stats_data["o_points"]["hp"] = round(d_o_points["h"]["offence_points"]/(d_o_points["a"]["offence_points"]+d_o_points["h"]["offence_points"]) * 100)
+    else:
+        stats_data["o_points"]["ap"] = 0
+        stats_data["o_points"]["hp"] = 0
+
+    # DEFENCE POINTS
+    stats_data["d_points"] = {
+        "a": d_o_points["a"]["defence_points"],
+        "h": d_o_points["h"]["defence_points"]
+    }
+    if (d_o_points["a"]["defence_points"]+d_o_points["h"]["defence_points"]) > 0:
+        stats_data["d_points"]["ap"] = round(d_o_points["a"]["defence_points"]/(d_o_points["a"]["defence_points"]+d_o_points["h"]["defence_points"]) * 100)
+        stats_data["d_points"]["hp"] = round(d_o_points["h"]["defence_points"]/(d_o_points["a"]["defence_points"]+d_o_points["h"]["defence_points"]) * 100)
+    else:
+        stats_data["d_points"]["ap"] = 0
+        stats_data["d_points"]["hp"] = 0
 
     # {'a': 37.4, 'h': 62.6, 'total': 5111}
     disc_possession = stats.count_disc_possession(events_data)
+    pprint(disc_possession)
+
+    # DISC POSESSION
+    stats_data["o_time"] = {
+        "a": str(disc_possession["a"])+"%",
+        "h": str(disc_possession["h"])+"%",
+        "ap": round(disc_possession["a"]),
+        "hp": round(disc_possession["h"])
+    }
 
     # {'a': 26, 'h': 31}
     turnovers = stats.count_turnovers(events_data)
+    pprint(turnovers)
+
+    # TURNOVERS
+    stats_data["turnovers"] = {
+        "a": turnovers["a"],
+        "h": turnovers["h"]
+    }
+    if (turnovers["a"]+turnovers["h"]) > 0:
+        stats_data["turnovers"]["ap"] = round(turnovers["a"]/(turnovers["a"]+turnovers["h"]) * 100)
+        stats_data["turnovers"]["hp"] = round(turnovers["h"]/(turnovers["a"]+turnovers["h"]) * 100)
+    else:
+        stats_data["turnovers"]["ap"] = 0
+        stats_data["turnovers"]["hp"] = 0
 
     # {'a': 0, 'h': 0}
     timeouts_used = stats.count_timeouts(events_data)
+    pprint(timeouts_used)
+
+    # TIMEOUTS
+    stats_data["timeouts"] = {
+        "a": timeouts_used["a"],
+        "h": timeouts_used["h"]
+    }
+    if (timeouts_used["a"]+timeouts_used["h"]) > 0:
+        stats_data["timeouts"]["ap"] = round(timeouts_used["a"]/(timeouts_used["a"]+timeouts_used["h"]) * 100)
+        stats_data["timeouts"]["hp"] = round(timeouts_used["h"]/(timeouts_used["a"]+timeouts_used["h"]) * 100)
+    else:
+        stats_data["timeouts"]["ap"] = 0
+        stats_data["timeouts"]["hp"] = 0
+
 
     # {'a': {   'total': [{'scores': 0, 'assists': 6, 'name': 'Piotr Wrzaszcz', 'no': '21'},
     #           'assists': [{'scores': 0, 'assists': 6, 'name': 'Piotr Wrzaszcz', 'no': '21'},
     #           'points': [{'scores': 3, 'assists': 1, 'name': 'Bartłomiej Skopiński', 'no': '9'},
-    points_per_player = stats.count_points_per_player(events_data, players_data)
-
+    # points_per_player = stats.count_points_per_player(events_data, players_data)
 
     # HERE SEND WEBSOCKET MSG TO SCOREBOARD
+    set_stats(stats_data)
 
 
 def prepare_event(event):
@@ -444,6 +525,14 @@ def set_wind(wind_angle, wind_speed):
             "wind_angle": wind_angle,
             "wind_speed": wind_speed
         }
+    })
+
+
+def set_stats(stats_data):
+    send_message_to_all({
+        "type": "stats",
+        "stats_update": 1,
+        "stats_data": stats_data
     })
 
 

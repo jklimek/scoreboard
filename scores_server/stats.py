@@ -192,8 +192,12 @@ def count_disc_possession(game_events):
             disc_possession[side] += e["t"] - tmp_time
 
         tmp_time = e["t"]
-    disc_possession["a"] = round(disc_possession["a"] / disc_possession["total"] * 100, 1)
-    disc_possession["h"] = round(disc_possession["h"] / disc_possession["total"] * 100, 1)
+    if disc_possession["total"] == 0:
+        disc_possession["a"] = 0
+        disc_possession["h"] = 0
+    else:
+        disc_possession["a"] = round(disc_possession["a"] / disc_possession["total"] * 100, 1)
+        disc_possession["h"] = round(disc_possession["h"] / disc_possession["total"] * 100, 1)
     return disc_possession
 
 
@@ -256,8 +260,3 @@ def count_points_per_player(game_events, players):
     return point_stats_sorted
 
 
-print(count_d_o_points(game_events))
-print(count_disc_possession(game_events))
-print(count_turnovers(game_events))
-print(count_timeouts(game_events))
-print(count_points_per_player(game_events, players))

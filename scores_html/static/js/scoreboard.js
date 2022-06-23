@@ -22,6 +22,7 @@ var windSpeedHandle = $("#wind-speed");
 var scorerHandle = $("#scorer");
 var assistHandle = $("#assist");
 var rosterHandle = $("#roster");
+var statsHandle = $("#stats");
 
 var awayTeam = "AWA";
 var homeTeam = "HOM";
@@ -32,6 +33,8 @@ var teams = {
         name: awayTeam.toString().split("-")[0],
         jerseys: awayTeam,
         handle: $("#ta"),
+        stats_handle: $("#stats__ta-stats"),
+        stats_name_handle: $("#stats__ta-name"),
         roster_name_handle: $("#roster__ta-name"),
         roster_players_handle: $("#roster__ta-roster"),
         score_handle: $("#ta-score-box")
@@ -41,6 +44,8 @@ var teams = {
         name: homeTeam.toString().split("-")[0],
         jerseys: homeTeam,
         handle: $("#th"),
+        stats_handle: $("#stats__th-stats"),
+        stats_name_handle: $("#stats__th-name"),
         roster_name_handle: $("#roster__th-name"),
         roster_players_handle: $("#roster__th-roster"),
         score_handle: $("#th-score-box")
@@ -49,7 +54,7 @@ var teams = {
 
 function websocketConnection() {
     // websocket = new WebSocket("ws://klimek.jakub.tech:5005/");
-    websocket = new WebSocket("ws://172.30.49.171:5005/");
+    websocket = new WebSocket("ws://172.30.37.11:5005/");
     websocket.onopen = function (evt) {
         onOpen(evt)
     };
@@ -107,6 +112,8 @@ function parseEvent(data) {
         toggleLeaderboard(data["leaderboard_toggle"]);
     } else if (data.hasOwnProperty("wind_update")) {
         windUpdate(data["data"]["wind_angle"], data["data"]["wind_speed"]);
+    } else if (data.hasOwnProperty("stats_update")) {
+        statsUpdate(data["stats_data"]);
     } else if (data.hasOwnProperty("score_reset")) {
         setScores(0, 0);
     } else if (data.hasOwnProperty("score_set")) {
@@ -133,6 +140,7 @@ function parseEvent(data) {
 function setTeamNames(team, name, name_full) {
     teams[team]["handle"].text(name);
     teams[team]["roster_name_handle"].text(name_full.toUpperCase())
+    teams[team]["stats_name_handle"].text(name_full.toUpperCase())
 }
 
 function setTeamJerseyColor(team, color) {
@@ -210,6 +218,23 @@ function windSpeedUpdate(windSpeedTarget) {
     windSpeed = windSpeedTarget
 }
 
+function statsUpdate(stats_data) {
+    let away_stats_html_list = "<ul>"
+    let home_stats_html_list = "<ul>"
+    let stats_list = ["points", "o_points", "d_points", "o_time", "turnovers", "timeouts"]
+
+    for (let stat in stats_list) {
+        console.log(stat);
+        away_stats_html_list += `<li style="background: linear-gradient(to right, var(--box-font-color) ${stats_data[stats_list[stat]]["ap"]}%, rgb(255 255 255 / 0%) ${stats_data[stats_list[stat]]["ap"]}%);">${stats_data[stats_list[stat]]["a"]}</li>`;
+        home_stats_html_list += `<li style="background: linear-gradient(to left, var(--box-font-color) ${stats_data[stats_list[stat]]["hp"]}%, rgb(255 255 255 / 0%) ${stats_data[stats_list[stat]]["hp"]}%);">${stats_data[stats_list[stat]]["h"]}</li>`;
+    }
+    away_stats_html_list += `</ul>`;
+    home_stats_html_list += `</ul>`;
+
+    teams["a"]["stats_handle"].html(away_stats_html_list)
+    teams["h"]["stats_handle"].html(home_stats_html_list)
+}
+
 function setPlayers(players_data) {
     players = players_data;
     let away_roster_html_list = "<ul class=\"roster__th-roster-list\">"
@@ -257,6 +282,15 @@ function toggleRoster(toggle) {
         rosterHandle.addClass("active");
     } else {
         rosterHandle.removeClass("active");
+    }
+}
+
+function toggleStats(toggle) {
+    console.log("Toggle stats: ", toggle);
+    if (toggle) {
+        statsHandle.addClass("active");
+    } else {
+        statsHandle.removeClass("active");
     }
 }
 

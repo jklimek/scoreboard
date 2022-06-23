@@ -342,9 +342,10 @@ li {
 }
 
 .stats {
-    grid-template-areas: "stats-th-name  stats-ta-name"
-                         "stats-th-content  stats-ta-content"
-                         "stats-info  stats-info";
+    grid-template-areas: "stats-th-name stats-div stats-ta-name"
+                         "stats-th-content  stats-stats  stats-ta-content"
+                         "stats-info  stats-info stats-info";
+    grid-template-columns: 1fr 300px 1fr;
 }
 
 
@@ -426,8 +427,51 @@ li {
     grid-area: stats-th-content;
 }
 
+#stats__div {
+    grid-area: stats-div;
+}
+
+#stats__stats {
+    grid-area: stats-stats;
+}
+
 #stats__ta-stats {
     grid-area: stats-ta-content;
+}
+
+
+.stats__stats-th-container, .stats__stats-ta-container {
+    background-color: var(--box-bg-color);
+}
+
+.stats__stats-th-container > ul > li, .stats__stats-ta-container > ul > li {
+    padding-bottom: 14px;
+    padding-top: 14px;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
+    font-size: 30px;
+    color: var(--box-bg-color);
+    position:relative;
+}
+
+.stats__stats-th-container > ul > li {
+    text-align: right;
+    padding-right: 10px;
+}
+
+.stats__stats-ta-container > ul > li {
+    text-align: left;
+    padding-left: 10px;
+}
+
+.stats__stats {
+    background-color: var(--box-bg-color);
+}
+
+.stats__stats > ul > li{
+    text-align: center;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
 }
 
 #roster__info, #stats__info {
