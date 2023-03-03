@@ -54,7 +54,7 @@ var teams = {
 
 function websocketConnection() {
     // websocket = new WebSocket("ws://klimek.jakub.tech:5005/");
-    websocket = new WebSocket("ws://172.30.37.11:5005/");
+    websocket = new WebSocket("ws://172.17.252.206:5005/");
     websocket.onopen = function (evt) {
         onOpen(evt)
     };
@@ -299,7 +299,7 @@ function timeout(team) {
     animateScorerIn(teams[team]["handle"], score);
     setTimeout(function () {
         animateScorerOut(teams[team]["handle"])
-    }, 50000);
+    }, 80000);
 }
 
 function score(team, assist, scorer) {

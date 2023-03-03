@@ -25,7 +25,7 @@ away_team_name = ""
 home_away = {"A": "h", "B": "a"}
 
 scores_url = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
-wind_url = os.getenv("WIND_URL", "http://localhost:4000/wind")
+wind_url = os.getenv("WIND_URL", "http://192.168.10.10/")
 
 
 # ======== ========= ========
@@ -151,11 +151,11 @@ def wind_update():
             wind_speed = round(float(result_data["s"]), 1)
             set_wind(wind_angle, wind_speed)
 
-        except requests.exceptions:
-            print("Connection refused")
+        except Exception as e:
+            print("Connection error: ", e)
             pass
 
-        time.sleep(1000)
+        time.sleep(0.5)
 
 
 def scores_update():
@@ -174,7 +174,7 @@ def scores_update():
                     scores_url,
                     data=payload,
                     headers=headers,
-                    timeout=10
+                    timeout=20
                 )
                 result_data = r.json()
                 print("Scores request: ")
@@ -182,8 +182,8 @@ def scores_update():
                 set_timer(result_data["ts"])
                 check_and_set_stopped_game_status(result_data["ts"])
                 parse_scores_events(result_data["e"])
-            except requests.exceptions:
-                print("Connection refused")
+            except Exception as e:
+                print("Connection error: ", e)
                 pass
         elif int(game_number) >= 1000 and not stopped_game:
             get_match_info(game_number)
@@ -229,8 +229,8 @@ def get_match_info(passed_game_number):
             players = result_data["p"]
             set_players(players)
 
-    except requests.exceptions.ConnectionError:
-        print("Connection refused")
+    except Exception as e:
+        print("Connection error: ", e)
         pass
         # time.sleep(5)
 
@@ -573,8 +573,8 @@ def set_team_names(home_name, home_abv, away_name, away_abv):
 # App generator for WSGI daemon (gunicorn)
 def generate_app():
     tmp_app = Flask(__name__)
-    wind_thread = Thread(target=wind_update)
-    wind_thread.start()
+#    wind_thread = Thread(target=wind_update)
+#    wind_thread.start()
     scores_thread = Thread(target=scores_update)
     scores_thread.start()
     websocket_thread = Thread(target=websocket_server)
