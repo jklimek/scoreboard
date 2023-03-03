@@ -53,8 +53,8 @@ var teams = {
 };
 
 function websocketConnection() {
-    // websocket = new WebSocket("ws://klimek.jakub.tech:5005/");
-    websocket = new WebSocket("ws://172.17.252.206:5005/");
+    websocket = new WebSocket("ws://klimek.jakub.tech:5005/");
+    // websocket = new WebSocket("ws://localhost:5005/");
     websocket.onopen = function (evt) {
         onOpen(evt)
     };
@@ -277,7 +277,7 @@ function toggleWind(toggle) {
 }
 
 function toggleRoster(toggle) {
-    console.log("Toggle wind: ", toggle);
+    console.log("Toggle roster: ", toggle);
     if (toggle) {
         rosterHandle.addClass("active");
     } else {

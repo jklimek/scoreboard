@@ -81,8 +81,8 @@ body {
     --main-bg-color: #ff00ff;
 
     --box-bg-color: rgba(255, 255, 255, 0.84);
-    --box-font-color: #0e5a2f;
-    --box-point-accent-color: #f18682;
+    --box-font-color: #4f2a30;
+    --box-point-accent-color: #d5b43a;
 
     --box-point-accent-fade-color: var(--box-bg-color);
 
@@ -100,7 +100,7 @@ body {
     text-transform: uppercase;
     color: var(--box-font-color);
     background-color: var(--main-bg-color);
-    /*background-image: url("../images/bg2.jpg");*/
+    background-image: url("../images/bg.png");
 
 
     background-size: cover;
