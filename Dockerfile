@@ -1,4 +1,4 @@
-FROM python:3.8-buster AS build
+FROM python:3.11-buster AS build
 
 RUN apt-get update && apt-get install -y supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
