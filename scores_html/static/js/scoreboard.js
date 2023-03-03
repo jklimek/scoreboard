@@ -53,7 +53,7 @@ var teams = {
 };
 
 function websocketConnection() {
-    websocket = new WebSocket("ws://klimek.jakub.tech:5005/");
+    websocket = new WebSocket("ws://scores.jakub.tech:5005/");
     // websocket = new WebSocket("ws://localhost:5005/");
     websocket.onopen = function (evt) {
         onOpen(evt)
