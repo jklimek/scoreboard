@@ -252,7 +252,7 @@ def parse_scores_events(events_array):
             if proper_event(event):
                 game_events.append(event)
                 # Recount stats only on new proper events
-                count_stats(game_events, players)
+                # count_stats(game_events, players)
                 send_message_to_all(prepare_event(event))
     # else Correct event
 

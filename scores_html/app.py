@@ -10,6 +10,11 @@ def controller():
     return render_template('controller.html')
 
 
+@app.route('/matches')
+def matches():
+    return render_template('matches.html')
+
+
 @app.route('/scoreboard')
 def scoreboard():
     return render_template('scoreboard.html')
