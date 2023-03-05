@@ -176,8 +176,8 @@ def count_disc_possession(game_events):
         "total": possession_game_events[-1]["t"]
     }
     tmp_time = 0
-    starting_offence = ""
-    side = ""
+    starting_offence = possession_game_events[0]["e"]
+    side = starting_offence
     for e in possession_game_events:
         if e["y"] == "O":
             starting_offence = e["e"]

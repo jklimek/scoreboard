@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta http-equiv="refresh" content="60" />
+    <title>Matches list</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='images/favicon.ico') }}">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="manifest" href="site.webmanifest">
+
+    <link rel="stylesheet" href="../static/css/matches.css">
+
+</head>
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+    your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<div class="content">
+    <div class="row">
+        <div class="column">
+            <h1>BOISKO 1</h1>
+            {%for m in matches_list_1%}
+            <div id="{{m['status']}}" class="match_data {{m['status']}}">
+                <div class="game_id">{{m['game_id']}}</div>
+                <div class="time">{{m['time']}}</div>
+                <div class="date">{{m['date']}}</div>
+                <div class="home_team">{{m['home_name']}}</div>
+                <div class="away_team">{{m['away_name']}}</div>
+                <div class="home_points">{{m['home_points']}}</div>
+                <div class="away_points">{{m['away_points']}}</div>
+                <div class="field">Boisko {{m['field']}}</div>
+            </div>
+            {%endfor%}
+        </div>
+        <div class="column">
+            <h1>BOISKO 2</h1>
+            {%for m in matches_list_2%}
+            <div id="{{m['status']}}" class="match_data {{m['status']}}">
+                <div class="game_id">{{m['game_id']}}</div>
+                <div class="time">{{m['time']}}</div>
+                <div class="date">{{m['date']}}</div>
+                <div class="home_team">{{m['home_name']}}</div>
+                <div class="away_team">{{m['away_name']}}</div>
+                <div class="home_points">{{m['home_points']}}</div>
+                <div class="away_points">{{m['away_points']}}</div>
+                <div class="field">Boisko {{m['field']}}</div>
+            </div>
+            {%endfor%}
+        </div>
+        <div class="column">
+            <h1>BOISKO 3</h1>
+            {%for m in matches_list_3%}
+            <div id="{{m['status']}}" class="match_data {{m['status']}}">
+                <div class="game_id">{{m['game_id']}}</div>
+                <div class="time">{{m['time']}}</div>
+                <div class="date">{{m['date']}}</div>
+                <div class="home_team">{{m['home_name']}}</div>
+                <div class="away_team">{{m['away_name']}}</div>
+                <div class="home_points">{{m['home_points']}}</div>
+                <div class="away_points">{{m['away_points']}}</div>
+                <div class="field">Boisko {{m['field']}}</div>
+            </div>
+            {%endfor%}
+        </div>
+    </div>
+
+
+</div>
+
+
+<script src="../static/js/jquery.js"></script>
+<script src="../static/js/easytimer.min.js"></script>
+</body>
+</html>
