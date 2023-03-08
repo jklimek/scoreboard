@@ -1,6 +1,7 @@
 json_data = {"a": 15,
              "an": "Ultimatum",
-             "e": [{"e": "h", "t": 0, "y": "O"},
+             "e": [
+                 # {"e": "h", "t": 0, "y": "O"},
                    {"e": "h", "t": 169, "y": "T"},
                    {"e": "a", "t": 184, "y": "T"},
                    {"e": "h", "t": 234, "y": "T"},
@@ -150,8 +151,8 @@ def count_d_o_points(game_events):
     }
     # -1 : a
     # +1 : h
-    side = 0
-    starting_offence = 0
+    starting_offence = d_o_game_events[0]["e"]
+    side = starting_offence
     for e in d_o_game_events:
         if e["y"] == "O":
             starting_offence = e["e"]
@@ -259,4 +260,5 @@ def count_points_per_player(game_events, players):
 
     return point_stats_sorted
 
-
+print({"as": "15", "hs": "9"})
+print(count_d_o_points(game_events))

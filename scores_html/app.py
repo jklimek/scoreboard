@@ -17,15 +17,32 @@ def controller():
 
 @app.route('/matches/<field>')
 def matches_field(field):
-    matches_list_raw = get_matches_list()
+    matches_list_raw = get_matches_list_for_date()
     matches_list = render_matches(matches_list_raw)
     filtered_matches_list = filter_matches(matches_list, field)
     return render_template('matches.html', matches_list=filtered_matches_list)
 
+@app.route('/matches_date/<date>')
+def matches_date(date):
+
+    def validate(date_text):
+        try:
+            return datetime.date.fromisoformat(date_text)
+        except ValueError:
+            raise ValueError("Incorrect data format, should be YYYY-MM-DD")
+
+    matches_list_raw = get_matches_list_for_date(validate(date))
+    matches_list = render_matches(matches_list_raw)
+    matches_list_1 = filter_matches(matches_list, "1")
+    matches_list_2 = filter_matches(matches_list, "2")
+    matches_list_3 = filter_matches(matches_list, "3")
+    return render_template('matches_all.html', matches_list_1=matches_list_1, matches_list_2=matches_list_2,
+                           matches_list_3=matches_list_3)
+
 
 @app.route('/matches')
 def matches():
-    matches_list_raw = get_matches_list()
+    matches_list_raw = get_matches_list_for_date()
     matches_list = render_matches(matches_list_raw)
     matches_list_1 = filter_matches(matches_list, "1")
     matches_list_2 = filter_matches(matches_list, "2")
@@ -83,10 +100,10 @@ def render_matches(matches_list):
     return updated_list
 
 
-def get_matches_list():
+def get_matches_list_for_date(date=datetime.date.today()):
     payload = {
         "schedule": 1,
-        "date": datetime.date.today()
+        "date": date
     }
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
