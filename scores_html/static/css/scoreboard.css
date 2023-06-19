@@ -1,78 +1,16 @@
 @font-face {
-    font-family: 'Myriad Pro It';
-    src: url('../fonts/MyriadPro-It.woff2') format('woff2'),
-    url('../fonts/MyriadPro-It.woff') format('woff');
-    font-weight: normal;
-    font-style: italic;
-}
-@font-face {
-    font-family: 'Myriad Pro Cond It';
-    src: url('../fonts/MyriadPro-CondIt.woff2') format('woff2'),
-    url('../fonts/MyriadPro-CondIt.woff') format('woff');
-    font-weight: normal;
-    font-style: italic;
-}
-@font-face {
-    font-family: 'Myriad Pro Semibold';
-    src: url('../fonts/MyriadPro-Semibold.woff2') format('woff2'),
-    url('../fonts/MyriadPro-Semibold.woff') format('woff');
-    font-weight: 600;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Myriad Pro Bold It';
-    src: url('../fonts/MyriadPro-BoldIt.woff2') format('woff2'),
-    url('../fonts/MyriadPro-BoldIt.woff') format('woff');
-    font-weight: bold;
-    font-style: italic;
-}
-@font-face {
-    font-family: 'Myriad Pro Bold Cond';
-    src: url('../fonts/MyriadPro-BoldCond.woff2') format('woff2'),
-    url('../fonts/MyriadPro-BoldCond.woff') format('woff');
-    font-weight: bold;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Myriad Pro Cond';
-    src: url('../fonts/MyriadPro-Cond.woff2') format('woff2'),
-    url('../fonts/MyriadPro-Cond.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Myriad Pro';
-    src: url('../fonts/MyriadPro-BoldCondIt.woff2') format('woff2'),
-    url('../fonts/MyriadPro-BoldCondIt.woff') format('woff');
-    font-weight: bold;
-    font-style: italic;
-}
-@font-face {
     font-family: 'Myriad Pro Bold';
     src: url('../fonts/MyriadPro-Bold.woff2') format('woff2'),
     url('../fonts/MyriadPro-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
 }
-@font-face {
-    font-family: 'Myriad Pro Semibold It';
-    src: url('../fonts/MyriadPro-SemiboldIt.woff2') format('woff2'),
-    url('../fonts/MyriadPro-SemiboldIt.woff') format('woff');
-    font-weight: 600;
-    font-style: italic;
-}
+
 @font-face {
     font-family: 'Myriad Pro';
     src: url('../fonts/MyriadPro-Regular.woff2') format('woff2'),
     url('../fonts/MyriadPro-Regular.woff') format('woff');
     font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Kiona Bold';
-    src: url('../fonts/Kiona-Bold.woff') format('woff'),
-    url('../fonts/Kiona-Bold.woff') format('woff');
-    font-weight: bold;
     font-style: normal;
 }
 
@@ -81,8 +19,8 @@ body {
     --main-bg-color: #ff00ff;
 
     --box-bg-color: rgba(255, 255, 255, 0.84);
-    --box-font-color: #4f2a30;
-    --box-point-accent-color: #d5b43a;
+    --box-font-color: #00a1a1;
+    --box-point-accent-color: #df75ff;
 
     --box-point-accent-fade-color: var(--box-bg-color);
 
@@ -100,7 +38,7 @@ body {
     text-transform: uppercase;
     color: var(--box-font-color);
     background-color: var(--main-bg-color);
-    /*background-image: url("../images/bg.png");*/
+    background-image: url("../images/bg2.jpg");
 
 
     background-size: cover;
@@ -127,7 +65,7 @@ li {
 
 .wind {
     width: 240px;
-    display:grid;
+    display: grid;
     position: absolute;
     opacity: 0;
     right: 0;
@@ -337,15 +275,29 @@ li {
     grid-template-columns: 1fr 300px 1fr;
 }
 
+.pstats {
+    grid-template-areas: "pstats-th-name pstats-div pstats-ta-name"
+                         "pstats-th-content  pstats-pstats  pstats-ta-content"
+                         "pstats-info  pstats-info pstats-info";
+    grid-template-columns: 1fr 300px 1fr;
+}
+
 
 #roster.active {
     transition: all .75s ease;
     opacity: 100%;
 }
+
 #stats.active {
     transition: all .75s ease;
     opacity: 100%;
 }
+
+#pstats.active {
+    transition: all .75s ease;
+    opacity: 100%;
+}
+
 #leaderboard.active {
     transition: all .75s ease;
     opacity: 100%;
@@ -439,7 +391,7 @@ li {
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
     font-size: 30px;
     color: var(--box-bg-color);
-    position:relative;
+    position: relative;
 }
 
 .stats__stats-th-container > ul > li {
@@ -456,7 +408,7 @@ li {
     background-color: var(--box-bg-color);
 }
 
-.stats__stats > ul > li{
+.stats__stats > ul > li {
     text-align: center;
     padding-bottom: 20px;
     padding-top: 20px;
