@@ -25,7 +25,7 @@ away_team_name = ""
 home_away = {"A": "h", "B": "a"}
 
 scores_url = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
-wind_url = os.getenv("WIND_URL", "http://192.168.10.10/")
+wind_url = os.getenv("WIND_URL", "http://192.168.10.13/")
 
 
 # ======== ========= ========
@@ -149,13 +149,15 @@ def wind_update():
             print("Wind request: ", result_data)
             wind_angle = result_data["a"]
             wind_speed = round(float(result_data["s"]), 1)
-            set_wind(wind_angle, wind_speed)
+            wind_temp = round(float(result_data["t"]), 1)
+            wind_hum = round(float(result_data["h"]), 0)
+            set_wind(wind_angle, wind_speed, wind_temp, wind_hum)
 
         except Exception as e:
             print("Connection error: ", e)
             pass
 
-        time.sleep(0.5)
+        time.sleep(0.1)
 
 
 def scores_update():
@@ -517,13 +519,15 @@ def set_score(a_score, h_score):
     })
 
 
-def set_wind(wind_angle, wind_speed):
+def set_wind(wind_angle, wind_speed, wind_temp, wind_hum):
     send_message_to_all({
         "type": "wind",
         "wind_update": 1,
         "data": {
             "wind_angle": wind_angle,
-            "wind_speed": wind_speed
+            "wind_speed": wind_speed,
+            "wind_temp": wind_temp,
+            "wind_hum": wind_hum
         }
     })
 
@@ -573,8 +577,8 @@ def set_team_names(home_name, home_abv, away_name, away_abv):
 # App generator for WSGI daemon (gunicorn)
 def generate_app():
     tmp_app = Flask(__name__)
-#    wind_thread = Thread(target=wind_update)
-#    wind_thread.start()
+    wind_thread = Thread(target=wind_update)
+    wind_thread.start()
     scores_thread = Thread(target=scores_update)
     scores_thread.start()
     websocket_thread = Thread(target=websocket_server)

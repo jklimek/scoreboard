@@ -19,6 +19,8 @@ var timerHandle = $("#timer");
 var windBoxHandle = $("#wind");
 var windArrowHandle = $("#wind-direction-arrow");
 var windSpeedHandle = $("#wind-speed");
+var windTempHandle = $("#wind-temp");
+var windHumHandle = $("#wind-hum");
 var scorerHandle = $("#scorer");
 var assistHandle = $("#assist");
 var rosterHandle = $("#roster");
@@ -53,8 +55,8 @@ var teams = {
 };
 
 function websocketConnection() {
-    websocket = new WebSocket("ws://scores.jakub.tech:5005/");
-    // websocket = new WebSocket("ws://localhost:5005/");
+    // websocket = new WebSocket("ws://scores.jakub.tech:5005/");
+    websocket = new WebSocket("ws://localhost:5005/");
     websocket.onopen = function (evt) {
         onOpen(evt)
     };
@@ -79,7 +81,9 @@ function onClose(evt) {
 }
 
 function onMessage(evt) {
-    console.log("event: " + evt.data + '\n');
+    if (!JSON.parse(evt.data).hasOwnProperty("wind_update")) {
+        console.log("event: " + evt.data + '\n');
+    }
     parseEvent(JSON.parse(evt.data));
 }
 
@@ -111,7 +115,7 @@ function parseEvent(data) {
     } else if (data.hasOwnProperty("leaderboard_toggle")) {
         toggleLeaderboard(data["leaderboard_toggle"]);
     } else if (data.hasOwnProperty("wind_update")) {
-        windUpdate(data["data"]["wind_angle"], data["data"]["wind_speed"]);
+        windUpdate(data["data"]["wind_angle"], data["data"]["wind_speed"], data["data"]["wind_temp"], data["data"]["wind_hum"]);
     } else if (data.hasOwnProperty("stats_update")) {
         statsUpdate(data["stats_data"]);
     } else if (data.hasOwnProperty("score_reset")) {
@@ -218,6 +222,16 @@ function windSpeedUpdate(windSpeedTarget) {
     windSpeed = windSpeedTarget
 }
 
+function windTempUpdate(windTempTarget) {
+    windTempHandle.text(windTempTarget)
+    windTemp = windTempTarget
+}
+
+function windHumUpdate(windHumTarget) {
+    windHumHandle.text(windHumTarget)
+    windHum = windHumTarget
+}
+
 function statsUpdate(stats_data) {
     let away_stats_html_list = "<ul>"
     let home_stats_html_list = "<ul>"
@@ -261,9 +275,11 @@ function setPlayers(players_data) {
 
 }
 
-function windUpdate(windAngle, windSpeed) {
+function windUpdate(windAngle, windSpeed, windTemp, windHum) {
     windAngleUpdate(windAngle);
     windSpeedUpdate(windSpeed);
+    windTempUpdate(windTemp);
+    windHumUpdate(windHum);
 }
 
 

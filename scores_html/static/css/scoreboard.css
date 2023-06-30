@@ -18,9 +18,9 @@ body {
     opacity: 0.9;
     --main-bg-color: #ff00ff;
 
-    --box-bg-color: rgba(255, 255, 255, 0.84);
-    --box-font-color: #00a1a1;
-    --box-point-accent-color: #df75ff;
+    --box-bg-color: rgba(35, 35, 35, 0.84);
+    --box-font-color: #ed4275;
+    --box-point-accent-color: #3dc8dc;
 
     --box-point-accent-fade-color: var(--box-bg-color);
 
@@ -64,13 +64,13 @@ li {
 }
 
 .wind {
-    width: 240px;
+    /*width: 240px;*/
     display: grid;
     position: absolute;
     opacity: 0;
     right: 0;
     margin-right: 50px;
-    grid-template-areas: "wind-icon wind-direction  wind-speed";
+    grid-template-areas: "wind-icon wind-direction wind-speed wind-icon2 wind-temp wind-icon3 wind-hum";
     transition: all .75s ease;
 }
 
@@ -96,13 +96,14 @@ li {
     padding: 8px 4px 4px;
     /*height: 40px;*/
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255, 20%), 0 6px 20px 0 rgb(255, 255, 255, 19%);*/
 }
 
 .wind-direction {
     width: 58px;
 }
 
-.wind-icon {
+.wind-icon, .wind-icon2, .wind-icon3 {
     background-color: var(--box-font-color);
     color: var(--box-bg-color);
     width: 50px;
@@ -113,7 +114,7 @@ li {
     transform: rotate(45deg);
 }
 
-.wind-speed {
+.wind-speed, .wind-temp, .wind-hum {
     text-transform: lowercase;
     font-size: 14pt;
     width: 108px;
@@ -145,6 +146,7 @@ li {
     background-color: var(--box-bg-color);
     width: 130px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /*box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);*/
     /*filter: brightness(85%);*/
 
 }
@@ -155,6 +157,7 @@ li {
     width: 50px;
     z-index: 9999; /* heh */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /*box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);*/
 }
 
 .score-away {
@@ -162,6 +165,7 @@ li {
     width: 50px;
     z-index: 9999; /* heh */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /*box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);*/
 }
 
 .time {
@@ -169,6 +173,7 @@ li {
     width: 80px;
     font-size: 14pt;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /*box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);*/
 }
 
 
@@ -309,6 +314,7 @@ li {
     padding-top: 24px;
     padding-bottom: 20px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255 , 20%), 0 6px 20px 0 rgb(255, 255, 255 , 19%);*/
 }
 
 .roster__th-name {
@@ -326,6 +332,7 @@ li {
     background-color: var(--box-font-color);
     color: var(--box-bg-color);
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255 , 20%), 0 6px 20px 0 rgb(255, 255, 255, 19%);*/
 }
 
 .roster__ta-roster-list, .roster__th-roster-list {
@@ -413,6 +420,7 @@ li {
     padding-bottom: 20px;
     padding-top: 20px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
+    /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255, 10%), 0 6px 20px 0 rgb(255, 255, 255, 10%);*/
 }
 
 #roster__info, #stats__info {
@@ -421,6 +429,7 @@ li {
     padding-top: 10px;
     padding-bottom: 8px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255, 20%), 0 6px 20px 0 rgb(255, 255, 255, 19%);*/
 }
 
 #roster__info {
