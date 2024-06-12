@@ -2,7 +2,7 @@ version: '3'
 
 services:
   scoreboard:
-    image: klimekjakub/scoreboard:1.22-pmp23
+    image: klimekjakub/scoreboard:1.32-hmp24
     ports:
       - "8000:8000"
       - "5005:5005"

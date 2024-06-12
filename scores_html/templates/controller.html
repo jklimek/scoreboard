@@ -27,7 +27,8 @@
                     <form>
                         <div class="form-group">
                             <label for="gameNumber">Game number</label>
-                            <input type="text" class="form-control" pattern="[1-9][0-9]{3}" id="gameNumber" placeholder="Enter game number...">
+                            <input type="text" class="form-control" pattern="[1-9][0-9]{3}" id="gameNumber"
+                                   placeholder="Enter game number...">
                             <button type="button" onClick="setGame();" class="btn btn-success btn-block">Set the game
                             </button>
                         </div>
@@ -69,29 +70,40 @@
                         <div class="btn-ctrl-group">
 
                             <div class="btn-group" role="group">
-                                <button type="button" class="btn-primary" onClick="toggleWind(1);"><i class="fa-solid fa-fan fa-spin fa-spin-reverse"></i> Show wind</button>
-                                <button type="button" class="btn btn-secondary" onClick="toggleWind(0);">Hide wind</button>
+                                <button type="button" class="btn-primary" onClick="toggleWind(1);"><i
+                                        class="fa-solid fa-fan fa-spin fa-spin-reverse"></i> Show wind
+                                </button>
+                                <button type="button" class="btn btn-secondary" onClick="toggleWind(0);">Hide wind
+                                </button>
                             </div>
 
                         </div>
                         <div class="btn-ctrl-group">
                             <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-primary" onClick="toggleRoster(1);toggleStats(0);"><i class="fa-solid fa-clipboard-user"></i> Show rosters</button>
-                                <button type="button" class="btn btn-secondary" onClick="toggleRoster(0);">Hide rosters</button>
+                                <button type="button" class="btn btn-primary" onClick="toggleRoster(1);toggleStats(0);">
+                                    <i class="fa-solid fa-clipboard-user"></i> Show rosters
+                                </button>
+                                <button type="button" class="btn btn-secondary" onClick="toggleRoster(0);">Hide
+                                    rosters
+                                </button>
                             </div>
                         </div>
                         <div class="btn-ctrl-group">
                             <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-primary" onClick="toggleStats(1);toggleRoster(0);"><i class="fa-solid fa-chart-simple"></i> Show match stats</button>
-                                <button type="button" class="btn btn-secondary" onClick="toggleStats(0);">Hide match stats</button>
+                                <button type="button" class="btn btn-primary" onClick="toggleStats(1);toggleRoster(0);">
+                                    <i class="fa-solid fa-chart-simple"></i> Show match stats
+                                </button>
+                                <button type="button" class="btn btn-secondary" onClick="toggleStats(0);">Hide match
+                                    stats
+                                </button>
                             </div>
                         </div>
-<!--                        <div class="btn-ctrl-group">-->
-<!--                            <div class="btn-group" role="group">-->
-<!--                                <button type="button" class="btn btn-primary">Show leaderboard</button>-->
-<!--                                <button type="button" class="btn btn-secondary">Hide leaderboard</button>-->
-<!--                            </div>-->
-<!--                        </div>-->
+                        <!--                        <div class="btn-ctrl-group">-->
+                        <!--                            <div class="btn-group" role="group">-->
+                        <!--                                <button type="button" class="btn btn-primary">Show leaderboard</button>-->
+                        <!--                                <button type="button" class="btn btn-secondary">Hide leaderboard</button>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
                         <button class="btn btn-danger" onClick="resetTimer();">Reset timer</button>
                     </div>
                 </div>

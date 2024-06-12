@@ -275,9 +275,9 @@ def count_stats(events_data, players_data):
         "a": away_score,
         "h": home_score
     }
-    if (s_away_score+s_home_score) > 0:
-        stats_data["points"]["ap"] = round(s_away_score/(s_away_score+s_home_score) * 100)
-        stats_data["points"]["hp"] = round(s_home_score/(s_away_score+s_home_score) * 100)
+    if (s_away_score + s_home_score) > 0:
+        stats_data["points"]["ap"] = stats.get_rounded_percentage(s_away_score, s_home_score)
+        stats_data["points"]["hp"] = stats.get_rounded_percentage(s_home_score, s_away_score)
     else:
         stats_data["points"]["ap"] = 0
         stats_data["points"]["hp"] = 0
@@ -291,9 +291,12 @@ def count_stats(events_data, players_data):
         "a": d_o_points["a"]["offence_points"],
         "h": d_o_points["h"]["offence_points"]
     }
-    if (d_o_points["a"]["offence_points"]+d_o_points["h"]["offence_points"]) > 0:
-        stats_data["o_points"]["ap"] = round(d_o_points["a"]["offence_points"]/(d_o_points["a"]["offence_points"]+d_o_points["h"]["offence_points"]) * 100)
-        stats_data["o_points"]["hp"] = round(d_o_points["h"]["offence_points"]/(d_o_points["a"]["offence_points"]+d_o_points["h"]["offence_points"]) * 100)
+    if (d_o_points["a"]["offence_points"] + d_o_points["h"]["offence_points"]) > 0:
+        stats_data["o_points"]["ap"] = stats.get_rounded_percentage(d_o_points["a"]["offence_points"],
+                                                                    d_o_points["h"]["offence_points"])
+
+        stats_data["o_points"]["hp"] = stats.get_rounded_percentage(d_o_points["h"]["offence_points"],
+                                                                    d_o_points["a"]["offence_points"])
     else:
         stats_data["o_points"]["ap"] = 0
         stats_data["o_points"]["hp"] = 0
@@ -303,9 +306,12 @@ def count_stats(events_data, players_data):
         "a": d_o_points["a"]["defence_points"],
         "h": d_o_points["h"]["defence_points"]
     }
-    if (d_o_points["a"]["defence_points"]+d_o_points["h"]["defence_points"]) > 0:
-        stats_data["d_points"]["ap"] = round(d_o_points["a"]["defence_points"]/(d_o_points["a"]["defence_points"]+d_o_points["h"]["defence_points"]) * 100)
-        stats_data["d_points"]["hp"] = round(d_o_points["h"]["defence_points"]/(d_o_points["a"]["defence_points"]+d_o_points["h"]["defence_points"]) * 100)
+    if (d_o_points["a"]["defence_points"] + d_o_points["h"]["defence_points"]) > 0:
+        stats_data["d_points"]["ap"] = stats.get_rounded_percentage(d_o_points["a"]["defence_points"],
+                                                                    d_o_points["h"]["defence_points"])
+
+        stats_data["d_points"]["hp"] = stats.get_rounded_percentage(d_o_points["h"]["defence_points"],
+                                                                    d_o_points["a"]["defence_points"])
     else:
         stats_data["d_points"]["ap"] = 0
         stats_data["d_points"]["hp"] = 0
@@ -316,8 +322,8 @@ def count_stats(events_data, players_data):
 
     # DISC POSESSION
     stats_data["o_time"] = {
-        "a": str(disc_possession["a"])+"%",
-        "h": str(disc_possession["h"])+"%",
+        "a": str(disc_possession["a"]) + "%",
+        "h": str(disc_possession["h"]) + "%",
         "ap": round(disc_possession["a"]),
         "hp": round(disc_possession["h"])
     }
@@ -331,9 +337,9 @@ def count_stats(events_data, players_data):
         "a": turnovers["a"],
         "h": turnovers["h"]
     }
-    if (turnovers["a"]+turnovers["h"]) > 0:
-        stats_data["turnovers"]["ap"] = round(turnovers["a"]/(turnovers["a"]+turnovers["h"]) * 100)
-        stats_data["turnovers"]["hp"] = round(turnovers["h"]/(turnovers["a"]+turnovers["h"]) * 100)
+    if (turnovers["a"] + turnovers["h"]) > 0:
+        stats_data["turnovers"]["ap"] = stats.get_rounded_percentage(turnovers["a"], turnovers["h"])
+        stats_data["turnovers"]["hp"] = stats.get_rounded_percentage(turnovers["h"], turnovers["a"])
     else:
         stats_data["turnovers"]["ap"] = 0
         stats_data["turnovers"]["hp"] = 0
@@ -347,13 +353,12 @@ def count_stats(events_data, players_data):
         "a": timeouts_used["a"],
         "h": timeouts_used["h"]
     }
-    if (timeouts_used["a"]+timeouts_used["h"]) > 0:
-        stats_data["timeouts"]["ap"] = round(timeouts_used["a"]/(timeouts_used["a"]+timeouts_used["h"]) * 100)
-        stats_data["timeouts"]["hp"] = round(timeouts_used["h"]/(timeouts_used["a"]+timeouts_used["h"]) * 100)
+    if (timeouts_used["a"] + timeouts_used["h"]) > 0:
+        stats_data["timeouts"]["ap"] = stats.get_rounded_percentage(timeouts_used["a"], timeouts_used["h"])
+        stats_data["timeouts"]["hp"] = stats.get_rounded_percentage(timeouts_used["h"], timeouts_used["a"])
     else:
         stats_data["timeouts"]["ap"] = 0
         stats_data["timeouts"]["hp"] = 0
-
 
     # {'a': {   'total': [{'scores': 0, 'assists': 6, 'name': 'Piotr Wrzaszcz', 'no': '21'},
     #           'assists': [{'scores': 0, 'assists': 6, 'name': 'Piotr Wrzaszcz', 'no': '21'},
@@ -577,8 +582,8 @@ def set_team_names(home_name, home_abv, away_name, away_abv):
 # App generator for WSGI daemon (gunicorn)
 def generate_app():
     tmp_app = Flask(__name__)
-    wind_thread = Thread(target=wind_update)
-    wind_thread.start()
+    # wind_thread = Thread(target=wind_update)
+    # wind_thread.start()
     scores_thread = Thread(target=scores_update)
     scores_thread.start()
     websocket_thread = Thread(target=websocket_server)

@@ -22,9 +22,9 @@ def matches_field(field):
     filtered_matches_list = filter_matches(matches_list, field)
     return render_template('matches.html', matches_list=filtered_matches_list)
 
+
 @app.route('/matches_date/<date>')
 def matches_date(date):
-
     def validate(date_text):
         try:
             return datetime.date.fromisoformat(date_text)
@@ -54,6 +54,21 @@ def matches():
 @app.route('/scoreboard')
 def scoreboard():
     return render_template('scoreboard.html')
+
+
+@app.route('/stats')
+def stats():
+    return render_template('stats.html')
+
+
+@app.route('/roster')
+def roster():
+    return render_template('roster.html')
+
+
+@app.route('/pstats')
+def pstats():
+    return render_template('pstats.html')
 
 
 def filter_matches(matches_list, field):

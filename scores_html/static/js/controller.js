@@ -1,6 +1,6 @@
 function init() {
-    document.myform.url.value = "ws://scores.jakub.tech:5005/";
-    // document.myform.url.value = "ws://localhost:5005/";
+    // document.myform.url.value = "ws://scores.jakub.tech:5005/";
+    document.myform.url.value = "ws://localhost:5005/";
     document.myform.disconnectButton.disabled = true;
 }
 
@@ -147,6 +147,7 @@ function toggleWind(toggle) {
     });
     doSend(message);
 }
+
 function toggleRoster(toggle) {
     var message = JSON.stringify({
         "type": "stats",
@@ -154,6 +155,7 @@ function toggleRoster(toggle) {
     });
     doSend(message);
 }
+
 function toggleLeaderboard(toggle) {
     var message = JSON.stringify({
         "type": "stats",
@@ -161,6 +163,7 @@ function toggleLeaderboard(toggle) {
     });
     doSend(message);
 }
+
 function toggleStats(toggle) {
     var message = JSON.stringify({
         "type": "stats",

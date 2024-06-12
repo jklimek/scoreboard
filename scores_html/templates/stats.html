@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Stream Scoreboard</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='images/favicon.ico') }}">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://kit.fontawesome.com/e939364dd5.js" crossorigin="anonymous"></script>
+    <link rel="manifest" href="site.webmanifest">
+
+    <link rel="stylesheet" href="../static/css/scoreboard.css">
+</head>
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+    your browser</a> to improve your experience and security.</p>
+<![endif]-->
+<div class="content">
+<!--    <div class="board">-->
+<!--        <div id="th" class="board__box team-home">HOM</div>-->
+<!--        <div class="board__box score-home" id="th-score-box"><span id="th-score">0</span></div>-->
+<!--        <div class="board__box score-away" id="ta-score-box"><span id="ta-score">0</span></div>-->
+<!--        <div id="ta" class="board__box team-away">AWA</div>-->
+
+<!--        <div id="timer" class="board__box time"><span id="timer-minutes">00</span>:<span id="timer-seconds">00</span></div>-->
+<!--    </div>-->
+<!--    <div id="wind" class="wind active">-->
+<!--&lt;!&ndash;        <div class="wind__box wind-icon">&ndash;&gt;-->
+<!--&lt;!&ndash;            <i class="fa-solid fa-fan fa-spin fa-spin-reverse"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="wind__box wind-direction">&ndash;&gt;-->
+<!--&lt;!&ndash;            <i id="wind-direction-arrow" class="wind-direction__arrow fa-solid fa-location-arrow"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="wind__box wind-speed">&ndash;&gt;-->
+<!--&lt;!&ndash;            <p id="wind-speed" class="wind-speed__data"></p>m/s&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--        <div class="wind__box wind-icon2">-->
+<!--            <i id="wind-temp-icon" class="fa-solid fa-temperature-three-quarters"></i>-->
+<!--        </div>-->
+<!--        <div class="wind__box wind-temp">-->
+<!--            <p id="wind-temp" class="wind-speed__data"></p>°C-->
+<!--        </div>-->
+<!--        <div class="wind__box wind-icon3">-->
+<!--            <i id="wind-hum-icon" class="fa-solid fa-droplet"></i>-->
+<!--        </div>-->
+<!--        <div class="wind__box wind-hum">-->
+<!--            <p id="wind-hum" class="wind-speed__data"></p>%-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <div id="roster" class="roster">-->
+<!--        <div id="roster__th-name" class="roster__name roster__th-name">-->
+<!--        </div>-->
+<!--        <div id="roster__ta-name" class="roster__name roster__ta-name">-->
+<!--        </div>-->
+<!--        <div id="roster__th-roster" class="roster__roster-container">-->
+
+<!--        </div>-->
+<!--        <div id="roster__ta-roster" class="roster__roster-container">-->
+<!--            <ul class="roster__ta-roster-list">-->
+
+<!--            </ul>-->
+<!--        </div>-->
+<!--        <div id="roster__info">-->
+<!--            Gdańsk Zaspa, Boisko 1-->
+<!--        </div>-->
+<!--    </div>-->
+
+    <div id="stats" class="stats active">
+        <div id="stats__th-name" class="stats__name stats__th-name">
+        </div>
+        <div id="stats__div"></div>
+        <div id="stats__ta-name" class="stats__name stats__ta-name">
+        </div>
+        <div id="stats__th-stats" class="stats__stats-th-container">
+        </div>
+        <div id="stats__stats" class="stats__stats">
+            <ul>
+                <li>PUNKTY</li>
+                <li>PUNKTY W ATAKU</li>
+                <li>PUNKTY W OBRONIE</li>
+                <li>CZAS W ATAKU</li>
+                <li>STRATY</li>
+                <li>TIMEOUTY</li>
+            </ul>
+        </div>
+        <div id="stats__ta-stats" class="stats__stats-ta-container">
+        </div>
+        <div id="stats__info">
+            Gdańsk Zaspa, Boisko 1</i>
+        </div>
+    </div>
+
+<!--    <div id="pstats" class="pstats">-->
+<!--        <div id="pstats__th-name" class="pstats__name pstats__th-name">-->
+<!--        </div>-->
+<!--        <div id="pstats__div"></div>-->
+<!--        <div id="pstats__ta-name" class="pstats__name pstats__ta-name">-->
+<!--        </div>-->
+<!--        <div id="pstats__th-pstats" class="pstats__pstats-th-container">-->
+<!--        </div>-->
+<!--        <div id="pstats__pstats" class="pstats__pstats">-->
+<!--            <ul>-->
+<!--                <li>PUNKTY</li>-->
+<!--                <li>PUNKTY W ATAKU</li>-->
+<!--                <li>PUNKTY W OBRONIE</li>-->
+<!--                <li>CZAS W ATAKU</li>-->
+<!--                <li>STRATY</li>-->
+<!--                <li>TIMEOUTY</li>-->
+<!--            </ul>-->
+<!--        </div>-->
+<!--        <div id="pstats__ta-pstats" class="pstats__pstats-ta-container">-->
+<!--        </div>-->
+<!--        <div id="pstats__info">-->
+<!--            Gdańsk Zaspa, Boisko 1</i>-->
+<!--        </div>-->
+<!--    </div>-->
+
+    <div class="names">
+        <div class="assist-wrapper">
+            <div id="assist" class="names__box">-</div>
+        </div>
+
+        <div class="scorer-wrapper">
+            <div id="scorer" class="names__box">-</div>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="../static/js/jquery.js"></script>
+<script src="../static/js/easytimer.min.js"></script>
+<script src="../static/js/scoreboard.js"></script>
+</body>
+</html>

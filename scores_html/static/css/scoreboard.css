@@ -18,9 +18,9 @@ body {
     opacity: 0.9;
     --main-bg-color: #ff00ff;
 
-    --box-bg-color: rgba(35, 35, 35, 0.84);
-    --box-font-color: #ed4275;
-    --box-point-accent-color: #3dc8dc;
+    --box-bg-color: rgba(206, 219, 255, 0.84);
+    --box-font-color: #0050c5;
+    --box-point-accent-color: #4298ed;
 
     --box-point-accent-fade-color: var(--box-bg-color);
 
@@ -39,6 +39,7 @@ body {
     color: var(--box-font-color);
     background-color: var(--main-bg-color);
     /*background-image: url("../images/bg2.jpg");*/
+    /*background-image: url("../images/bg_indoor.jpg");*/
 
 
     background-size: cover;
