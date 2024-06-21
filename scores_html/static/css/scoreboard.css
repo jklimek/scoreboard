@@ -14,13 +14,24 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Lemonada Bold';
+    src: url('../fonts/Lemonada-Bold.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     opacity: 0.9;
     --main-bg-color: #ff00ff;
 
     --box-bg-color: rgba(206, 219, 255, 0.84);
-    --box-font-color: #0050c5;
-    --box-point-accent-color: #4298ed;
+    /*--box-font-color: #fe8976;*/
+    --box-font-color: #3a52bf;
+
+    /*--box-point-accent-color: #f1ab1c;*/
+    --box-point-accent-color: #fe8976;
+    /*--box-point-accent-color: #7f90d7;*/
 
     --box-point-accent-fade-color: var(--box-bg-color);
 
@@ -38,7 +49,7 @@ body {
     text-transform: uppercase;
     color: var(--box-font-color);
     background-color: var(--main-bg-color);
-    /*background-image: url("../images/bg2.jpg");*/
+    background-image: url("../images/bg2.jpg");
     /*background-image: url("../images/bg_indoor.jpg");*/
 
 
@@ -97,6 +108,7 @@ li {
     padding: 8px 4px 4px;
     /*height: 40px;*/
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    border-radius: 60px;
     /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255, 20%), 0 6px 20px 0 rgb(255, 255, 255, 19%);*/
 }
 
@@ -130,7 +142,7 @@ li {
 
 .disc-possession {
     /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19), inset -5px 0 0 0 rgb(255 255 255);*/
-    border-right: solid rgb(255 255 255) 5px;
+    border-right: solid var(--box-point-accent-color) 5px;
     transition: border-right 0.3s cubic-bezier(0, 0, 0, 1);;
 }
 
@@ -159,6 +171,7 @@ li {
     z-index: 9999; /* heh */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     /*box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);*/
+    border-radius: 60px;
 }
 
 .score-away {
@@ -167,6 +180,7 @@ li {
     z-index: 9999; /* heh */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     /*box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);*/
+    border-radius: 60px;
 }
 
 .time {
@@ -206,6 +220,7 @@ li {
     padding-left: 40px;
     padding-right: 40px;
     padding-top: 20px;
+    border-radius: 60px;
 }
 
 .assist-wrapper {
@@ -223,11 +238,11 @@ li {
     background-color: var(--names-assist-bg-color);
     color: var(--names-assist-font-color);
     bottom: -60px;
-    transition: all .25s ease;
+    transition: all .40s cubic-bezier(0.7, -0.46, 0.36, 1.04);
 }
 
 #assist.active {
-    transition: all .25s ease;
+    transition: all .60s cubic-bezier(0.64, 0.06, 0.3, 1.29);
     bottom: 0;
 }
 
@@ -240,17 +255,17 @@ li {
 
 #scorer {
     position: absolute;
-    height: 60px;
+    height: 50px;
     font-size: 22pt;
     border-right: 8px solid var(--names-point-accent-color);
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 -6px 20px 0 rgba(0, 0, 0, 0.19);
     z-index: 9998;
     left: -70%;
-    transition: all .75s ease;
+    transition: all .65s cubic-bezier(0.7, -0.46, 0.36, 1.04);
 }
 
 #scorer.active {
-    transition: all .75s ease;
+    transition: all .90s cubic-bezier(0.64, 0.06, 0.3, 1.29);
     left: 0;
 }
 
@@ -266,6 +281,7 @@ li {
     opacity: 0;
     display: grid;
     transition: all .75s ease;
+
 }
 
 .roster {
@@ -310,38 +326,45 @@ li {
 }
 
 .roster__name, .stats__name {
+    border-radius: 60px;
     background-color: var(--box-bg-color);
     font-size: 24pt;
     padding-top: 24px;
     padding-bottom: 20px;
+    margin-bottom: 12px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
     /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255 , 20%), 0 6px 20px 0 rgb(255, 255, 255 , 19%);*/
 }
 
 .roster__th-name {
     grid-area: roster-th-name;
-    border-left: 8px solid white;
+    border-top: 8px solid white;
 }
 
 .roster__ta-name {
     grid-area: roster-ta-name;
-    border-right: 8px solid white;
+    border-top: 8px solid white;
 }
 
 .roster__roster-container {
+    border-radius: 60px;
     width: 800px;
     background-color: var(--box-font-color);
     color: var(--box-bg-color);
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    margin-bottom: 3px;
     /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255 , 20%), 0 6px 20px 0 rgb(255, 255, 255, 19%);*/
 }
 
 .roster__ta-roster-list, .roster__th-roster-list {
+
     padding-bottom: 20px;
     padding-top: 10px;
     columns: 2;
     -webkit-columns: 2;
     -moz-columns: 2;
+    padding-bottom: 42px;
+    padding-top: 32px;
 }
 
 /*.roster__ta-roster-list li:nth-child(2n), .roster__th-roster-list li:nth-child(2n) {*/
@@ -382,46 +405,63 @@ li {
 
 #stats__stats {
     grid-area: stats-stats;
+    border-radius: 60px;
 }
 
 #stats__ta-stats {
     grid-area: stats-ta-content;
 }
 
+.stats__ta-name, .stats__th-name {
+    border-top: 8px solid white;
+}
+
 
 .stats__stats-th-container, .stats__stats-ta-container {
-    background-color: var(--box-bg-color);
+    /*background-color: var(--box-bg-color);*/
+    border-radius: 60px;
 }
 
 .stats__stats-th-container > ul > li, .stats__stats-ta-container > ul > li {
+    background-color: var(--box-font-color);
     padding-bottom: 14px;
     padding-top: 14px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
     font-size: 30px;
     color: var(--box-bg-color);
     position: relative;
+    border-radius: 60px;
+    margin-bottom: 3px;
 }
 
 .stats__stats-th-container > ul > li {
     text-align: right;
-    padding-right: 10px;
+    padding-right: 20px;
+    border-radius: 60px;
+    float: right;
+    clear: both;
 }
 
 .stats__stats-ta-container > ul > li {
     text-align: left;
-    padding-left: 10px;
+    padding-left: 20px;
+    border-radius: 60px;
 }
 
 .stats__stats {
-    background-color: var(--box-bg-color);
+
+    /*background-color: var(--box-bg-color);*/
 }
 
 .stats__stats > ul > li {
+    background-color: var(--box-bg-color);
+    border-radius: 60px;
     text-align: center;
     padding-bottom: 20px;
     padding-top: 20px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
     /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255, 10%), 0 6px 20px 0 rgb(255, 255, 255, 10%);*/
+    margin-bottom: 3px;
 }
 
 #roster__info, #stats__info {
@@ -430,6 +470,8 @@ li {
     padding-top: 10px;
     padding-bottom: 8px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    border-radius: 60px;
+    margin-top: 9px;
     /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255, 20%), 0 6px 20px 0 rgb(255, 255, 255, 19%);*/
 }
 

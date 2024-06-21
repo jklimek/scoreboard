@@ -284,7 +284,7 @@ def count_stats(events_data, players_data):
 
     # {'a': {'offence_points': 7, 'defence_points': 8}, 'h': {'offence_points': 6, 'defence_points': 3}}
     d_o_points = stats.count_d_o_points(events_data)
-    pprint(d_o_points)
+    # pprint(d_o_points)
 
     # OFFENCE POINTS
     stats_data["o_points"] = {
@@ -318,7 +318,7 @@ def count_stats(events_data, players_data):
 
     # {'a': 37.4, 'h': 62.6, 'total': 5111}
     disc_possession = stats.count_disc_possession(events_data)
-    pprint(disc_possession)
+    # pprint(disc_possession)
 
     # DISC POSESSION
     stats_data["o_time"] = {
@@ -330,7 +330,7 @@ def count_stats(events_data, players_data):
 
     # {'a': 26, 'h': 31}
     turnovers = stats.count_turnovers(events_data)
-    pprint(turnovers)
+    # pprint(turnovers)
 
     # TURNOVERS
     stats_data["turnovers"] = {
@@ -346,7 +346,7 @@ def count_stats(events_data, players_data):
 
     # {'a': 0, 'h': 0}
     timeouts_used = stats.count_timeouts(events_data)
-    pprint(timeouts_used)
+    # pprint(timeouts_used)
 
     # TIMEOUTS
     stats_data["timeouts"] = {
@@ -363,8 +363,8 @@ def count_stats(events_data, players_data):
     # {'a': {   'total': [{'scores': 0, 'assists': 6, 'name': 'Piotr Wrzaszcz', 'no': '21'},
     #           'assists': [{'scores': 0, 'assists': 6, 'name': 'Piotr Wrzaszcz', 'no': '21'},
     #           'points': [{'scores': 3, 'assists': 1, 'name': 'Bartłomiej Skopiński', 'no': '9'},
-    # points_per_player = stats.count_points_per_player(events_data, players_data)
-
+    points_per_player = stats.count_points_per_player(events_data, players_data)
+    stats_data["player_stats"] = points_per_player
     # HERE SEND WEBSOCKET MSG TO SCOREBOARD
     set_stats(stats_data)
 

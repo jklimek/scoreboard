@@ -150,6 +150,8 @@ function setTeamNames(team, name, name_full) {
 function setTeamJerseyColor(team, color) {
     console.log(team, color);
     teams[team]["handle"].css("border-color", color);
+    teams[team]["roster_name_handle"].css("border-color", color);
+    teams[team]["stats_name_handle"].css("border-color", color);
 }
 
 function setScores(a, h) {
@@ -231,7 +233,6 @@ function windHumUpdate(windHumTarget) {
     windHumHandle.text(windHumTarget)
     windHum = windHumTarget
 }
-
 function statsUpdate(stats_data) {
     let away_stats_html_list = "<ul>"
     let home_stats_html_list = "<ul>"
@@ -239,8 +240,22 @@ function statsUpdate(stats_data) {
 
     for (let stat in stats_list) {
         console.log(stat);
-        away_stats_html_list += `<li style="background: linear-gradient(to right, var(--box-font-color) ${stats_data[stats_list[stat]]["ap"]}%, rgb(255 255 255 / 0%) ${stats_data[stats_list[stat]]["ap"]}%);">${stats_data[stats_list[stat]]["a"]}</li>`;
-        home_stats_html_list += `<li style="background: linear-gradient(to left, var(--box-font-color) ${stats_data[stats_list[stat]]["hp"]}%, rgb(255 255 255 / 0%) ${stats_data[stats_list[stat]]["hp"]}%);">${stats_data[stats_list[stat]]["h"]}</li>`;
+        away_percent = stats_data[stats_list[stat]]["ap"]
+        home_percent = stats_data[stats_list[stat]]["hp"]
+
+        function set_stat_widths(percent) {
+            if (percent > 80) {
+                percent = percent - 3
+            } else if (percent < 5) {
+                percent = 5.5
+            }
+            return percent
+        }
+
+        away_stats_html_list += `<li style="width:${set_stat_widths(away_percent)}%">${stats_data[stats_list[stat]]["a"]}</li>`;
+        home_stats_html_list += `<li style="width:${set_stat_widths(home_percent)}%">${stats_data[stats_list[stat]]["h"]}</li>`;
+        // away_stats_html_list += `<li style="background:  linear-gradient(to right, var(--box-font-color) ${stats_data[stats_list[stat]]["ap"]}%, var(--box-bg-color) ${stats_data[stats_list[stat]]["ap"]}%);">${stats_data[stats_list[stat]]["a"]}</li>`;
+        // home_stats_html_list += `<li style="background: linear-gradient(to left, var(--box-font-color) ${stats_data[stats_list[stat]]["hp"]}%, var(--box-bg-color) ${stats_data[stats_list[stat]]["hp"]}%);">${stats_data[stats_list[stat]]["h"]}</li>`;
     }
     away_stats_html_list += `</ul>`;
     home_stats_html_list += `</ul>`;
