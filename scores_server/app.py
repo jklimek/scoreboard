@@ -142,11 +142,14 @@ class WebSocketHandler(WebSocket):
 
 
 def wind_update():
+    wind_requests_count = 0
     while True:
         try:
+            wind_requests_count += 1
             wind_request = requests.get(wind_url, timeout=5)
             result_data = wind_request.json()
-            print("Wind request: ", result_data)
+            if wind_requests_count % 10 == 0:
+                print("Wind request: ", result_data)
             wind_angle = result_data["a"]
             wind_speed = round(float(result_data["s"]), 1)
             wind_temp = round(float(result_data["t"]), 1)
@@ -161,9 +164,10 @@ def wind_update():
 
 
 def scores_update():
+    scores_requests_count = 0
     while True:
         if any(players) and int(game_number) >= 1000 and not stopped_game:
-
+            scores_requests_count += 1
             payload = {
                 "game": game_number,
                 "update": "true"
@@ -179,8 +183,9 @@ def scores_update():
                     timeout=20
                 )
                 result_data = r.json()
-                print("Scores request: ")
-                pprint(result_data)
+                if scores_requests_count % 2 == 0:
+                    print("Scores request: ")
+                    pprint(result_data)
                 set_timer(result_data["ts"])
                 check_and_set_stopped_game_status(result_data["ts"])
                 parse_scores_events(result_data["e"])
@@ -240,8 +245,8 @@ def get_match_info(passed_game_number):
 def parse_scores_events(events_array):
     global home_score
     global away_score
-    print("Events difference: ")
-    print(len(events_array) - len(game_events))
+    # print("Events difference: ")
+    # print(len(events_array) - len(game_events))
     if len(game_events) < len(events_array):
         for i in range(len(game_events), len(events_array)):
             event = events_array[i]

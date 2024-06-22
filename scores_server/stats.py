@@ -139,7 +139,6 @@
 
 
 def get_rounded_percentage(a, b):
-    print(a+b)
     return round((a / (a + b)) * 100) if (a + b) != 0 else 0
 
 
