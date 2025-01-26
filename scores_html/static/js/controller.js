@@ -1,4 +1,5 @@
 function init() {
+    // document.myform.url.value = "ws://scores.jakub.tech:5005/";
     document.myform.url.value = "ws://localhost:5005/";
     document.myform.disconnectButton.disabled = true;
 }
@@ -37,10 +38,10 @@ function onMessage(evt) {
     eventData = JSON.parse(evt.data);
     if (eventData["type"] === "team") {
         if (eventData["team"] === "h") {
-            $("#teamHomeName").html(eventData["team_name"])
+            $("#teamHomeName").html(eventData["team_name_full"] + "(" + eventData["team_name"] + ")")
         }
         if (eventData["team"] === "a") {
-            $( "#teamAwayName" ).html(eventData["team_name"])
+            $("#teamAwayName").html(eventData["team_name_full"] + "(" + eventData["team_name"] + ")")
         }
     }
 
@@ -55,8 +56,8 @@ function onError(evt) {
 
 function doSend(message) {
     if (typeof websocket !== 'undefined') {
-        writeToScreen("sent: " + message.toString() + '\n');
         websocket.send(message);
+        writeToScreen("sent: " + message.toString() + '\n');
     } else {
         writeToScreen("Connect to Websocket server first" + '\n');
     }
@@ -69,6 +70,14 @@ function writeToScreen(message) {
 
 window.addEventListener("load", init, false);
 
+$(document).keypress(
+    function (event) {
+        if (event.which == '13') {
+            event.preventDefault();
+        }
+    });
+
+
 function clearText() {
     document.myform.wslog.value = "";
 }
@@ -79,12 +88,17 @@ function doDisconnect() {
 
 function setGame() {
     var gameNumber = $("#gameNumber").val();
-    var message = JSON.stringify({
-        "type": "game",
-        "game_number": gameNumber
-    });
+    if (gameNumber) {
+        var message = JSON.stringify({
+            "type": "game",
+            "game_number": gameNumber
+        });
 
-    doSend(message);
+        doSend(message);
+    } else {
+        writeToScreen("Provide proper game number\n");
+    }
+
 }
 
 function jerseysColor(color, team) {
@@ -124,5 +138,36 @@ function resetTimer() {
         });
         doSend(message);
     }
+}
 
+function toggleWind(toggle) {
+    var message = JSON.stringify({
+        "type": "wind",
+        "wind_toggle": toggle
+    });
+    doSend(message);
+}
+
+function toggleRoster(toggle) {
+    var message = JSON.stringify({
+        "type": "stats",
+        "roster_toggle": toggle
+    });
+    doSend(message);
+}
+
+function toggleLeaderboard(toggle) {
+    var message = JSON.stringify({
+        "type": "stats",
+        "leaderboard_toggle": toggle
+    });
+    doSend(message);
+}
+
+function toggleStats(toggle) {
+    var message = JSON.stringify({
+        "type": "stats",
+        "stats_toggle": toggle
+    });
+    doSend(message);
 }

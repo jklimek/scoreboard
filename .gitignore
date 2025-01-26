@@ -18,3 +18,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+.idea
+scores_server/__pycache__
+scores_html/static/images/bg.png

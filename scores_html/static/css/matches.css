@@ -1,0 +1,174 @@
+@font-face {
+    font-family: 'Myriad Pro Bold';
+    src: url('../fonts/MyriadPro-Bold.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Myriad Pro';
+    src: url('../fonts/MyriadPro-Regular.woff2') format('woff2'),
+    url('../fonts/MyriadPro-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+
+    --box-bg-color: rgba(255, 255, 255, 0.84);
+    --box-font-color: black;
+    --box-point-accent-color: #d5b43a;
+
+
+    margin: 0;
+    font-family: 'Myriad Pro', sans-serif;
+    font-size: 20pt;
+    color: var(--box-font-color);
+
+
+    background-size: cover;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    /* little centering for ease of cropping (1280 x 720)*/
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-top: 60px;
+    font-size: 16pt;
+    /*width: 100%;*/
+}
+
+.column {
+    float: left;
+    width: 33.33%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.match_data {
+    margin-bottom: 50px;
+    background-color: #dadada;
+    width: 500px;
+    display: grid;
+    grid-auto-columns: 1fr 1fr;
+    grid-auto-rows: 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 30% 20% 20% 20% 10%;
+    gap: 0px 20px;
+    grid-template-areas:
+    "game_id game_id"
+    "time date"
+    "home_team away_team"
+    "home_points away_points"
+    "field  field";
+}
+
+.game_id {
+    display: flex;
+    grid-area: game_id;
+    width: 500px;
+    height: 40px;
+    font-family: 'Myriad Pro Bold', sans-serif;
+    font-size: 18pt;
+    text-align: center;
+    justify-self: center;
+    justify-content: center;
+    align-items: center;
+    background-color: #b4b4b4;
+}
+
+.time, .date, .home_team, .home_points, .away_team, .away_points {
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+.time {
+    grid-area: time;
+    justify-self: right;
+}
+
+.date {
+    grid-area: date;
+}
+
+.home_team {
+    grid-area: home_team;
+    justify-self: right;
+    justify-content: flex-end;
+    border-bottom: black;
+}
+
+.away_team {
+    grid-area: away_team;
+}
+
+.home_points {
+    grid-area: home_points;
+    justify-self: right;
+}
+
+.away_points {
+    grid-area: away_points;
+}
+
+.field {
+    display: flex;
+    grid-area: field;
+    width: 500px;
+    font-size: 16px;
+    height: 30px;
+    text-align: center;
+    justify-self: center;
+    justify-content: center;
+    align-items: center;
+    background-color: #cecece;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.active > .game_id {
+    background-color: #ff6464;
+}
+
+.next > .game_id {
+    background-color: #98ff64;
+}
+
+.past {
+    background-color: #ececec;
+    color: #c0c0c0;
+}
+.past > .game_id, .past > .field {
+    background-color: #e1e1e1;
+}

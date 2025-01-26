@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>SCOREBOARD</title>
+    <title>Stream Scoreboard</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='images/favicon.ico') }}">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <script src="https://kit.fontawesome.com/e939364dd5.js" crossorigin="anonymous"></script>
     <link rel="manifest" href="site.webmanifest">
 
-    <link rel="stylesheet" href="css/scoreboard.css">
-    <link rel="stylesheet" href="css/jerseys.css">
+    <link rel="stylesheet" href="../static/css/scoreboard.css">
 </head>
 <body>
 <!--[if lte IE 9]>
@@ -20,14 +20,14 @@
 <div class="content">
     <div class="board">
         <div id="th" class="board__box team-home">HOM</div>
-        <div class="board__box score"><span id="th-score">0</span> - <span id="ta-score">0</span></div>
+        <div class="board__box score-home" id="th-score-box"><span id="th-score">0</span></div>
+        <div class="board__box score-away" id="ta-score-box"><span id="ta-score">0</span></div>
         <div id="ta" class="board__box team-away">AWA</div>
 
-        <div id="timer" class="board__box time"><span id="timer-minutes">00</span>:<span id="timer-seconds">00</span></div>
+        <div id="timer" class="board__box time">
+            <span id="timer-minutes">00</span>:<span id="timer-seconds">00</span>
+        </div>
     </div>
-    <!--<div class="logo">-->
-        <!--<img src="img/logo_small_opque_web.png" alt="">-->
-    <!--</div>-->
     <div class="names">
         <div class="assist-wrapper">
             <div id="assist" class="names__box">-</div>
@@ -37,11 +37,12 @@
             <div id="scorer" class="names__box">-</div>
         </div>
     </div>
+
 </div>
 
 
-<script src="js/jquery.js"></script>
-<script src="js/easytimer.min.js"></script>
-<script src="js/scoreboard.js"></script>
+<script src="../static/js/jquery.js"></script>
+<script src="../static/js/easytimer.min.js"></script>
+<script src="../static/js/scoreboard.js"></script>
 </body>
 </html>
