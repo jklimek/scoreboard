@@ -33,3 +33,4 @@ scores_server/test2.py
 scores_server/handlers/__pycache__/*
 scores_server/logs/scores_server.log
 scores_server/models/__pycache__/*
+scores_server/server/__pycache__/*
