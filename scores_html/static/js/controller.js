@@ -43,8 +43,9 @@ function onMessage(evt) {
         if (eventData["team"] === "a") {
             $("#teamAwayName").html(eventData["team_name_full"] + "(" + eventData["team_name"] + ")")
         }
+    } else if (eventData["type"] === "clear_text") {
+        clearText();
     }
-
 }
 
 function onError(evt) {

@@ -327,7 +327,7 @@ function toggleStats(toggle) {
 
 function timeout(team) {
     setAssistAndScorerTexts("", "TIMEOUT");
-    animateScorerIn(teams[team]["handle"], score);
+    animateScorerIn(teams[team]["handle"]);
     setTimeout(function () {
         animateScorerOut(teams[team]["handle"])
     }, 50000);
@@ -335,7 +335,7 @@ function timeout(team) {
 
 function score(team, assist, scorer) {
     setAssistAndScorerTexts(assist, scorer);
-    animateScorerIn(team, score);
+    animateScorerIn(team);
     setTimeout(animateAssistIn, 1000);
     setTimeout(animateAssistOut, 8000);
     setTimeout(function () {

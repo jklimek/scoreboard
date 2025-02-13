@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import List, Dict, Any, Union
+
 # json_data = {"a": 15,
 #              "an": "Ultimatum",
 #              "e": [
@@ -138,11 +141,26 @@
 #
 
 
-def get_rounded_percentage(a, b):
-    return round((a / (a + b)) * 100) if (a + b) != 0 else 0
+def get_rounded_percentage(a: Union[int, str], b: Union[int, str]) -> int:
+    """
+    Calculate rounded percentage of a/(a+b).
+    
+    Args:
+        a: First number (can be int or str)
+        b: Second number (can be int or str)
+        
+    Returns:
+        Rounded percentage or 0 if sum is 0
+    """
+    # Convert to integers if strings
+    a_int = int(a) if isinstance(a, str) else a
+    b_int = int(b) if isinstance(b, str) else b
+    
+    return round((a_int / (a_int + b_int)) * 100) if (a_int + b_int) != 0 else 0
 
 
-def count_d_o_points(game_events):
+def count_d_o_points(game_events: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
+    """Count defensive and offensive points for each team."""
     d_o_game_events = list(filter(lambda ev: ev["y"] in ["S", "O", "H"], game_events))
     d_o_points = {
         "a": {
@@ -154,10 +172,15 @@ def count_d_o_points(game_events):
             "defence_points": 0
         }
     }
+    
+    if not d_o_game_events:
+        return d_o_points
+        
     # -1 : a
     # +1 : h
     starting_offence = d_o_game_events[0]["e"]
     side = starting_offence
+    
     for e in d_o_game_events:
         if e["y"] == "O":
             starting_offence = e["e"]
@@ -171,6 +194,7 @@ def count_d_o_points(game_events):
             else:
                 d_o_points[e["e"]]["offence_points"] += 1
             side = "h" if e["e"] == "a" else "a"
+            
     return d_o_points
 
 
