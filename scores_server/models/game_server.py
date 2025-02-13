@@ -148,6 +148,17 @@ class GameServer:
                     data["team_name"],
                     ""   # away_abv
                 )
+        elif "team" in data and "jersey_color" in data:
+            self.logger.info(f"Jersey color: {data}")
+            if data["team"] == "h":
+                self.state.home_jersey_color = data["jersey_color"]
+            else:
+                self.state.away_jersey_color = data["jersey_color"]
+            self.send_message_to_all({
+                "type": "team",
+                "team": data["team"],
+                "jersey_color": data["jersey_color"]
+            })
 
     def handle_wind_setting_message(self, data: Dict[str, Any]) -> None:
         """

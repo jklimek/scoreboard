@@ -64,7 +64,7 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     FLASK_DEBUG = True
-    SCORES_URL: str = os.getenv("SCORES_URL", "https://scores.frisbee.pl/test3/watchlive.php")
+    SCORES_URL: str = os.getenv("SCORES_URL", "https://scores.frisbee.pl/test3/ext/watchlive.php/")
     # Add testing-specific settings
 
 # Select config based on environment

@@ -49,7 +49,7 @@ body {
     text-transform: uppercase;
     color: var(--box-font-color);
     background-color: var(--main-bg-color);
-    background-image: url("../images/bg2.jpg");
+    /*background-image: url("../images/bg2.jpg");*/
     /*background-image: url("../images/bg_indoor.jpg");*/
 
 

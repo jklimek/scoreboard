@@ -61,6 +61,12 @@ def stats():
     return render_template('stats.html')
 
 
+
+@app.route('/wind')
+def wind():
+    return render_template('wind.html')
+
+
 @app.route('/roster')
 def roster():
     return render_template('roster.html')
