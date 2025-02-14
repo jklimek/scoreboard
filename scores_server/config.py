@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Config:
     # API URLs
-    SCORES_URL: str = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
+    # SCORES_URL: str = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
     WIND_URL: str = os.getenv("WIND_URL", "http://192.168.10.13/")
     
     # Server settings
@@ -54,35 +54,27 @@ class Config:
             'User-Agent': cls.USER_AGENT
         }
 
-class DevelopmentConfig(Config):
-    FLASK_DEBUG = True
-    # Add development-specific settings
-
 class ProductionConfig(Config):
     FLASK_DEBUG = False
     # Add production-specific settings
+    SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/"
 
 class TestingConfig(Config):
     FLASK_DEBUG = True
-    SCORES_URL: str = os.getenv("SCORES_URL", "https://scores.frisbee.pl/test3/ext/watchlive.php/")
     # Add testing-specific settings
+    SCORES_URL: str = "https://scores.frisbee.pl/test3/ext/watchlive.php/"
 
 # Select config based on environment
-env = os.getenv("FLASK_ENV", "testing")
+# env = os.getenv("FLASK_ENV", "testing")
 env = "testing"
 
-if env not in ("development", "production", "testing"):
+if env not in ("production", "testing"):
     logger.error(f"Invalid FLASK_ENV value: {env}, defaulting to testing")
-    env = "testing"
 
 config_map = {
-    "development": DevelopmentConfig(),
     "production": ProductionConfig(),
     "testing": TestingConfig(),
 }
 
 logger.info(f"Using {env} environment configuration")
 config = config_map[env]
-
-# Create a global config instance
-config: Config = Config() 

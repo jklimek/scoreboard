@@ -58,10 +58,12 @@ class ScoresServer:
     def _scores_update(self) -> None:
         """Background thread for updating scores from the API."""
         while True:
+            self.logger.debug("Checking for score updates...")
             if (any(self.game_server.state.players) and 
                 int(self.game_server.state.game_number) >= 1000 and 
                 not self.game_server.state.stopped_game):
                 
+                self.logger.debug(f"Conditions met for game {self.game_server.state.game_number}, requesting update...")
                 self.game_server.state.scores_requests_count += 1
                 payload = {
                     "game": self.game_server.state.game_number,
@@ -82,6 +84,10 @@ class ScoresServer:
                     self.game_server.parse_scores_events(result_data["e"])
                 except Exception as e:
                     self.logger.error(f"Connection error: {e}", exc_info=True)
+            else:
+                self.logger.debug(f"Update conditions not met: players={bool(any(self.game_server.state.players))}, "
+                                f"game_number={self.game_server.state.game_number}, "
+                                f"stopped_game={self.game_server.state.stopped_game}")
 
             time.sleep(config.SCORES_UPDATE_INTERVAL)
 

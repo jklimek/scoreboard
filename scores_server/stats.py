@@ -247,46 +247,62 @@ def count_timeouts(game_events):
     return timeout_stats
 
 
-def count_points_per_player(game_events, players):
-    points_stats = {
+def count_points_per_player(game_events: List[Dict[str, Any]], players: Dict[str, Dict[str, str]]) -> Dict[str, Dict[str, Any]]:
+    """
+    Count points per player statistics.
+    
+    Args:
+        game_events: List of game events
+        players: Dictionary of players by team and number
+        
+    Returns:
+        Dictionary of player statistics, sorted by total points
+    """
+    player_stats = {
         "a": {},
         "h": {}
     }
-    for e in filter(lambda ev: ev["y"] == "S", game_events):
-        # e["e"] home/away
-        scorer_no = str(e["s"])
-        scorer = players[e["e"]][scorer_no]
-        assist_no = str(e["a"])
-        assist = players[e["e"]][assist_no]
-        if scorer_no not in points_stats[e["e"]]:
-            points_stats[e["e"]][scorer_no] = {
-                "scores": 0,
-                "assists": 0,
-                "name": scorer,
-                "no": scorer_no
-            }
-        if assist_no not in points_stats[e["e"]]:
-            points_stats[e["e"]][assist_no] = {
-                "scores": 0,
-                "assists": 0,
-                "name": assist,
-                "no": assist_no
-            }
-        points_stats[e["e"]][scorer_no]["scores"] += 1
-        points_stats[e["e"]][assist_no]["assists"] += 1
-    point_stats_sorted = {
-        "a": {
-            "total": sorted(list(points_stats["a"].values()), key=lambda el: el["scores"] + el["assists"],
-                            reverse=True),
-            "assists": sorted(list(points_stats["a"].values()), key=lambda el: el["assists"], reverse=True),
-            "points": sorted(list(points_stats["a"].values()), key=lambda el: el["scores"], reverse=True)
-        },
-        "h": {
-            "total": sorted(list(points_stats["h"].values()), key=lambda el: el["scores"] + el["assists"],
-                            reverse=True),
-            "assists": sorted(list(points_stats["h"].values()), key=lambda el: el["assists"], reverse=True),
-            "points": sorted(list(points_stats["h"].values()), key=lambda el: el["scores"], reverse=True)
-        }
+
+    for e in game_events:
+        if e["y"] == "S":
+            scorer_no = str(e["s"])
+            assist_no = str(e["a"])
+            
+            # Skip invalid player numbers
+            if scorer_no == "-1" or assist_no == "-1":
+                continue
+                
+            # Initialize player stats if needed
+            if scorer_no not in player_stats[e["e"]]:
+                player_stats[e["e"]][scorer_no] = {
+                    "name": players[e["e"]][scorer_no],
+                    "goals": 0,
+                    "assists": 0,
+                    "total": 0
+                }
+            
+            # Count scorer stats
+            player_stats[e["e"]][scorer_no]["goals"] += 1
+            player_stats[e["e"]][scorer_no]["total"] += 1
+            
+            # Handle assist stats (skip for Callahan)
+            if assist_no != "XX":
+                if assist_no not in player_stats[e["e"]]:
+                    player_stats[e["e"]][assist_no] = {
+                        "name": players[e["e"]][assist_no],
+                        "goals": 0,
+                        "assists": 0,
+                        "total": 0
+                    }
+                player_stats[e["e"]][assist_no]["assists"] += 1
+                player_stats[e["e"]][assist_no]["total"] += 1
+
+    # Sort player stats by total points
+    sorted_stats = {
+        "a": dict(sorted(player_stats["a"].items(), 
+                        key=lambda x: (-x[1]["total"], -x[1]["goals"], -x[1]["assists"], x[1]["name"]))),
+        "h": dict(sorted(player_stats["h"].items(), 
+                        key=lambda x: (-x[1]["total"], -x[1]["goals"], -x[1]["assists"], x[1]["name"])))
     }
 
-    return point_stats_sorted
+    return sorted_stats

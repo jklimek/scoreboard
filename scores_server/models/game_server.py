@@ -83,6 +83,7 @@ class GameServer:
         elif event["y"] == "S":
             prepared_event.update(self._prepare_score_event(event))
         elif event["y"] == "E":
+            self.logger.info(f"End event: {event}")
             prepared_event["subtype"] = "end"
             prepared_event["data"]["time"] = event["t"]
 
@@ -309,15 +310,28 @@ class GameServer:
         })
 
     def set_timer(self, time_data: Dict[str, Any], match_info: bool = False) -> None:
-        """Set and update game timer."""
+        """
+        Set and update game timer.
+        
+        Args:
+            time_data: Timer data containing 'ds' (timestamp), 'stop' and 'time' fields
+            match_info: Whether this is initial match info
+        """
+        self.logger.debug(f"Setting timer with data: {time_data}")
         timer_offset = self.calculate_timer_offset(time_data["ds"])
 
         if self.detect_start(time_data):
             self.state.game_time = time_data["ds"]
             self.start_match_event(timer_offset)
-        if match_info and not time_data["stop"]:
+        elif match_info and not time_data["stop"]:
             self.set_running_timer_event(timer_offset)
         elif match_info and time_data["stop"]:
+            self.set_timer_event(int(time_data["time"]) / 10)
+        elif not time_data["stop"]:
+            # Handle ongoing game updates
+            self.set_running_timer_event(timer_offset)
+        else:
+            # Handle stopped timer
             self.set_timer_event(int(time_data["time"]) / 10)
 
     def start_match_event(self, timer_offset: float) -> None:
@@ -367,15 +381,25 @@ class GameServer:
 
     @staticmethod
     def calculate_timer_offset(timestamp: int) -> float:
-        """Calculate timer offset from timestamp."""
-        return round((int(round(time.time() * 1000)) - int(timestamp) * 100) / 1000)
+        """
+        Calculate timer offset from timestamp.
+        
+        Args:
+            timestamp: Server timestamp in deciseconds
+            
+        Returns:
+            Offset in seconds
+        """
+        current_time = int(round(time.time() * 1000))  # Current time in milliseconds
+        server_time = int(timestamp) * 100  # Convert deciseconds to milliseconds
+        return round((current_time - server_time) / 1000)
 
     def detect_start(self, time_data: Dict[str, Any]) -> bool:
         """
         Detect if a game is starting.
         
         Args:
-            time_data: Timer data
+            time_data: Timer data containing 'ds' (timestamp) and 'stop' fields
             
         Returns:
             True if game is starting, False otherwise
