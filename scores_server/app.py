@@ -21,7 +21,7 @@ def setup_logging() -> None:
         handlers.append(logging.StreamHandler())  # Print to console only in debug mode
         
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=handlers
     )

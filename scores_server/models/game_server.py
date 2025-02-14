@@ -32,6 +32,7 @@ class GameServer:
         self.reset_timer()
 
     def get_match_info(self, game_number: int) -> None:
+        """Get initial match information from the server."""
         payload = {
             "game": game_number,
             "players": "true",
@@ -55,6 +56,11 @@ class GameServer:
                 result_data["an"], 
                 result_data["aa"]
             )
+            
+            # Save initial game time
+            if not result_data["ts"]["stop"]:
+                self.state.game_time = result_data["ts"]["ds"]
+            
             self.set_timer(result_data["ts"], True)
             self.set_score(result_data["a"], result_data["h"])
             
@@ -102,7 +108,7 @@ class GameServer:
                 "h_score": str(event["hs"])
             }
         }
-
+        self.logger.info(f"Score event: {score_event}")
         if score_event["data"]["assist_no"] == config.CALLAHAN_MARKER:
             score_event["data"]["assist"] = "CALLAHAN"
         elif score_event["data"]["assist_no"] != config.INVALID_PLAYER_NO:
@@ -317,22 +323,24 @@ class GameServer:
             time_data: Timer data containing 'ds' (timestamp), 'stop' and 'time' fields
             match_info: Whether this is initial match info
         """
-        self.logger.debug(f"Setting timer with data: {time_data}")
+        self.logger.debug(f"Setting timer with data: {time_data}, current game_time: {self.state.game_time}")
         timer_offset = self.calculate_timer_offset(time_data["ds"])
 
-        if self.detect_start(time_data):
-            self.state.game_time = time_data["ds"]
-            self.start_match_event(timer_offset)
-        elif match_info and not time_data["stop"]:
-            self.set_running_timer_event(timer_offset)
-        elif match_info and time_data["stop"]:
-            self.set_timer_event(int(time_data["time"]) / 10)
-        elif not time_data["stop"]:
-            # Handle ongoing game updates
-            self.set_running_timer_event(timer_offset)
+        # Only update game_time if timer is running
+        if not time_data["stop"]:
+            if self.detect_start(time_data):
+                self.logger.debug(f"Start detected")
+                self.state.game_time = time_data["ds"]
+                self.start_match_event(timer_offset)
+            else:
+                # For running timer, update game_time and send running timer event
+                self.state.game_time = time_data["ds"]
+                self.set_running_timer_event(timer_offset)
         else:
-            # Handle stopped timer
+            # For stopped timer, use the time value directly
             self.set_timer_event(int(time_data["time"]) / 10)
+            
+        self.logger.debug(f"Timer set complete, game_time: {self.state.game_time}")
 
     def start_match_event(self, timer_offset: float) -> None:
         """
@@ -345,7 +353,7 @@ class GameServer:
             "type": "game",
             "start": 1,
             "data": {
-                "offset": timer_offset
+                "timer_offset": timer_offset
             }
         })
 
@@ -358,9 +366,9 @@ class GameServer:
         """
         self.send_message_to_all({
             "type": "game",
-            "timer_running": 1,
+            "running_timer_set": 1,
             "data": {
-                "offset": timer_offset
+                "timer_offset": timer_offset
             }
         })
 
@@ -375,7 +383,7 @@ class GameServer:
             "type": "game",
             "timer_set": 1,
             "data": {
-                "time": time_value
+                "timer_offset": time_value
             }
         })
 
@@ -405,7 +413,7 @@ class GameServer:
             True if game is starting, False otherwise
         """
         timer_offset = self.calculate_timer_offset(time_data["ds"])
-        self.logger.info(f"Timer offset: {timer_offset}")
+        self.logger.info(f"Start detection - Timer offset: {timer_offset}, Game time: {self.state.game_time}")
         return (
             self.state.game_time == 0 and 
             not time_data["stop"] and 

@@ -63,7 +63,7 @@ class ScoresServer:
                 int(self.game_server.state.game_number) >= 1000 and 
                 not self.game_server.state.stopped_game):
                 
-                self.logger.debug(f"Conditions met for game {self.game_server.state.game_number}, requesting update...")
+                self.logger.debug(f"Current game time: {self.game_server.state.game_time}")
                 self.game_server.state.scores_requests_count += 1
                 payload = {
                     "game": self.game_server.state.game_number,
@@ -79,9 +79,14 @@ class ScoresServer:
                     result_data = r.json()
                     if self.game_server.state.scores_requests_count % 2 == 0:
                         self.logger.info(f"Scores request: {result_data}")
-                    self.game_server.set_timer(result_data["ts"])
+                    
+                    # Only update timer if it's running
+                    if not result_data["ts"]["stop"]:
+                        self.game_server.set_timer(result_data["ts"])
                     self.game_server.check_and_set_stopped_game_status(result_data["ts"])
                     self.game_server.parse_scores_events(result_data["e"])
+                    
+                    self.logger.debug(f"Updated game time: {self.game_server.state.game_time}")
                 except Exception as e:
                     self.logger.error(f"Connection error: {e}", exc_info=True)
             else:
