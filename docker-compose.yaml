@@ -2,7 +2,9 @@ version: '3'
 
 services:
   scoreboard:
-    image: klimekjakub/scoreboard:1.42-pmp24
+    image: klimekjakub/scoreboard:2.0-hmp25
+    environment:
+      - RUN_ENV=production
     ports:
       - "8000:8000"
       - "5005:5005"

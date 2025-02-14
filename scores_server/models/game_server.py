@@ -76,7 +76,7 @@ class GameServer:
         Prepare event data for WebSocket transmission.
         """
         prepared_event = {"type": "scoreboard", "subtype": "", "data": {}}
-
+        self.logger.debug(f"Preparing event: {event}")
         if event["y"] == "O":
             prepared_event["side"] = event["e"]
             prepared_event["subtype"] = "offence"
@@ -248,18 +248,27 @@ class GameServer:
                     self.send_message_to_all(self.prepare_event(event))
 
     def proper_event(self, event: Dict[str, Any]) -> bool:
-        """Check if the event is valid and should be processed."""
-        return (
-            "y" in event and 
-            event["y"] in [
-                config.EventType.TURNOVER,
-                config.EventType.SCORE,
-                config.EventType.OFFENCE,
-                config.EventType.END,
-                config.EventType.HALFTIME,
-                config.EventType.TIMEOUT
-            ]
-        )
+        """
+        Check if the event is valid and should be processed.
+        
+        Args:
+            event: Event data to validate
+            
+        Returns:
+            True if event is valid, False otherwise
+        """
+        # First check for invalid score event
+        if event["y"] == "S" and event["a"] == -1 and event["s"] == -1:
+            return False
+            
+        # Then check for valid event types
+        return event["y"] in [
+            config.EventType.TURNOVER,
+            config.EventType.SCORE,
+            config.EventType.OFFENCE,
+            config.EventType.END,
+            config.EventType.TIMEOUT
+        ]
 
     def count_stats(self, events_data: List[Dict[str, Any]], players_data: Dict[str, Dict[str, str]]) -> None:
         """Calculate and update game statistics."""
@@ -323,7 +332,7 @@ class GameServer:
             time_data: Timer data containing 'ds' (timestamp), 'stop' and 'time' fields
             match_info: Whether this is initial match info
         """
-        self.logger.debug(f"Setting timer with data: {time_data}, current game_time: {self.state.game_time}")
+        self.logger.debug(f"Setting timer with data: {time_data}, current game_time: {self.state.game_time}. Match info: {match_info}")
         timer_offset = self.calculate_timer_offset(time_data["ds"])
 
         # Only update game_time if timer is running
@@ -367,9 +376,7 @@ class GameServer:
         self.send_message_to_all({
             "type": "game",
             "running_timer_set": 1,
-            "data": {
-                "timer_offset": timer_offset
-            }
+            "timer_offset": timer_offset
         })
 
     def set_timer_event(self, time_value: float) -> None:
@@ -382,9 +389,7 @@ class GameServer:
         self.send_message_to_all({
             "type": "game",
             "timer_set": 1,
-            "data": {
-                "timer_offset": time_value
-            }
+            "timer_offset": time_value
         })
 
     @staticmethod
@@ -413,7 +418,7 @@ class GameServer:
             True if game is starting, False otherwise
         """
         timer_offset = self.calculate_timer_offset(time_data["ds"])
-        self.logger.info(f"Start detection - Timer offset: {timer_offset}, Game time: {self.state.game_time}")
+        self.logger.debug(f"Start detection - Timer offset: {timer_offset}, Game time: {self.state.game_time}")
         return (
             self.state.game_time == 0 and 
             not time_data["stop"] and 

@@ -17,7 +17,6 @@ class Config:
     # Server settings
     FLASK_HOST: str = "0.0.0.0"
     FLASK_PORT: int = 5000
-    FLASK_DEBUG: bool = False
     WEBSOCKET_PORT: int = 5005
     
     # Update intervals (seconds)
@@ -65,8 +64,7 @@ class TestingConfig(Config):
     SCORES_URL: str = "https://scores.frisbee.pl/test3/ext/watchlive.php/"
 
 # Select config based on environment
-# env = os.getenv("FLASK_ENV", "testing")
-env = "testing"
+env = os.getenv("RUN_ENV", "testing")
 
 if env not in ("production", "testing"):
     logger.error(f"Invalid FLASK_ENV value: {env}, defaulting to testing")
