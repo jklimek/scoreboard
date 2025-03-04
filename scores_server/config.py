@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Config:
     # API URLs
-    # SCORES_URL: str = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
     WIND_URL: str = os.getenv("WIND_URL", "http://192.168.10.13/")
     
     # Server settings
     FLASK_HOST: str = "0.0.0.0"
     FLASK_PORT: int = 5000
+    
     WEBSOCKET_PORT: int = 5005
     
     # Update intervals (seconds)
@@ -57,11 +57,13 @@ class ProductionConfig(Config):
     FLASK_DEBUG = False
     # Add production-specific settings
     SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/"
+    WEBSOCKET_URL: str = "ws://klimek.jakub.tech:5005/"
 
 class TestingConfig(Config):
     FLASK_DEBUG = True
     # Add testing-specific settings
     SCORES_URL: str = "https://scores.frisbee.pl/test3/ext/watchlive.php/"
+    WEBSOCKET_URL: str = "ws://localhost:5005/"
 
 # Select config based on environment
 env = os.getenv("RUN_ENV", "testing")

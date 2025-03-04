@@ -19,6 +19,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 .idea
+.history
 scores_server/__pycache__
 scores_html/static/images/bg.png
 json_api/daty.json
