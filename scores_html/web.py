@@ -77,6 +77,11 @@ def pstats():
     return render_template('pstats.html')
 
 
+@app.route('/player_stats')
+def player_stats():
+    return render_template('player_stats.html')
+
+
 def filter_matches(matches_list, field):
     return [m for m in matches_list if m['field'] == field]
 

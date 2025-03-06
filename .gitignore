@@ -20,6 +20,7 @@ Temporary Items
 .apdisk
 .idea
 .history
+CLAUDE.md
 scores_server/__pycache__
 scores_html/static/images/bg.png
 json_api/daty.json
@@ -35,3 +36,4 @@ scores_server/handlers/__pycache__/*
 scores_server/logs/scores_server.log
 scores_server/models/__pycache__/*
 scores_server/server/__pycache__/*
+scores_server/tests/__pycache__/*

@@ -160,8 +160,18 @@ def get_rounded_percentage(a: Union[int, str], b: Union[int, str]) -> int:
 
 
 def count_d_o_points(game_events: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
-    """Count defensive and offensive points for each team."""
-    d_o_game_events = list(filter(lambda ev: ev["y"] in ["S", "O", "H"], game_events))
+    """
+    Count defensive and offensive points for each team.
+    
+    In Ultimate Frisbee:
+    - Offense points occur when the team that started with the disc scores
+    - Defense points occur when the team that didn't start with the disc forces a turnover and scores
+    
+    Note: In Ultimate Frisbee, the "O" event appears only once at the start of the game to 
+    indicate who starts with possession. After that, possession alternates after each point,
+    and flips at halftime if the first half ended with an odd number of points.
+    """
+    # Initialize points structure
     d_o_points = {
         "a": {
             "offence_points": 0,
@@ -173,61 +183,166 @@ def count_d_o_points(game_events: List[Dict[str, Any]]) -> Dict[str, Dict[str, i
         }
     }
     
-    if not d_o_game_events:
-        return d_o_points
-        
-    # -1 : a
-    # +1 : h
-    starting_offence = d_o_game_events[0]["e"]
-    side = starting_offence
+    # Filter only events we need
+    relevant_events = list(filter(lambda ev: ev["y"] in ["S", "O", "H", "T"], game_events))
     
-    for e in d_o_game_events:
-        if e["y"] == "O":
-            starting_offence = e["e"]
-            side = starting_offence
-        if e["y"] == "H":
-            side = "h" if starting_offence == "a" else "a"
-        if e["y"] == "S":
-            side_check = e["e"]
-            if side != side_check:
-                d_o_points[e["e"]]["defence_points"] += 1
-            else:
-                d_o_points[e["e"]]["offence_points"] += 1
-            side = "h" if e["e"] == "a" else "a"
+    if not relevant_events:
+        return d_o_points
+    
+    # First find all halftimes and scores to divide the game into parts
+    halftime_indices = []
+    score_indices = []
+    
+    for i, event in enumerate(relevant_events):
+        if event["y"] == "H":
+            halftime_indices.append(i)
+        elif event["y"] == "S":
+            score_indices.append(i)
+    
+    if not score_indices:
+        return d_o_points
+    
+    # Find the initial offense event
+    starting_offense = None
+    for event in relevant_events:
+        if event["y"] == "O":
+            starting_offense = event["e"]
+            break
+    
+    if starting_offense is None and relevant_events:
+        # If no explicit offense event, use the first event's team
+        starting_offense = relevant_events[0]["e"]
+    elif starting_offense is None:
+        # No events at all
+        return d_o_points
+    
+    # Process the game with precise tracking of who starts each point with possession
+    current_offense_team = starting_offense
+    
+    # Track if we've passed halftime
+    passed_halftime = False
+    
+    # Process each point
+    point_boundaries = [0] + [i+1 for i in score_indices] + [len(relevant_events)]
+    
+    for i in range(len(point_boundaries) - 1):
+        # Skip the last pseudo-point
+        if i >= len(score_indices):
+            break
             
+        # Get score event for this point
+        score_idx = score_indices[i]
+        score_event = relevant_events[score_idx]
+        
+        # Get all events in this point
+        point_start = point_boundaries[i]
+        point_end = point_boundaries[i+1]
+        point_events = relevant_events[point_start:point_end]
+        
+        # Check if this point contains halftime
+        for event in point_events:
+            if event["y"] == "H" and not passed_halftime:
+                passed_halftime = True
+                # At halftime, possession switches to opposite team
+                current_offense_team = "h" if current_offense_team == "a" else "a"
+        
+        # Check if point had turnovers
+        had_turnover = any(event["y"] == "T" for event in point_events)
+        
+        # Determine who scored and if it was offense or defense
+        scoring_team = score_event["e"]
+        is_offense_point = scoring_team == current_offense_team
+        
+        if is_offense_point:
+            # Offense point
+            d_o_points[scoring_team]["offence_points"] += 1
+        else:
+            # Defense point
+            d_o_points[scoring_team]["defence_points"] += 1
+        
+        # After a score, possession switches
+        current_offense_team = "a" if scoring_team == "h" else "h"
+    
     return d_o_points
 
 
-def count_disc_possession(game_events):
+def count_disc_possession(game_events: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Calculate disc possession time for each team as a percentage.
+    
+    Args:
+        game_events: List of game events including turnovers, scores, etc.
+        
+    Returns:
+        Dictionary with possession percentages and total time
+    """
     possession_game_events = list(filter(lambda ev: ev["y"] in ["T", "S", "O", "H"], game_events))
+    
+    # Handle empty events case
+    if not possession_game_events:
+        return {
+            "a": 0,
+            "h": 0,
+            "total": 0
+        }
+    
     disc_possession = {
         "a": 0,
         "h": 0,
         "total": possession_game_events[-1]["t"]
     }
-    tmp_time = 0
-    starting_offence = possession_game_events[0]["e"]
-    side = starting_offence
+    
+    # Find first offense setting event
+    first_offense_event = None
+    for event in possession_game_events:
+        if event["y"] == "O":
+            first_offense_event = event
+            break
+    
+    # If no explicit offense event found, use first event
+    if first_offense_event is None:
+        first_offense_event = possession_game_events[0]
+    
+    # Initialize tracking variables
+    side = first_offense_event["e"]  # Current possession side
+    tmp_time = 0  # Previous event timestamp
+    
     for e in possession_game_events:
+        # Handle different event types
         if e["y"] == "O":
-            starting_offence = e["e"]
-            side = starting_offence
-        if e["y"] == "S":
+            # Explicit offense setting
             disc_possession[side] += e["t"] - tmp_time
+            side = e["e"]  # Change possession to specified team
+            
+        elif e["y"] == "S":
+            # Score event - add time to current possession holder
+            disc_possession[side] += e["t"] - tmp_time
+            # After score, possession switches to the other team
             side = "h" if e["e"] == "a" else "a"
-        if e["y"] == "H":
+            
+        elif e["y"] == "H":
+            # Halftime - add time to current possession holder
             disc_possession[side] += e["t"] - tmp_time
-            side = "h" if starting_offence == "a" else "a"
-        if e["y"] == "T":
+            # At halftime, possession typically switches
+            side = "h" if side == "a" else "a"
+            
+        elif e["y"] == "T":
+            # Turnover - add time to current possession holder
             disc_possession[side] += e["t"] - tmp_time
-
+            # Switch possession to the other team
+            side = "h" if side == "a" else "a"
+        
+        # Update previous event time
         tmp_time = e["t"]
+    
+    # Calculate percentages
     if disc_possession["total"] == 0:
         disc_possession["a"] = 0
         disc_possession["h"] = 0
     else:
         disc_possession["a"] = round(disc_possession["a"] / disc_possession["total"] * 100, 1)
         disc_possession["h"] = round(disc_possession["h"] / disc_possession["total"] * 100, 1)
+        
     return disc_possession
 
 
@@ -265,44 +380,70 @@ def count_points_per_player(game_events: List[Dict[str, Any]], players: Dict[str
 
     for e in game_events:
         if e["y"] == "S":
+            # Convert to strings to handle both string and integer inputs
             scorer_no = str(e["s"])
             assist_no = str(e["a"])
+            team = e["e"]
             
-            # Skip invalid player numbers
+            # Skip events with invalid player numbers
             if scorer_no == "-1" or assist_no == "-1":
                 continue
                 
-            # Initialize player stats if needed
-            if scorer_no not in player_stats[e["e"]]:
-                player_stats[e["e"]][scorer_no] = {
-                    "name": players[e["e"]][scorer_no],
-                    "goals": 0,
-                    "assists": 0,
-                    "total": 0
-                }
-            
-            # Count scorer stats
-            player_stats[e["e"]][scorer_no]["goals"] += 1
-            player_stats[e["e"]][scorer_no]["total"] += 1
-            
-            # Handle assist stats (skip for Callahan)
-            if assist_no != "XX":
-                if assist_no not in player_stats[e["e"]]:
-                    player_stats[e["e"]][assist_no] = {
-                        "name": players[e["e"]][assist_no],
+            # Process scorer
+            try:
+                # Initialize player stats if needed
+                if scorer_no not in player_stats[team]:
+                    player_stats[team][scorer_no] = {
+                        "name": players[team][scorer_no],
                         "goals": 0,
                         "assists": 0,
                         "total": 0
                     }
-                player_stats[e["e"]][assist_no]["assists"] += 1
-                player_stats[e["e"]][assist_no]["total"] += 1
+                
+                # Count scorer stats
+                player_stats[team][scorer_no]["goals"] += 1
+                player_stats[team][scorer_no]["total"] += 1
+            except KeyError:
+                # Handle error when player number doesn't exist in roster
+                # Re-raise to ensure callers know there's a problem
+                raise KeyError(f"Player {scorer_no} not found in team {team} roster")
+            
+            # Handle assist stats (skip for Callahan)
+            if assist_no != "XX":
+                try:
+                    # Initialize player stats if needed
+                    if assist_no not in player_stats[team]:
+                        player_stats[team][assist_no] = {
+                            "name": players[team][assist_no],
+                            "goals": 0,
+                            "assists": 0,
+                            "total": 0
+                        }
+                    
+                    # Count assist stats
+                    player_stats[team][assist_no]["assists"] += 1
+                    player_stats[team][assist_no]["total"] += 1
+                except KeyError:
+                    # Handle error when player number doesn't exist in roster
+                    raise KeyError(f"Player {assist_no} not found in team {team} roster")
 
-    # Sort player stats by total points
-    sorted_stats = {
-        "a": dict(sorted(player_stats["a"].items(), 
-                        key=lambda x: (-x[1]["total"], -x[1]["goals"], -x[1]["assists"], x[1]["name"]))),
-        "h": dict(sorted(player_stats["h"].items(), 
-                        key=lambda x: (-x[1]["total"], -x[1]["goals"], -x[1]["assists"], x[1]["name"])))
-    }
+    # Sort player stats by total points, goals, assists, then name
+    sorted_stats = {}
+    
+    for team in ["a", "h"]:
+        # Sort by:
+        # 1. Total points (descending)
+        # 2. Goals (descending)
+        # 3. Assists (descending)
+        # 4. Player name (ascending)
+        sorted_stats[team] = dict(sorted(
+            player_stats[team].items(),
+            key=lambda x: (
+                -x[1]["total"],        # Sort by total points (descending)
+                -x[1]["goals"],        # Then by goals (descending)
+                -x[1]["assists"],      # Then by assists (descending)
+                x[1]["name"]           # Then by name (ascending)
+            )
+        ))
 
     return sorted_stats

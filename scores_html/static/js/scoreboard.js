@@ -39,6 +39,8 @@ var teams = {
         stats_name_handle: $("#stats__ta-name"),
         roster_name_handle: $("#roster__ta-name"),
         roster_players_handle: $("#roster__ta-roster"),
+        player_stats_handle: $("#player-stats__ta-stats"),
+        player_stats_name_handle: $("#player-stats__ta-name"),
         score_handle: $("#ta-score-box")
     },
     h: {
@@ -50,6 +52,8 @@ var teams = {
         stats_name_handle: $("#stats__th-name"),
         roster_name_handle: $("#roster__th-name"),
         roster_players_handle: $("#roster__th-roster"),
+        player_stats_handle: $("#player-stats__th-stats"),
+        player_stats_name_handle: $("#player-stats__th-name"),
         score_handle: $("#th-score-box")
     }
 };
@@ -142,9 +146,19 @@ function parseEvent(data) {
 }
 
 function setTeamNames(team, name, name_full) {
+    // Save the full name in the teams object
+    teams[team]["name"] = name;
+    teams[team]["full_name"] = name_full;
+    
+    // Update UI elements
     teams[team]["handle"].text(name);
-    teams[team]["roster_name_handle"].text(name_full.toUpperCase())
-    teams[team]["stats_name_handle"].text(name_full.toUpperCase())
+    teams[team]["roster_name_handle"].text(name_full.toUpperCase());
+    teams[team]["stats_name_handle"].text(name_full.toUpperCase());
+    
+    // Player stats view
+    if (teams[team]["player_stats_name_handle"] && teams[team]["player_stats_name_handle"].length) {
+        teams[team]["player_stats_name_handle"].text(name_full.toUpperCase());
+    }
 }
 
 function setTeamJerseyColor(team, color) {
@@ -152,6 +166,11 @@ function setTeamJerseyColor(team, color) {
     teams[team]["handle"].css("border-color", color);
     teams[team]["roster_name_handle"].css("border-color", color);
     teams[team]["stats_name_handle"].css("border-color", color);
+    
+    // Player stats view
+    if (teams[team]["player_stats_name_handle"] && teams[team]["player_stats_name_handle"].length) {
+        teams[team]["player_stats_name_handle"].css("border-color", color);
+    }
 }
 
 function setScores(a, h) {
@@ -254,14 +273,101 @@ function statsUpdate(stats_data) {
 
         away_stats_html_list += `<li style="width:${set_stat_widths(away_percent)}%">${stats_data[stats_list[stat]]["a"]}</li>`;
         home_stats_html_list += `<li style="width:${set_stat_widths(home_percent)}%">${stats_data[stats_list[stat]]["h"]}</li>`;
-        // away_stats_html_list += `<li style="background:  linear-gradient(to right, var(--box-font-color) ${stats_data[stats_list[stat]]["ap"]}%, var(--box-bg-color) ${stats_data[stats_list[stat]]["ap"]}%);">${stats_data[stats_list[stat]]["a"]}</li>`;
-        // home_stats_html_list += `<li style="background: linear-gradient(to left, var(--box-font-color) ${stats_data[stats_list[stat]]["hp"]}%, var(--box-bg-color) ${stats_data[stats_list[stat]]["hp"]}%);">${stats_data[stats_list[stat]]["h"]}</li>`;
     }
     away_stats_html_list += `</ul>`;
     home_stats_html_list += `</ul>`;
 
     teams["a"]["stats_handle"].html(away_stats_html_list)
     teams["h"]["stats_handle"].html(home_stats_html_list)
+    
+    // Update player stats if available
+    if (stats_data.hasOwnProperty("player_stats")) {
+        updatePlayerStats(stats_data["player_stats"]);
+    }
+}
+
+function updatePlayerStats(player_stats) {
+    // Process player stats for both teams and show top 5 players
+    let away_player_stats = processTopPlayers(player_stats["a"], 5);
+    let home_player_stats = processTopPlayers(player_stats["h"], 5);
+    
+    // Update team names in the player stats view
+    if (teams["a"]["full_name"]) {
+        teams["a"]["player_stats_name_handle"].text(teams["a"]["full_name"].toUpperCase());
+    }
+    
+    if (teams["h"]["full_name"]) {
+        teams["h"]["player_stats_name_handle"].text(teams["h"]["full_name"].toUpperCase());
+    }
+    
+    // Generate HTML for player stats
+    let away_player_stats_html = generatePlayerStatsHtml(away_player_stats);
+    let home_player_stats_html = generatePlayerStatsHtml(home_player_stats);
+    
+    // Update the HTML
+    teams["a"]["player_stats_handle"].html(away_player_stats_html);
+    teams["h"]["player_stats_handle"].html(home_player_stats_html);
+}
+
+function processTopPlayers(team_stats, limit) {
+    // Convert object to array for easier sorting
+    let playersArray = Object.entries(team_stats).map(([playerNumber, stats]) => {
+        return {
+            number: playerNumber,
+            name: stats.name,
+            goals: stats.goals,
+            assists: stats.assists,
+            total: stats.total
+        };
+    });
+    
+    // Sort players by total points, then goals, then assists
+    playersArray.sort((a, b) => {
+        if (a.total !== b.total) return b.total - a.total;
+        if (a.goals !== b.goals) return b.goals - a.goals;
+        return b.assists - a.assists;
+    });
+    
+    // Return the top players (limited to the specified count)
+    return playersArray.slice(0, limit);
+}
+
+function generatePlayerStatsHtml(playersArray) {
+    if (playersArray.length === 0) {
+        return "<div class='no-data'>Brak danych</div>";
+    }
+    
+    let html = `
+    <table class="player-stats-table">
+        <thead>
+            <tr>
+                <th>GRACZ</th>
+                <th>GOLE</th>
+                <th>ASYSTY</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+    
+    playersArray.forEach(player => {
+        html += `
+            <tr>
+                <td class="player-name">
+                    <span class="player-number">#${player.number}</span>
+                    ${player.name}
+                </td>
+                <td>${player.goals}</td>
+                <td>${player.assists}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+        </tbody>
+    </table>
+    `;
+    
+    return html;
 }
 
 function setPlayers(players_data) {

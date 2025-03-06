@@ -66,7 +66,7 @@ class TestingConfig(Config):
     WEBSOCKET_URL: str = "ws://localhost:5005/"
 
 # Select config based on environment
-env = os.getenv("RUN_ENV", "testing")
+env = os.getenv("RUN_ENV", "production")
 
 if env not in ("production", "testing"):
     logger.error(f"Invalid FLASK_ENV value: {env}, defaulting to testing")
