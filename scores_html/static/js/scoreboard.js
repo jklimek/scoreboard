@@ -342,7 +342,7 @@ function generatePlayerStatsHtml(playersArray) {
         <thead>
             <tr>
                 <th>GRACZ</th>
-                <th>GOLE</th>
+                <th>PUNKTY</th>
                 <th>ASYSTY</th>
             </tr>
         </thead>
