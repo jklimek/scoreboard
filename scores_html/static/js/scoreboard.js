@@ -372,28 +372,109 @@ function generatePlayerStatsHtml(playersArray) {
 
 function setPlayers(players_data) {
     players = players_data;
-    let away_roster_html_list = "<ul class=\"roster__th-roster-list\">"
-    for (let number in players["a"]) {
-        away_roster_html_list += `<li class="roster__ta-roster-item roster__roster-item">
-                    <span class="roster__roster-item__number">#${number}</span>
-                    ${players["a"][number]}
-                </li>`;
+    
+    // Create away team roster table - with two columns of players
+    let away_roster_html = `
+    <table class="roster-table">
+        <tbody>
+    `;
+    
+    // Sort player numbers numerically
+    let away_numbers = Object.keys(players["a"]).sort((a, b) => parseInt(a) - parseInt(b));
+    
+    // Split the players into two columns
+    const halfLength = Math.ceil(away_numbers.length / 2);
+    const leftColumn = away_numbers.slice(0, halfLength);
+    const rightColumn = away_numbers.slice(halfLength);
+    
+    // Generate rows with two players per row
+    for (let i = 0; i < halfLength; i++) {
+        if (i % 2 === 0) {
+            away_roster_html += `<tr class="roster__even-row">`;
+        } else {
+            away_roster_html += `<tr>`;
+        }
+        // Left column player
+        away_roster_html += `
+            <td class="player-number">#${leftColumn[i]}</td>
+            <td class="player-name">${players["a"][leftColumn[i]]}</td>
+        `;
+        
+        // Right column player (if exists)
+        if (i < rightColumn.length) {
+            away_roster_html += `
+                <td class="player-number second-column">#${rightColumn[i]}</td>
+                <td class="player-name">${players["a"][rightColumn[i]]}</td>
+            `;
+        } else {
+            // Empty cells for alignment
+            away_roster_html += `
+                <td class="player-number second-column"></td>
+                <td class="player-name"></td>
+            `;
+        }
+        
+        away_roster_html += `</tr>`;
     }
-    away_roster_html_list += `</ul>`;
+    
+    away_roster_html += `
+        </tbody>
+    </table>
+    `;
 
-    let home_roster_html_list = "<ul class=\"roster__th-roster-list\">"
-    for (let number in players["h"]) {
-        home_roster_html_list += `<li class="roster__ta-roster-item roster__roster-item">
-                    <span class="roster__roster-item__number">#${number}</span>
-                    ${players["h"][number]}
-                </li>`;
+    // Create home team roster table - with two columns of players
+    let home_roster_html = `
+    <table class="roster-table">
+        <tbody>
+    `;
+    
+    // Sort player numbers numerically
+    let home_numbers = Object.keys(players["h"]).sort((a, b) => parseInt(a) - parseInt(b));
+    
+    // Split the players into two columns
+    const homeHalfLength = Math.ceil(home_numbers.length / 2);
+    const homeLeftColumn = home_numbers.slice(0, homeHalfLength);
+    const homeRightColumn = home_numbers.slice(homeHalfLength);
+    
+    // Generate rows with two players per row
+    for (let i = 0; i < homeHalfLength; i++) {
+        if (i % 2 === 0) {
+            home_roster_html += `<tr class="roster__even-row">`;
+        } else {
+            home_roster_html += `<tr>`;
+        }
+        
+        // Left column player
+        home_roster_html += `
+            <td class="player-number">#${homeLeftColumn[i]}</td>
+            <td class="player-name">${players["h"][homeLeftColumn[i]]}</td>
+        `;
+        
+        // Right column player (if exists)
+        if (i < homeRightColumn.length) {
+            home_roster_html += `
+                <td class="player-number second-column">#${homeRightColumn[i]}</td>
+                <td class="player-name">${players["h"][homeRightColumn[i]]}</td>
+            `;
+        } else {
+            // Empty cells for alignment
+            home_roster_html += `
+                <td class="player-number second-column"></td>
+                <td class="player-name"></td>
+            `;
+        }
+        
+        home_roster_html += `</tr>`;
     }
-    home_roster_html_list += `</ul>`;
+    
+    home_roster_html += `
+        </tbody>
+    </table>
+    `;
 
-    teams["a"]["roster_players_handle"].html(away_roster_html_list)
-    teams["h"]["roster_players_handle"].html(home_roster_html_list)
-
-
+    // Update the DOM
+    teams["a"]["roster_players_handle"].html(away_roster_html);
+    teams["h"]["roster_players_handle"].html(home_roster_html);
 }
 
 function windUpdate(windAngle, windSpeed, windTemp, windHum) {
