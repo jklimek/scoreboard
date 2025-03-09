@@ -406,10 +406,10 @@ li {
     border-radius: 2px;
 }
 
-.stats__stats {
+/* .stats__stats {
 
-    /*background-color: var(--box-bg-color);*/
-}
+    background-color: var(--box-bg-color);
+} */
 
 .stats__stats > ul > li {
     background-color: var(--box-bg-color);
