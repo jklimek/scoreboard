@@ -35,8 +35,10 @@ The application consists of two main components:
 ### Docker Installation (Recommended)
 
 1. Clone the repository:
-`git clone https://github.com/jklimek/scoreboard.git`
-`cd scoreboard`
+```
+git clone https://github.com/jklimek/scoreboard.git
+cd scoreboard
+```
 2. Start the application using Docker Compose:
 docker-compose up
 3. Access the application:
@@ -49,16 +51,23 @@ docker-compose up
 ### Manual Installation
 
 1. Clone the repository:
-`git clone https://github.com/jklimek/scoreboard.git`
-`cd scoreboard`
+```git clone https://github.com/jklimek/scoreboard.git
+cd scoreboard
+```
 2. Install dependencies:
-`pip install -r scores_server/requirements.txt`
+```
+pip install -r scores_server/requirements.txt
+```
 3. Start the backend server:
-`cd scores_server`
-`gunicorn -b 0.0.0.0:5000 app:app`
+```
+cd scores_server
+gunicorn -b 0.0.0.0:5000 app:app
+```
 4. In a separate terminal, start the frontend server:
-`cd scores_html`
-`gunicorn -b 0.0.0.0:8000 web:app`
+```
+cd scores_html
+gunicorn -b 0.0.0.0:8000 web:app
+```
 5. Access the application at http://localhost:8000
 
 ## Using the Controller
@@ -108,21 +117,29 @@ Appearance can be customized by modifying:
 ### Running in Development Mode
 
 1. Start the backend server in debug mode:
-`cd scores_server`
-`python app.py`
+```
+cd scores_server
+python app.py
+```
 2. Start the frontend server in debug mode:
-`cd scores_html`
-`python web.py`
+```
+cd scores_html
+python web.py
+```
 
 ### Testing
 
 Run tests with:
-`cd scores_server`
-`pytest tests/`
+```
+cd scores_server
+pytest tests/
+```
 
 Test a specific file:
 `cd scores_server
-`pytest tests/test_stats.py -v`
+```
+pytest tests/test_stats.py -v
+```
 
 ## Troubleshooting
 
