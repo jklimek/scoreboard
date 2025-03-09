@@ -61,6 +61,12 @@ def stats():
     return render_template('stats.html')
 
 
+
+@app.route('/wind')
+def wind():
+    return render_template('wind.html')
+
+
 @app.route('/roster')
 def roster():
     return render_template('roster.html')
@@ -69,6 +75,11 @@ def roster():
 @app.route('/pstats')
 def pstats():
     return render_template('pstats.html')
+
+
+@app.route('/player_stats')
+def player_stats():
+    return render_template('player_stats.html')
 
 
 def filter_matches(matches_list, field):

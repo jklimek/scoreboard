@@ -19,5 +19,21 @@ Network Trash Folder
 Temporary Items
 .apdisk
 .idea
+.history
+CLAUDE.md
 scores_server/__pycache__
 scores_html/static/images/bg.png
+json_api/daty.json
+json_api/match_caly.json
+json_api/match.json
+json_api/wind.json
+scores_html/static/fonts/OFL.txt
+scores_html/static/fonts/README.txt
+scores_html/static/images/bg_indoor.jpg
+scores_html/static/images/bg2.jpg
+scores_server/test2.py
+scores_server/handlers/__pycache__/*
+scores_server/logs/scores_server.log
+scores_server/models/__pycache__/*
+scores_server/server/__pycache__/*
+scores_server/tests/__pycache__/*

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Stream Scoreboard</title>
+    <title>Player Stats - Scoreboard</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='images/favicon.ico') }}">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -18,33 +18,35 @@
     your browser</a> to improve your experience and security.</p>
 <![endif]-->
 <div class="content">
-    <div id="pstats" class="pstats active">
-        <div id="pstats__th-name" class="pstats__name pstats__th-name">
+
+    <div id="player-stats" class="player-stats active">
+        <div id="player-stats__th-name" class="player-stats__name player-stats__th-name">
         </div>
-        <div id="pstats__div"></div>
-        <div id="pstats__ta-name" class="pstats__name pstats__ta-name">
+        <div id="player-stats__ta-name" class="player-stats__name player-stats__ta-name">
         </div>
-        <div id="pstats__th-pstats" class="pstats__pstats-th-container">
+        <div id="player-stats__th-stats">
+            <!-- Home team stats table will be inserted here -->
         </div>
-        <div id="pstats__pstats" class="pstats__pstats">
-            <ul>
-                <li>PUNKTY</li>
-                <li>ASYSTY</li>
-            </ul>
+        <div id="player-stats__ta-stats">
+            <!-- Away team stats table will be inserted here -->
         </div>
-        <div id="pstats__ta-pstats" class="pstats__pstats-ta-container">
-        </div>
-        <div id="pstats__info">
-            Gdańsk Stogi, Boisko 1</i>
+        <div id="player-stats__info">
+            Książenice, Boisko 1
         </div>
     </div>
 
-
 </div>
-
 
 <script src="../static/js/jquery.js"></script>
 <script src="../static/js/easytimer.min.js"></script>
 <script src="../static/js/scoreboard.js"></script>
+<script>
+    // Initialize player stats view
+    $(document).ready(function() {
+        if (window.websocket.readyState !== WebSocket.OPEN) {
+            websocketConnection();
+        }
+    });
+</script>
 </body>
 </html>
