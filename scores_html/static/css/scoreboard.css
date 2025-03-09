@@ -48,7 +48,7 @@ body {
     color: var(--box-font-color);
     background-color: var(--main-bg-color);
     /*background-image: url("../images/bg2.jpg");*/
-    /* background-image: url("../images/bg_indoor.jpg"); */
+    background-image: url("../images/bg_indoor.jpg");
 
 
     background-size: cover;
@@ -291,6 +291,7 @@ li {
 .stats {
     grid-template-areas: "stats-th-name stats-div stats-ta-name"
                          "stats-th-content  stats-stats  stats-ta-content"
+                         "stats-timeline stats-timeline stats-timeline"
                          "stats-info  stats-info stats-info";
     grid-template-columns: 1fr 300px 1fr;
 }
@@ -382,14 +383,14 @@ li {
 
 .stats__stats-th-container > ul > li, .stats__stats-ta-container > ul > li {
     background-color: var(--box-font-color);
-    padding-bottom: 14px;
-    padding-top: 14px;
+    padding-bottom: 18px;
+    padding-top: 18px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
-    font-size: 30px;
+    font-size: 16pt;
     color: var(--box-bg-color);
     position: relative;
     border-radius: 2px;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 }
 
 .stats__stats-th-container > ul > li {
@@ -415,11 +416,11 @@ li {
     background-color: var(--box-bg-color);
     border-radius: 2px;
     text-align: center;
-    padding-bottom: 20px;
-    padding-top: 20px;
+    padding-bottom: 18px;
+    padding-top: 18px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
     /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255, 10%), 0 6px 20px 0 rgb(255, 255, 255, 10%);*/
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 }
 
 #roster__info, #stats__info {
@@ -439,6 +440,71 @@ li {
 
 #stats__info {
     grid-area: stats-info;
+}
+
+#stats__timeline {
+    grid-area: stats-timeline;
+    margin-top: 15px;
+    height: 40px;
+    width: 100%;
+}
+
+.stats__timeline-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: #eeeeee; /* Light grey background to ensure visibility */
+    border-radius: 2px;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    overflow: hidden;
+}
+
+.timeline-event {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    z-index: 5;
+}
+
+.timeline-event.home {
+    background-color: var(--box-font-color); /* Blue */
+}
+
+.timeline-event.away {
+    background-color: var(--box-point-accent-color); /* Orange */
+}
+
+.timeline-event-point {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-50%); /* Center the dot on the exact position */
+    background-color: var(--box-font-color);
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.timeline-event-timeout {
+    position: absolute;
+    width: 48px;
+    height: 30px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-50%); /* Center on the position */
+    background-color: var(--box-point-accent-color);
+    z-index: 9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.timeline-event-halftime {
+    position: absolute;
+    width: 4px;
+    height: 100%;
+    background-color: white;
+    z-index: 8;
+    transform: translateX(-50%); /* Center on the position */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 

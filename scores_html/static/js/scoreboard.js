@@ -12,8 +12,10 @@ var awayScore = 0;
 var homeScore = 0;
 var players = {};
 var events = [];
+var gameEvents = [];
 var windAngle = 0;
 var windSpeed = "-";
+var maxGameTime = 0;
 
 var timerHandle = $("#timer");
 var windBoxHandle = $("#wind");
@@ -124,23 +126,56 @@ function parseEvent(data) {
         statsUpdate(data["stats_data"]);
     } else if (data.hasOwnProperty("score_reset")) {
         setScores(0, 0);
+        // Clear the timeline
+        clearTimeline();
     } else if (data.hasOwnProperty("score_set")) {
         setScores(data["data"]["a_score"], data["data"]["h_score"]);
     } else if (data.hasOwnProperty("subtype")) {
+        // Track game event
+        if (data["t"]) {
+            maxGameTime = Math.max(maxGameTime, data["t"]);
+        }
+        
+        // Store event in gameEvents array
+        gameEvents.push(data);
+        
         if (data["subtype"] === "score") {
             score(teams[data["side"]]["handle"], data["data"]["assist"], data["data"]["scorer"]);
             setScores(data["data"]["a_score"], data["data"]["h_score"]);
             discPossessionChange(data["side"]);
+            
+            // Update timeline
+            updateTimeline();
+            
         } else if (data["subtype"] === "offence") {
             discPossessionChange(data["side"], true);
+            
+            // Update timeline
+            updateTimeline();
+            
         } else if (data["subtype"] === "turnover") {
             discPossessionChange(data["side"]);
+            
+            // Update timeline
+            updateTimeline();
+            
         } else if (data["subtype"] === "timeout") {
             timeout(data["side"]);
+            
+            // Update timeline
+            updateTimeline();
+            
         } else if (data["subtype"] === "start") {
             startMatch(data["timer_offset"]);
+            
+            // Clear and initialize timeline
+            clearTimeline();
+            
         } else if (data["subtype"] === "end") {
             end();
+            
+            // Final timeline update
+            updateTimeline();
         }
     }
 }
@@ -607,6 +642,330 @@ String.prototype.escapeDiacritics = function () {
         .replace(/ś/g, 's').replace(/Ś/g, 'S')
         .replace(/ż/g, 'z').replace(/Ż/g, 'Z')
         .replace(/ź/g, 'z').replace(/Ź/g, 'Z');
+};
+
+// Timeline functions
+function clearTimeline() {
+    // Clear all timeline elements
+    $(".stats__timeline-container").empty();
+    gameEvents = [];
+    maxGameTime = 0;
+}
+
+function updateTimeline() {
+    // Debug info
+    console.log("Updating timeline, events:", gameEvents.length);
+    
+    // If no events or not showing stats, don't update
+    if (gameEvents.length === 0 || !statsHandle.hasClass("active")) {
+        return;
+    }
+    
+    // Get timeline container and clear it
+    const container = $(".stats__timeline-container");
+    container.empty();
+    
+    // Get team colors from the border-top of stats name elements
+    const homeColor = teams["h"]["stats_name_handle"].css("border-top-color") || "#5866E1";
+    const awayColor = teams["a"]["stats_name_handle"].css("border-top-color") || "#bc4920";
+    console.log("Team colors - Home:", homeColor, "Away:", awayColor);
+    
+    // Width of the container
+    const containerWidth = container.width();
+    console.log("Container width:", containerWidth);
+    
+    // Ensure we have valid time values
+    const validTimeEvents = gameEvents.filter(event => typeof event.t === 'number' && event.t >= 0);
+    console.log("Events with valid times:", validTimeEvents.length);
+    
+    // If no valid time events, add artificial times
+    if (validTimeEvents.length === 0 && gameEvents.length > 0) {
+        gameEvents.forEach((event, index) => {
+            event.t = index * 100; // Space events 100 units apart
+        });
+        maxGameTime = (gameEvents.length - 1) * 100;
+        console.log("Created artificial timestamps in updateTimeline, new max time:", maxGameTime);
+    }
+    
+    // Set maxGameTime to latest event time
+    maxGameTime = 0;
+    gameEvents.forEach(event => {
+        if (typeof event.t === 'number') {
+            maxGameTime = Math.max(maxGameTime, event.t);
+        }
+    });
+    
+    // If still no maxGameTime, use a default
+    if (maxGameTime === 0) {
+        maxGameTime = 3600; // Default to 1 hour (3600 deciseconds)
+    }
+    
+    console.log("Max game time:", maxGameTime);
+    
+    // Sort events by time
+    const sortedEvents = [...gameEvents].sort((a, b) => {
+        const timeA = typeof a.t === 'number' ? a.t : 0;
+        const timeB = typeof b.t === 'number' ? b.t : 0;
+        return timeA - timeB;
+    });
+    
+    console.log("Sorted events:", sortedEvents);
+    
+    // Default to home team as first team
+    let currentTeam = "h"; 
+    let lastPosition = 0;
+    
+    // First event should determine initial possession
+    if (sortedEvents.length > 0 && sortedEvents[0].subtype === "offence") {
+        currentTeam = sortedEvents[0].side;
+        console.log("Found starting offense:", currentTeam);
+    }
+    
+    // Process each event
+    sortedEvents.forEach((event, index) => {
+        // Skip events without time
+        if (!event.t && event.t !== 0) return;
+        
+        console.log("Processing event:", event);
+        
+        // Calculate position based on time (percentage of total time)
+        // For artificial timestamps, we can simply use the index to space events evenly
+        // This ensures a clean visual regardless of the actual time values
+        const eventTime = typeof event.t === 'number' ? event.t : 0;
+        const safeMaxTime = maxGameTime > 0 ? maxGameTime : 1;
+        const position = (eventTime / safeMaxTime) * containerWidth;
+        const timeout_width = 40;
+        console.log("Event position:", position, "Time:", eventTime, "Max time:", safeMaxTime);
+        
+        // Handle different event types
+        if (event.subtype === "turnover") {
+            // Create segment for the period before turnover
+            const segmentWidth = position - lastPosition;
+            
+            if (segmentWidth > 0) {
+                const segment = $("<div>")
+                    .addClass("timeline-event")
+                    .css({
+                        left: lastPosition + "px",
+                        width: segmentWidth + "px",
+                        backgroundColor: currentTeam === "h" ? homeColor : awayColor
+                    });
+                
+                container.append(segment);
+                console.log("Added turnover segment:", currentTeam, lastPosition, segmentWidth);
+            }
+            
+            // Switch possession after turnover
+            currentTeam = currentTeam === "h" ? "a" : "h";
+            lastPosition = position;
+        } 
+        else if (event.subtype === "score") {
+            // Create segment for the period before score
+            const segmentWidth = position - lastPosition;
+            
+            if (segmentWidth > 0) {
+                const segment = $("<div>")
+                    .addClass("timeline-event")
+                    .css({
+                        left: lastPosition + "px",
+                        width: segmentWidth + "px", 
+                        backgroundColor: currentTeam === "h" ? homeColor : awayColor
+                    });
+                
+                container.append(segment);
+                console.log("Added score segment:", currentTeam, lastPosition, segmentWidth);
+            }
+            
+            // Add point marker
+            const pointMarker = $("<div>")
+                .addClass("timeline-event-point")
+                .css({
+                    left: position + "px"
+                });
+            
+            container.append(pointMarker);
+            console.log("Added point marker at:", position);
+            
+            // Switch possession after score
+            currentTeam = currentTeam === "h" ? "a" : "h";
+            lastPosition = position;
+        }
+        else if (event.subtype === "offence") {
+            // Only create segment if this isn't the first event
+            if (index > 0) {
+                // Create segment for the period before offense
+                const segmentWidth = position - lastPosition;
+                
+                if (segmentWidth > 0) {
+                    const segment = $("<div>")
+                        .addClass("timeline-event")
+                        .css({
+                            left: lastPosition + "px",
+                            width: segmentWidth + "px",
+                            backgroundColor: currentTeam === "h" ? homeColor : awayColor
+                        });
+                    
+                    container.append(segment);
+                    console.log("Added offense segment:", currentTeam, lastPosition, segmentWidth);
+                }
+            }
+            
+            // Set team with offense
+            currentTeam = event.side;
+            lastPosition = position;
+        }
+        else if (event.subtype === "timeout") {
+            // Add timeout marker
+            const timeoutMarker = $("<div>")
+                .addClass("timeline-event-timeout")
+                .css({
+                    left: position + timeout_width + "px"
+                });
+            
+            container.append(timeoutMarker);
+            console.log("Added timeout marker at:", position);
+        }
+        else if (event.y === "H") {  // Halftime event
+            // Create segment before halftime
+            const segmentWidth = position - lastPosition;
+            
+            if (segmentWidth > 0) {
+                const segment = $("<div>")
+                    .addClass("timeline-event")
+                    .css({
+                        left: lastPosition + "px",
+                        width: segmentWidth + "px",
+                        backgroundColor: currentTeam === "h" ? homeColor : awayColor
+                    });
+                
+                container.append(segment);
+                console.log("Added pre-halftime segment:", currentTeam, lastPosition, segmentWidth);
+            }
+            
+            // Add halftime marker
+            const halftimeMarker = $("<div>")
+                .addClass("timeline-event-halftime")
+                .css({
+                    left: position + "px"
+                });
+            
+            container.append(halftimeMarker);
+            console.log("Added halftime marker at:", position);
+            
+            // After halftime, possession switches
+            currentTeam = currentTeam === "h" ? "a" : "h";
+            lastPosition = position;
+        }
+    });
+    
+    // Add final segment if needed
+    if (lastPosition < containerWidth) {
+        const segmentWidth = containerWidth - lastPosition;
+        if (segmentWidth > 0) {
+            const finalSegment = $("<div>")
+                .addClass("timeline-event")
+                .css({
+                    left: lastPosition + "px",
+                    width: segmentWidth + "px",
+                    backgroundColor: currentTeam === "h" ? homeColor : awayColor
+                });
+            
+            container.append(finalSegment);
+            console.log("Added final segment:", currentTeam, lastPosition, segmentWidth);
+        }
+    }
+}
+
+// Add stats update handler to also update timeline
+const originalStatsUpdate = statsUpdate;
+statsUpdate = function(stats_data) {
+    originalStatsUpdate(stats_data);
+    
+    // Check for raw events in the game_events field (sent from backend)
+    if (stats_data.hasOwnProperty("game_events") && stats_data.game_events && stats_data.game_events.length > 0) {
+        // Reset game events from stats
+        gameEvents = [];
+        maxGameTime = 0;
+        
+        console.log("Raw game events from backend:", stats_data.game_events.length);
+        
+        // Use timestamps directly from server - backend now ensures they're valid
+        stats_data.game_events.forEach((event, index) => {
+            const eventTime = typeof event.t === 'number' ? event.t : parseInt(event.t || 0, 10);
+            
+            console.log("Processing event from backend:", event, "Parsed time:", eventTime);
+            
+            if (event.y === "S") { // Score event
+                gameEvents.push({
+                    subtype: "score",
+                    side: event.e,
+                    t: eventTime,
+                    data: {
+                        assist: event.a,
+                        scorer: event.s,
+                        a_score: event.as, 
+                        h_score: event.hs
+                    }
+                });
+                
+                // Update max time
+                maxGameTime = Math.max(maxGameTime, eventTime);
+            } 
+            else if (event.y === "T") { // Turnover event
+                gameEvents.push({
+                    subtype: "turnover",
+                    side: event.e,
+                    t: eventTime
+                });
+                
+                // Update max time
+                maxGameTime = Math.max(maxGameTime, eventTime);
+            }
+            else if (event.y === "O") { // Offense event
+                gameEvents.push({
+                    subtype: "offence",
+                    side: event.e,
+                    t: eventTime
+                });
+                
+                // Update max time
+                maxGameTime = Math.max(maxGameTime, eventTime);
+            }
+            else if (event.y === "TO") { // Timeout event
+                gameEvents.push({
+                    subtype: "timeout",
+                    side: event.e,
+                    t: eventTime
+                });
+                
+                // Update max time
+                maxGameTime = Math.max(maxGameTime, eventTime);
+            }
+            else if (event.y === "H") { // Halftime event
+                gameEvents.push({
+                    y: "H",
+                    t: eventTime
+                });
+                
+                // Update max time
+                maxGameTime = Math.max(maxGameTime, eventTime);
+            }
+            else if (event.y === "E") { // End event
+                gameEvents.push({
+                    subtype: "end",
+                    t: eventTime
+                });
+                
+                // Update max time
+                maxGameTime = Math.max(maxGameTime, eventTime);
+            }
+        });
+        
+        console.log("Processed events with artificial times:", gameEvents.length, "Max time:", maxGameTime);
+    }
+    
+    // After updating stats, update the timeline
+    updateTimeline();
 };
 
 

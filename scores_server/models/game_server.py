@@ -281,6 +281,144 @@ class GameServer:
         timeouts = stats.count_timeouts(events_data)
         player_stats = stats.count_points_per_player(events_data, players_data)
 
+        # Make a fresh copy of events data for timeline
+        timeline_events = []
+        
+        # Get valid time-based events and sort them
+        valid_events = []
+        for event in events_data:
+            if event["y"] in ["S", "T", "O", "TO", "H", "E"] and "t" in event:
+                try:
+                    # Convert time to integer
+                    event_copy = event.copy()
+                    event_copy["t"] = int(event["t"])
+                    valid_events.append(event_copy)
+                except (ValueError, TypeError):
+                    self.logger.error(f"Invalid time value in event: {event}")
+        
+        # Sort events by time
+        valid_events.sort(key=lambda x: x["t"])
+        
+        # Check if we have valid events with different timestamps
+        has_valid_time_sequence = False
+        if len(valid_events) >= 2:
+            # Check if time spans are valid (not all the same)
+            first_time = valid_events[0]["t"]
+            last_time = valid_events[-1]["t"]
+            
+            # Log time spans to debug
+            self.logger.info(f"First event time: {first_time}, Last event time: {last_time}")
+            self.logger.info(f"Time span: {last_time - first_time}")
+            
+            # Look at time differences between events
+            time_diffs = []
+            for i in range(1, len(valid_events)):
+                time_diff = valid_events[i]["t"] - valid_events[i-1]["t"]
+                time_diffs.append(time_diff)
+            
+            self.logger.info(f"Time differences between events: {time_diffs}")
+            
+            if last_time > first_time:
+                has_valid_time_sequence = True
+        
+        # Add explicit offense event at the beginning to establish initial possession
+        # Default to home team possession at the start
+        first_team = "h"
+        
+        # Look for evidence of which team had first possession
+        for event in events_data:
+            if event["y"] in ["O", "T", "S"]:
+                first_team = event["e"]
+                break
+                
+        # Only add initial offense event if using real timestamps
+        # For artificial timestamps, we'll add it as part of that process
+        if has_valid_time_sequence and valid_events:
+            # Use the actual first timestamp - 10 to put it slightly earlier
+            first_time = max(0, valid_events[0]["t"] - 10)
+            timeline_events.append({
+                "y": "O",
+                "e": first_team,
+                "t": first_time
+            })
+        
+        if has_valid_time_sequence:
+            # Use actual timestamps
+            self.logger.info("Using actual timestamps for timeline")
+            timeline_events.extend(valid_events)
+            
+            # Log resulting timeline events to debug
+            time_values = [event.get("t", 0) for event in timeline_events]
+            self.logger.info(f"Timeline time values: {time_values}")
+            
+            # Calculate time differences to verify proportions
+            time_diffs = []
+            for i in range(1, len(timeline_events)):
+                time_diff = timeline_events[i]["t"] - timeline_events[i-1]["t"]
+                time_diffs.append(time_diff)
+            self.logger.info(f"Timeline time differences: {time_diffs}")
+            
+        else:
+            
+            # Calculate exponentially increasing time intervals
+            # This will make later events more spread out, creating dynamic width segments
+            total_events = sum(1 for event in events_data if event["y"] in ["S", "T", "O", "TO", "H", "E"])
+            
+            # Create a realistic-looking set of timestamps
+            event_index = 1  # Start at 1 because we'll add the first event here
+            total_game_time = 5000  # Total artificial game time
+            
+            # Add the initial offense event at time 0
+            # timeline_events.append({
+            #     "y": "O",
+            #     "e": first_team,
+            #     "t": 0
+            # })
+            
+            # Different event types have different typical time spans - simulate this
+            for event in events_data:
+                # Make sure we copy the event to avoid modifying the original
+                event_copy = event.copy()
+                # Include only relevant events for timeline
+                if event["y"] in ["S", "T", "O", "TO", "H", "E"]:
+                    # Real games have varied time intervals - create this with a progressive approach
+                    # Each event's time depends on its position in game sequence
+                    
+                    # Get base time from event's position in sequence (non-linear)
+                    progression_factor = event_index / total_events  # 0-1 range
+                    # Make later events more spread out with exponential growth
+                    progression_factor = progression_factor ** 0.8  # Apply slight power curve for natural flow
+                    
+                    # Base time from event position - this creates naturally varying segment widths
+                    time_value = int(progression_factor * total_game_time)
+                    
+                    # Ensure events don't have identical times by adding minimum differences
+                    if timeline_events:
+                        # Get the last event's time
+                        last_time = timeline_events[-1]["t"]
+                        # Ensure this event is at least a minimum distance away
+                        min_diff = 100 + (event_index * 20)  # Increasing minimum gaps
+                        time_value = max(time_value, last_time + min_diff)
+                    
+                    # Set the final time
+                    event_copy["t"] = time_value
+                    event_index += 1
+                    
+                    # Add to timeline events
+                    timeline_events.append(event_copy)
+            
+            # Sort the events by time to ensure proper ordering
+            timeline_events.sort(key=lambda x: x.get("t", 0))
+            
+            # Log resulting timeline events to debug
+            time_values = [event.get("t", 0) for event in timeline_events]
+            
+            # Calculate time differences to verify proportions
+            time_diffs = []
+            for i in range(1, len(timeline_events)):
+                time_diff = timeline_events[i]["t"] - timeline_events[i-1]["t"]
+                time_diffs.append(time_diff)
+
         stats_data = {
             "points": {
                 "a": self.state.away_score,
@@ -318,7 +456,8 @@ class GameServer:
                 "ap": stats.get_rounded_percentage(timeouts["a"], timeouts["h"]),
                 "hp": stats.get_rounded_percentage(timeouts["h"], timeouts["a"])
             },
-            "player_stats": player_stats
+            "player_stats": player_stats,
+            "game_events": timeline_events  # Pass processed timeline events
         }
 
         self.send_message_to_all({

@@ -58,6 +58,11 @@ class ProductionConfig(Config):
     # Add production-specific settings
     SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/"
     WEBSOCKET_URL: str = "ws://klimek.jakub.tech:5005/"
+class DevConfig(Config):
+    FLASK_DEBUG = True
+    # Add production-specific settings
+    SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/"
+    WEBSOCKET_URL: str = "ws://klimek.jakub.tech:5005/"
 
 class TestingConfig(Config):
     FLASK_DEBUG = True
@@ -66,7 +71,7 @@ class TestingConfig(Config):
     WEBSOCKET_URL: str = "ws://localhost:5005/"
 
 # Select config based on environment
-env = os.getenv("RUN_ENV", "production")
+env = os.getenv("RUN_ENV", "dev")
 
 if env not in ("production", "testing"):
     logger.error(f"Invalid FLASK_ENV value: {env}, defaulting to testing")
@@ -74,6 +79,7 @@ if env not in ("production", "testing"):
 config_map = {
     "production": ProductionConfig(),
     "testing": TestingConfig(),
+    "dev": DevConfig(),
 }
 
 logger.info(f"Using {env} environment configuration")
