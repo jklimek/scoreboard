@@ -83,22 +83,6 @@ The controller interface allows you to manage all aspects of the scoreboard syst
 - Player rosters are automatically loaded from the match data
 - Player numbers and names can be adjusted if needed
 
-### Controlling the Game
-
-1. Timer Management:
-- Start the match timer with the "Start" button
-- Reset timer with the "Reset timer" button
-- Set specific timer value with "Set timer"
-2. Score Management:
-- Track scores automatically from API data
-- Manually update scores using the score controls
-- Record goals with player attribution (scorer and assist)
-3. Disc Possession:
-- Set which team has possession using the offense buttons
-- Record turnovers using the turnover buttons
-4. Special Events:
-- Record timeouts for either team
-
 
 ## Advanced Usage
 
