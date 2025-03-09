@@ -11,108 +11,6 @@
     <link rel="manifest" href="site.webmanifest">
 
     <link rel="stylesheet" href="../static/css/scoreboard.css">
-    <style>
-        /* Additional styles for player stats */
-        .player-stats {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            -webkit-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%);
-            text-align: center;
-            width: 1600px;
-            font-size: 16pt;
-            opacity: 0;
-            display: grid;
-            transition: all .75s ease;
-            grid-template-areas: "player-stats-th-name player-stats-ta-name"
-                                "player-stats-th-content player-stats-ta-content"
-                                "player-stats-info player-stats-info";
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        #player-stats.active {
-            transition: all .75s ease;
-            opacity: 100%;
-        }
-
-        .player-stats__name {
-            border-radius: 60px;
-            background-color: var(--box-bg-color);
-            font-size: 24pt;
-            padding-top: 24px;
-            padding-bottom: 20px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
-        }
-
-        .player-stats__th-name {
-            grid-area: player-stats-th-name;
-            border-top: 8px solid white;
-        }
-
-        .player-stats__ta-name {
-            grid-area: player-stats-ta-name;
-            border-top: 8px solid white;
-        }
-
-        #player-stats__th-stats {
-            grid-area: player-stats-th-content;
-        }
-
-        #player-stats__ta-stats {
-            grid-area: player-stats-ta-content;
-        }
-
-        .player-stats-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 3px;
-        }
-
-        .player-stats-table th {
-            background-color: var(--box-bg-color);
-            color: var(--box-font-color);
-            padding: 15px 10px;
-            text-align: center;
-            border-radius: 20px;
-            font-size: 20pt;
-            box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
-        }
-
-        .player-stats-table td {
-            background-color: var(--box-font-color);
-            color: var(--box-bg-color);
-            padding: 12px 10px;
-            text-align: center;
-            border-radius: 20px;
-            font-size: 18pt;
-            box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
-        }
-        
-        .player-stats-table .player-name {
-            text-align: left;
-            padding-left: 20px;
-        }
-
-        #player-stats__info {
-            grid-area: player-stats-info;
-            background-color: var(--box-point-accent-color);
-            color: var(--box-bg-color);
-            padding-top: 10px;
-            padding-bottom: 8px;
-            box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
-            border-radius: 60px;
-            margin-top: 9px;
-        }
-
-        .player-number {
-            font-size: 16px;
-            opacity: 0.8;
-            margin-right: 8px;
-        }
-    </style>
 </head>
 <body>
 <!--[if lte IE 9]>
@@ -133,7 +31,7 @@
             <!-- Away team stats table will be inserted here -->
         </div>
         <div id="player-stats__info">
-            Gdańsk Stogi, Boisko 1
+            Książenice, Boisko 1
         </div>
     </div>
 

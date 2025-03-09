@@ -50,7 +50,7 @@ body {
     color: var(--box-font-color);
     background-color: var(--main-bg-color);
     /*background-image: url("../images/bg2.jpg");*/
-    /*background-image: url("../images/bg_indoor.jpg");*/
+    background-image: url("../images/bg_indoor.jpg");
 
 
     background-size: cover;
@@ -108,7 +108,7 @@ li {
     padding: 8px 4px 4px;
     /*height: 40px;*/
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
-    border-radius: 60px;
+    border-radius: 2px;
     /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255, 20%), 0 6px 20px 0 rgb(255, 255, 255, 19%);*/
 }
 
@@ -171,7 +171,7 @@ li {
     z-index: 9999; /* heh */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     /*box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);*/
-    border-radius: 60px;
+    border-radius: 2px;
 }
 
 .score-away {
@@ -180,7 +180,7 @@ li {
     z-index: 9999; /* heh */
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     /*box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);*/
-    border-radius: 60px;
+    border-radius: 2px;
 }
 
 .time {
@@ -220,7 +220,7 @@ li {
     padding-left: 40px;
     padding-right: 40px;
     padding-top: 20px;
-    border-radius: 60px;
+    border-radius: 2px;
 }
 
 .assist-wrapper {
@@ -281,7 +281,7 @@ li {
     opacity: 0;
     display: grid;
     transition: all .75s ease;
-
+    gap: 20px;
 }
 
 .roster {
@@ -294,13 +294,6 @@ li {
     grid-template-areas: "stats-th-name stats-div stats-ta-name"
                          "stats-th-content  stats-stats  stats-ta-content"
                          "stats-info  stats-info stats-info";
-    grid-template-columns: 1fr 300px 1fr;
-}
-
-.pstats {
-    grid-template-areas: "pstats-th-name pstats-div pstats-ta-name"
-                         "pstats-th-content  pstats-pstats  pstats-ta-content"
-                         "pstats-info  pstats-info pstats-info";
     grid-template-columns: 1fr 300px 1fr;
 }
 
@@ -326,7 +319,7 @@ li {
 }
 
 .roster__name, .stats__name {
-    border-radius: 60px;
+    border-radius: 2px;
     background-color: var(--box-bg-color);
     font-size: 24pt;
     padding-top: 24px;
@@ -347,7 +340,7 @@ li {
 }
 
 .roster__roster-container {
-    border-radius: 60px;
+    border-radius: 2px;
     width: 800px;
     background-color: var(--box-font-color);
     color: var(--box-bg-color);
@@ -405,7 +398,7 @@ li {
 
 #stats__stats {
     grid-area: stats-stats;
-    border-radius: 60px;
+    border-radius: 2px;
 }
 
 #stats__ta-stats {
@@ -419,7 +412,7 @@ li {
 
 .stats__stats-th-container, .stats__stats-ta-container {
     /*background-color: var(--box-bg-color);*/
-    border-radius: 60px;
+    border-radius: 2px;
 }
 
 .stats__stats-th-container > ul > li, .stats__stats-ta-container > ul > li {
@@ -430,14 +423,14 @@ li {
     font-size: 30px;
     color: var(--box-bg-color);
     position: relative;
-    border-radius: 60px;
+    border-radius: 2px;
     margin-bottom: 3px;
 }
 
 .stats__stats-th-container > ul > li {
     text-align: right;
     padding-right: 20px;
-    border-radius: 60px;
+    border-radius: 2px;
     float: right;
     clear: both;
 }
@@ -445,7 +438,7 @@ li {
 .stats__stats-ta-container > ul > li {
     text-align: left;
     padding-left: 20px;
-    border-radius: 60px;
+    border-radius: 2px;
 }
 
 .stats__stats {
@@ -455,7 +448,7 @@ li {
 
 .stats__stats > ul > li {
     background-color: var(--box-bg-color);
-    border-radius: 60px;
+    border-radius: 2px;
     text-align: center;
     padding-bottom: 20px;
     padding-top: 20px;
@@ -470,7 +463,7 @@ li {
     padding-top: 10px;
     padding-bottom: 8px;
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
-    border-radius: 60px;
+    border-radius: 2px;
     margin-top: 9px;
     /*box-shadow: 0 4px 8px 0 rgb(255, 255, 255, 20%), 0 6px 20px 0 rgb(255, 255, 255, 19%);*/
 }
@@ -488,5 +481,105 @@ li {
 /*animation: scorer-slide-right 1s infinite;*/
 /*}*/
 
+/* Player Stats Styles */
+.player-stats {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 1600px;
+    font-size: 16pt;
+    opacity: 0;
+    display: grid;
+    transition: all .75s ease;
+    grid-template-areas: "player-stats-th-name player-stats-ta-name"
+                        "player-stats-th-content player-stats-ta-content"
+                        "player-stats-info player-stats-info";
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+#player-stats.active {
+    transition: all .75s ease;
+    opacity: 100%;
+}
+
+.player-stats__name {
+    border-radius: 2px;
+    background-color: var(--box-bg-color);
+    font-size: 24pt;
+    padding-top: 24px;
+    padding-bottom: 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+}
+
+.player-stats__th-name {
+    grid-area: player-stats-th-name;
+    border-top: 8px solid white;
+}
+
+.player-stats__ta-name {
+    grid-area: player-stats-ta-name;
+    border-top: 8px solid white;
+}
+
+#player-stats__th-stats {
+    grid-area: player-stats-th-content;
+}
+
+#player-stats__ta-stats {
+    grid-area: player-stats-ta-content;
+}
+
+.player-stats-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 3px;
+}
+
+.player-stats-table th {
+    background-color: var(--box-bg-color);
+    color: var(--box-font-color);
+    padding: 15px 10px;
+    text-align: center;
+    border-radius: 2px;
+    font-size: 20pt;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
+}
+
+.player-stats-table td {
+    background-color: var(--box-font-color);
+    color: var(--box-bg-color);
+    padding: 12px 10px;
+    text-align: center;
+    border-radius: 2px;
+    font-size: 18pt;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 10%), 0 6px 20px 0 rgb(0 0 0 / 10%);
+}
+
+.player-stats-table .player-name {
+    text-align: left;
+    padding-left: 20px;
+}
+
+#player-stats__info {
+    grid-area: player-stats-info;
+    background-color: var(--box-point-accent-color);
+    color: var(--box-bg-color);
+    padding-top: 10px;
+    padding-bottom: 8px;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+    border-radius: 2px;
+    margin-top: 9px;
+}
+
+.player-number {
+    font-size: 16px;
+    opacity: 0.8;
+    margin-right: 8px;
+}
 
 

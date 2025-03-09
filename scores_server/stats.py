@@ -304,36 +304,42 @@ def count_disc_possession(game_events: List[Dict[str, Any]]) -> Dict[str, Any]:
         first_offense_event = possession_game_events[0]
     
     # Initialize tracking variables
-    side = first_offense_event["e"]  # Current possession side
-    tmp_time = 0  # Previous event timestamp
+    current_side = first_offense_event["e"]  # Current possession side
+    prev_time = 0  # Previous event timestamp
     
     for e in possession_game_events:
+        current_time = e["t"]
+        elapsed_time = current_time - prev_time
+        
         # Handle different event types
         if e["y"] == "O":
-            # Explicit offense setting
-            disc_possession[side] += e["t"] - tmp_time
-            side = e["e"]  # Change possession to specified team
-            
-        elif e["y"] == "S":
-            # Score event - add time to current possession holder
-            disc_possession[side] += e["t"] - tmp_time
-            # After score, possession switches to the other team
-            side = "h" if e["e"] == "a" else "a"
-            
-        elif e["y"] == "H":
-            # Halftime - add time to current possession holder
-            disc_possession[side] += e["t"] - tmp_time
-            # At halftime, possession typically switches
-            side = "h" if side == "a" else "a"
-            
-        elif e["y"] == "T":
-            # Turnover - add time to current possession holder
-            disc_possession[side] += e["t"] - tmp_time
-            # Switch possession to the other team
-            side = "h" if side == "a" else "a"
+            # Time is attributed to the team that had possession BEFORE this event
+            disc_possession[current_side] += elapsed_time
+            # Now switch to the new offense team
+            current_side = e["e"]
         
-        # Update previous event time
-        tmp_time = e["t"]
+        elif e["y"] == "T":
+            # Time is attributed to the team that had possession BEFORE this event
+            # (which is the same team that committed the turnover)
+            disc_possession[current_side] += elapsed_time
+            # Switch possession to the other team for the next time period
+            current_side = "h" if current_side == "a" else "a"
+        
+        elif e["y"] == "S":
+            # Time is attributed to the team that had possession BEFORE this event
+            # (which is also the scoring team)
+            disc_possession[current_side] += elapsed_time
+            # After score, possession switches to the other team
+            current_side = "h" if e["e"] == "a" else "a"
+        
+        elif e["y"] == "H":
+            # Time is attributed to the team that had possession BEFORE this event
+            disc_possession[current_side] += elapsed_time
+            # At halftime, possession typically switches
+            current_side = "h" if current_side == "a" else "a"
+        
+        # Update previous time for next iteration
+        prev_time = current_time
     
     # Calculate percentages
     if disc_possession["total"] == 0:

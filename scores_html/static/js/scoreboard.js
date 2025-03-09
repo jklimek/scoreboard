@@ -341,7 +341,7 @@ function generatePlayerStatsHtml(playersArray) {
     <table class="player-stats-table">
         <thead>
             <tr>
-                <th>GRACZ</th>
+                <th>IMIĘ I NAZWISKO</th>
                 <th>PUNKTY</th>
                 <th>ASYSTY</th>
             </tr>
