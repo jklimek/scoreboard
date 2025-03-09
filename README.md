@@ -7,7 +7,7 @@ A comprehensive real-time scores and statistics tracking system designed for Ult
 ## Features
 
 - Real-time score tracking and updates
-- Match timer with start/stop functionality
+- Match timer
 - Player rosters with jersey numbers
 - Individual player statistics (goals, assists)
 - Team statistics (points, possession time, turnovers)
@@ -35,29 +35,30 @@ The application consists of two main components:
 ### Docker Installation (Recommended)
 
 1. Clone the repository:
-git clone https://github.com/yourusername/scoreboard.git
-cd scoreboard
+`git clone https://github.com/jklimek/scoreboard.git`
+`cd scoreboard`
 2. Start the application using Docker Compose:
 docker-compose up
 3. Access the application:
 - Scoreboard: http://localhost:8000/scoreboard
 - Controller: http://localhost:8000/controller
 - Statistics: http://localhost:8000/stats
+- Roster: http://localhost:8000/roster
 - Player Stats: http://localhost:8000/pstats
 
 ### Manual Installation
 
 1. Clone the repository:
-git clone https://github.com/yourusername/scoreboard.git
-cd scoreboard
+`git clone https://github.com/jklimek/scoreboard.git`
+`cd scoreboard`
 2. Install dependencies:
-pip install -r scores_server/requirements.txt
+`pip install -r scores_server/requirements.txt`
 3. Start the backend server:
-cd scores_server
-gunicorn -b 0.0.0.0:5000 app:app
+`cd scores_server`
+`gunicorn -b 0.0.0.0:5000 app:app`
 4. In a separate terminal, start the frontend server:
-cd scores_html
-gunicorn -b 0.0.0.0:8000 web:app
+`cd scores_html`
+`gunicorn -b 0.0.0.0:8000 web:app`
 5. Access the application at http://localhost:8000
 
 ## Using the Controller
@@ -107,35 +108,29 @@ Appearance can be customized by modifying:
 ### Running in Development Mode
 
 1. Start the backend server in debug mode:
-cd scores_server
-python app.py
+`cd scores_server`
+`python app.py`
 2. Start the frontend server in debug mode:
-cd scores_html
-python web.py
+`cd scores_html`
+`python web.py`
 
 ### Testing
 
 Run tests with:
-cd scores_server
-pytest tests/
+`cd scores_server`
+`pytest tests/`
 
 Test a specific file:
-cd scores_server
-pytest tests/test_stats.py -v
-
-### Code Quality
-
-Lint the code with:
-cd scores_server
-pylint app.py
+`cd scores_server
+`pytest tests/test_stats.py -v`
 
 ## Troubleshooting
 
 WebSocket Connection Issues:
-- Ensure the WebSocket server port (5005) is not blocked by a firewall
+- Ensure the WebSocket server port (`5005`) is not blocked by a firewall
 - Check that the WebSocket URL matches your network configuration
-- For local development, use ws://localhost:5005/
-- For remote access, use ws://your-server-ip:5005/
+- For local development, use `ws://localhost:5005/`
+- For remote access, use `ws://your-server-ip:5005/`
 
 Missing Player Data:
 - Verify that the match ID exists and has player information
@@ -146,9 +141,6 @@ Display Not Updating:
 - Verify the WebSocket connection is active
 - Check the browser console for JavaScript errors
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ### Acknowledgments
 
