@@ -51,7 +51,8 @@ docker-compose up
 ### Manual Installation
 
 1. Clone the repository:
-```git clone https://github.com/jklimek/scoreboard.git
+```
+git clone https://github.com/jklimek/scoreboard.git
 cd scoreboard
 ```
 2. Install dependencies:
@@ -77,7 +78,7 @@ The controller interface allows you to manage all aspects of the scoreboard syst
 ### Connecting to the Server
 
 1. Open http://localhost:8000/controller in your web browser
-2. Enter the WebSocket URL in the connection field (default: ws://localhost:5005/)
+2. Enter the WebSocket URL in the connection field (default: `ws://localhost:5005/`)
 3. Click "Connect" to establish connection
 
 ### Setting Up a Match
@@ -136,8 +137,8 @@ pytest tests/
 ```
 
 Test a specific file:
-`cd scores_server
 ```
+cd scores_server
 pytest tests/test_stats.py -v
 ```
 
