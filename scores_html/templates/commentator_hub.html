@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Commentator Hub - Scoreboard</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='images/favicon.ico') }}">
+    <meta name="description" content="Comprehensive commentator dashboard for ultimate frisbee matches">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://kit.fontawesome.com/e939364dd5.js" crossorigin="anonymous"></script>
+    <link rel="manifest" href="site.webmanifest">
+
+    <link rel="stylesheet" href="../static/css/scoreboard.css">
+    <link rel="stylesheet" href="../static/css/commentator_hub.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+    your browser</a> to improve your experience and security.</p>
+<![endif]-->
+<div class="commentator-content">
+    <div id="commentator-hub" class="commentator-hub active">
+        <!-- Header Section with Team Names & Scores -->
+        <div id="hub-header" class="hub-header">
+            <div id="hub-home-team" class="hub-team hub-home-team">
+                <div class="hub-team-name"></div>
+                <div class="hub-team-jersey"></div>
+            </div>
+            <div id="hub-score" class="hub-score">
+                <div class="hub-score-row">
+                    <span id="hub-home-score" class="hub-home-score">0</span>
+                    <span class="hub-score-separator">-</span>
+                    <span id="hub-away-score" class="hub-away-score">0</span>
+                </div>
+                <div id="hub-game-time" class="hub-game-time">00:00</div>
+                <div id="hub-half" class="hub-half">1st Half</div>
+            </div>
+            <div id="hub-away-team" class="hub-team hub-away-team">
+                <div class="hub-team-name"></div>
+                <div class="hub-team-jersey"></div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div id="hub-content" class="hub-content">
+            <!-- Home Roster Column -->
+            <div id="hub-home-roster" class="hub-column hub-home-roster">
+                <div class="hub-section-title">ROSTER</div>
+                <div id="home-roster-container" class="roster-container">
+                    <!-- Roster will be inserted here by JS -->
+                </div>
+            </div>
+
+            <!-- Home Stats Column -->
+            <div id="hub-home-stats" class="hub-column hub-home-stats">
+                <div class="hub-section-title">PLAYER STATS</div>
+                <div id="home-player-stats-container" class="player-stats-container">
+                    <!-- Player stats will be inserted here by JS -->
+                </div>
+                <div class="hub-section-subtitle">TEAM STATS</div>
+                <div id="home-team-stats-container" class="team-stats-container">
+                    <!-- Team stats will be inserted here by JS -->
+                </div>
+            </div>
+
+            <!-- Timeline Column -->
+            <div id="hub-timeline" class="hub-column hub-timeline">
+                <div class="hub-section-title">MATCH TIMELINE</div>
+                <div id="timeline-container" class="timeline-container">
+                    <!-- Timeline events will be inserted here by JS -->
+                </div>
+            </div>
+
+            <!-- Away Stats Column -->
+            <div id="hub-away-stats" class="hub-column hub-away-stats">
+                <div class="hub-section-title">PLAYER STATS</div>
+                <div id="away-player-stats-container" class="player-stats-container">
+                    <!-- Player stats will be inserted here by JS -->
+                </div>
+                <div class="hub-section-subtitle">TEAM STATS</div>
+                <div id="away-team-stats-container" class="team-stats-container">
+                    <!-- Team stats will be inserted here by JS -->
+                </div>
+            </div>
+
+            <!-- Away Roster Column -->
+            <div id="hub-away-roster" class="hub-column hub-away-roster">
+                <div class="hub-section-title">ROSTER</div>
+                <div id="away-roster-container" class="roster-container">
+                    <!-- Roster will be inserted here by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer with Location Info -->
+        <div id="hub-footer" class="hub-footer">
+            <div id="hub-info" class="hub-info">
+                Książenice, Boisko 1
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../static/js/jquery.js"></script>
+<script src="../static/js/easytimer.min.js"></script>
+<script>
+// Copy the needed globals and utility functions from scoreboard.js
+// This prevents the commentator page from being affected by the main scoreboard script
+var teams = {
+    a: {
+        full_name: "",
+        name: "AWAY",
+        jerseys: "AWAY"
+    },
+    h: {
+        full_name: "",
+        name: "HOME",
+        jerseys: "HOME"
+    }
+};
+
+// Initialize players data structure
+var players = {
+    h: {}, // Home team players
+    a: {}  // Away team players
+};
+
+// Initialize timer
+var timer = new Timer();
+var matchTimerStarted = false;
+const matchTimeTotalMinutes = 30;
+
+// Declare websocket here to prevent conflicts
+var websocket;
+
+// Create a dedicated websocket connection for this view only
+function websocketConnection() {
+    // Create a standalone websocket connection just for this view
+    websocket = new WebSocket("ws://localhost:5005/");
+    websocket.onopen = function(evt) {
+        console.log("Websocket connected for commentator hub");
+    };
+    websocket.onclose = function(evt) {
+        console.log("Websocket disconnected for commentator hub");
+        // Try to reconnect after a delay
+        setTimeout(websocketConnection, 5000);
+    };
+    websocket.onerror = function(evt) {
+        console.log('Websocket error: ' + evt.error);
+    };
+}
+
+// Timer functions
+function startTimer(offset = 0) {
+    // Don't restart timer if a match has ended
+    if (matchEnded) {
+        console.log("Match has ended - not starting timer");
+        return;
+    }
+    
+    console.log("Starting timer with offset:", offset);
+    stopTimer();
+    timer.start({startValues: {seconds: offset}});
+    timer.addEventListener('secondsUpdated', function(e) {
+        var timeValues = timer.getTimeValues();
+        var secondsString = addPrefixZeroToTime(timeValues.seconds);
+        var minutesString = addPrefixZeroToTime(timeValues.minutes);
+        var remainingSecondsString = addPrefixZeroToTime(60 - timeValues.seconds);
+        var remainingMinutesString = addPrefixZeroToTime(matchTimeTotalMinutes - timeValues.minutes - 1); //TODO: 30 minutes match time
+        $("#hub-game-time").html(minutesString + ":" + secondsString + "  <small>(-" + remainingMinutesString +":"+remainingSecondsString +")</small>");
+    });
+    matchTimerStarted = true;
+}
+
+function setTimer(offset = 0) {
+    stopTimer();
+    var secondsString = addPrefixZeroToTime(offset % 60);
+    var minutesString = addPrefixZeroToTime(Math.floor(offset / 60));
+    $("#hub-game-time").text(minutesString + ":" + secondsString);
+}
+
+function addPrefixZeroToTime(time) {
+    if (time < 10) {
+        return "0" + time.toString();
+    }
+    return time.toString();
+}
+
+function stopTimer() {
+    timer.stop();
+}
+
+function resetTimer() {
+    timer.stop();
+    $("#hub-game-time").text("00:00");
+    matchTimerStarted = false;
+}
+
+// Connect immediately
+websocketConnection();
+</script>
+<script src="../static/js/commentator_hub.js"></script>
+</body>
+</html>

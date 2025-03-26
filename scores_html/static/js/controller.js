@@ -104,7 +104,7 @@ function setGame() {
 
 function jerseysColor(color, team) {
     var message = JSON.stringify({
-        "type": "team",
+        "type": "jersey_color",
         "team": team,
         "jersey_color": "#" + color.toString()
     });

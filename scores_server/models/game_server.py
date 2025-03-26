@@ -127,6 +127,12 @@ class GameServer:
             data: Game setting message data
         """
         if "game_number" in data:
+            # Broadcast the game change to all clients first so they can reset their state
+            self.send_message_to_all({
+                "type": "game",
+                "game_number": data["game_number"]
+            })
+            # Then set the game data
             self.set_game(data)
         elif "timer_reset" in data:
             self.reset_timer()
@@ -148,7 +154,7 @@ class GameServer:
             else:
                 self.state.away_jersey_color = data["jersey_color"]
             self.send_message_to_all({
-                "type": "team",
+                "type": "jersey_color",
                 "team": data["team"],
                 "jersey_color": data["jersey_color"]
             })
@@ -331,16 +337,16 @@ class GameServer:
                 first_team = event["e"]
                 break
                 
-        # Only add initial offense event if using real timestamps
-        # For artificial timestamps, we'll add it as part of that process
-        if has_valid_time_sequence and valid_events:
-            # Use the actual first timestamp - 10 to put it slightly earlier
-            first_time = max(0, valid_events[0]["t"] - 10)
-            timeline_events.append({
-                "y": "O",
-                "e": first_team,
-                "t": first_time
-            })
+        # # Only add initial offense event if using real timestamps
+        # # For artificial timestamps, we'll add it as part of that process
+        # if has_valid_time_sequence and valid_events:
+        #     # Use the actual first timestamp - 10 to put it slightly earlier
+        #     first_time = max(0, valid_events[0]["t"] - 10)
+        #     timeline_events.append({
+        #         "y": "O",
+        #         "e": first_team,
+        #         "t": first_time
+        #     })
         
         if has_valid_time_sequence:
             # Use actual timestamps
@@ -368,12 +374,6 @@ class GameServer:
             event_index = 1  # Start at 1 because we'll add the first event here
             total_game_time = 5000  # Total artificial game time
             
-            # Add the initial offense event at time 0
-            # timeline_events.append({
-            #     "y": "O",
-            #     "e": first_team,
-            #     "t": 0
-            # })
             
             # Different event types have different typical time spans - simulate this
             for event in events_data:
@@ -386,8 +386,6 @@ class GameServer:
                     
                     # Get base time from event's position in sequence (non-linear)
                     progression_factor = event_index / total_events  # 0-1 range
-                    # Make later events more spread out with exponential growth
-                    progression_factor = progression_factor ** 0.8  # Apply slight power curve for natural flow
                     
                     # Base time from event position - this creates naturally varying segment widths
                     time_value = int(progression_factor * total_game_time)
@@ -660,6 +658,87 @@ class GameServer:
             "stats_update": 1,
             "stats_data": stats_data
         })
+        
+    def send_game_state_to_client(self, client) -> None:
+        """
+        Send complete game state to a specific client.
+        Used when a client explicitly requests current game state.
+        
+        Args:
+            client: The WebSocket client to send state to
+        """
+        self.logger.info(f"Sending game state to client {client.address}")
+        
+        # Send game ID
+        if self.state.game_number:
+            client.sendMessage(json.dumps({
+                "type": "game",
+                "game_number": self.state.game_number
+            }))
+        
+        # Send team names
+        if self.state.home_team_name:
+            client.sendMessage(json.dumps({
+                "team": "h",
+                "team_name": self.state.home_team_name.split(" ")[0] if self.state.home_team_name else "",
+                "team_name_full": self.state.home_team_name
+            }))
+        
+        if self.state.away_team_name:
+            client.sendMessage(json.dumps({
+                "team": "a",
+                "team_name": self.state.away_team_name.split(" ")[0] if self.state.away_team_name else "",
+                "team_name_full": self.state.away_team_name
+            }))
+        
+        # Send jersey colors
+        if self.state.home_jersey_color:
+            client.sendMessage(json.dumps({
+                "type": "jersey_color",
+                "team": "h",
+                "jersey_color": self.state.home_jersey_color
+            }))
+        
+        if self.state.away_jersey_color:
+            client.sendMessage(json.dumps({
+                "type": "jersey_color",
+                "team": "a",
+                "jersey_color": self.state.away_jersey_color
+            }))
+        
+        # Send player data
+        if self.state.players:
+            client.sendMessage(json.dumps({
+                "players_set": True,
+                "players": self.state.players
+            }))
+        
+        # Send current score
+        if self.state.away_score is not None and self.state.home_score is not None:
+            client.sendMessage(json.dumps({
+                "type": "game",
+                "score_set": 1,
+                "data": {
+                    "a_score": self.state.away_score,
+                    "h_score": self.state.home_score
+                }
+            }))
+        
+        # Send current timer state
+        if self.state.game_time is not None:
+            client.sendMessage(json.dumps({
+                "timer_set": True,
+                "timer_offset": self.state.game_time
+            }))
+            
+        # Send stats data if available
+        if self.state.game_events:
+            stats_data = self.count_stats(self.state.game_events, self.state.players)
+            client.sendMessage(json.dumps({
+                "type": "stats",
+                "stats_update": 1,
+                "stats_data": stats_data
+            }))
 
     def handle_wind_request(self) -> None:
         """Handle wind data request from the wind sensor."""

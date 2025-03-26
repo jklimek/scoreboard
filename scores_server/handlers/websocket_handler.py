@@ -12,7 +12,7 @@ class WebSocketHandler(WebSocket):
         """Handle incoming WebSocket messages."""
         try:
             data = json.loads(self.data)
-            if data["type"] == "team":
+            if data["type"] in ["team", "jersey_color"]:
                 self.game_server.handle_team_setting_message(data)
             elif data["type"] == "game":
                 self.game_server.handle_game_setting_message(data)
@@ -20,6 +20,14 @@ class WebSocketHandler(WebSocket):
                 self.game_server.handle_wind_setting_message(data)
             elif data["type"] == "stats":
                 self.game_server.handle_stats_setting_message(data)
+            elif data["type"] == "request_game_state":
+                self.logger.info("Game state request received")
+                # Send current game state data to requesting client
+                if self.game_server.state.game_number:
+                    # If we have an active game, re-send all relevant game data
+                    self.game_server.send_game_state_to_client(self)
+                else:
+                    self.logger.info("No active game to send state for")
             elif data["type"] == "clear_text":
                 self.logger.info("Manual text clear requested")
                 self.game_server.send_message_to_all({

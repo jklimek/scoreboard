@@ -82,6 +82,16 @@ def player_stats():
     return render_template('player_stats.html')
 
 
+@app.route('/graph_stats')
+def graph_stats():
+    return render_template('graph_stats.html')
+
+
+@app.route('/commentator_hub')
+def commentator_hub():
+    return render_template('commentator_hub.html')
+
+
 def filter_matches(matches_list, field):
     return [m for m in matches_list if m['field'] == field]
 

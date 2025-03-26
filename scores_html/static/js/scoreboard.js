@@ -7,6 +7,7 @@ var time = 0;
 var timerIntervalId = 0;
 var ajaxInterval = 1000;
 var scoresTimeoutId = 0;
+var topPlayersStatsLimit = 6;
 
 var awayScore = 0;
 var homeScore = 0;
@@ -43,6 +44,7 @@ var teams = {
         roster_players_handle: $("#roster__ta-roster"),
         player_stats_handle: $("#player-stats__ta-stats"),
         player_stats_name_handle: $("#player-stats__ta-name"),
+        timeline_handle: $(".timeline-event-away"),
         score_handle: $("#ta-score-box")
     },
     h: {
@@ -56,6 +58,7 @@ var teams = {
         roster_players_handle: $("#roster__th-roster"),
         player_stats_handle: $("#player-stats__th-stats"),
         player_stats_name_handle: $("#player-stats__th-name"),
+        timeline_handle: $(".timeline-event-home"),
         score_handle: $("#th-score-box")
     }
 };
@@ -100,83 +103,64 @@ function onError(evt) {
 
 function parseEvent(data) {
     console.log(data);
-    if (data.hasOwnProperty("jersey_color")) {
-        setTeamJerseyColor(data["team"], data["jersey_color"])
-    } else if (data.hasOwnProperty("team_name")) {
-        setTeamNames(data["team"], data["team_name"], data["team_name_full"])
-    } else if (data.hasOwnProperty("timer_reset")) {
+    if (data.jersey_color) {
+        setTeamJerseyColor(data.team, data.jersey_color);
+    } else if (data.team_name) {
+        setTeamNames(data.team, data.team_name, data.team_name_full);
+    } else if (data.timer_reset) {
         resetTimer();
-    } else if (data.hasOwnProperty("running_timer_set")) {
-        startTimer(data["timer_offset"]);
-    } else if (data.hasOwnProperty("timer_set")) {
-        setTimer(data["timer_offset"]);
-    } else if (data.hasOwnProperty("players_set")) {
-        setPlayers(data["players"]);
-    } else if (data.hasOwnProperty("wind_toggle")) {
-        toggleWind(data["wind_toggle"]);
-    } else if (data.hasOwnProperty("roster_toggle")) {
-        toggleRoster(data["roster_toggle"]);
-    } else if (data.hasOwnProperty("stats_toggle")) {
-        toggleStats(data["stats_toggle"]);
-    } else if (data.hasOwnProperty("leaderboard_toggle")) {
-        toggleLeaderboard(data["leaderboard_toggle"]);
-    } else if (data.hasOwnProperty("wind_update")) {
-        windUpdate(data["data"]["wind_angle"], data["data"]["wind_speed"], data["data"]["wind_temp"], data["data"]["wind_hum"]);
-    } else if (data.hasOwnProperty("stats_update")) {
-        statsUpdate(data["stats_data"]);
-    } else if (data.hasOwnProperty("score_reset")) {
+    } else if (data.running_timer_set) {
+        startTimer(data.timer_offset);
+    } else if (data.timer_set) {
+        setTimer(data.timer_offset);
+    } else if (data.players_set) {
+        setPlayers(data.players);
+    } else if (data.wind_toggle) {
+        toggleWind(data.wind_toggle);
+    } else if (data.roster_toggle) {
+        toggleRoster(data.roster_toggle);
+    } else if (data.stats_toggle) {
+        toggleStats(data.stats_toggle);
+    } else if (data.leaderboard_toggle) {
+        toggleLeaderboard(data.leaderboard_toggle);
+    } else if (data.wind_update) {
+        windUpdate(data.data.wind_angle, data.data.wind_speed, data.data.wind_temp, data.data.wind_hum);
+    } else if (data.stats_update) {
+        statsUpdate(data.stats_data);
+    } else if (data.score_reset) {
         setScores(0, 0);
-        // Clear the timeline
         clearTimeline();
-    } else if (data.hasOwnProperty("score_set")) {
-        setScores(data["data"]["a_score"], data["data"]["h_score"]);
-    } else if (data.hasOwnProperty("subtype")) {
-        // Track game event
-        if (data["t"]) {
-            maxGameTime = Math.max(maxGameTime, data["t"]);
+    } else if (data.score_set) {
+        setScores(data.data.a_score, data.data.h_score);
+    } else if (data.subtype) {
+        if (data.t) {
+            maxGameTime = Math.max(maxGameTime, data.t);
         }
-        
-        // Store event in gameEvents array
         gameEvents.push(data);
-        
-        if (data["subtype"] === "score") {
-            score(teams[data["side"]]["handle"], data["data"]["assist"], data["data"]["scorer"]);
-            setScores(data["data"]["a_score"], data["data"]["h_score"]);
-            discPossessionChange(data["side"]);
-            
-            // Update timeline
-            updateTimeline();
-            
-        } else if (data["subtype"] === "offence") {
-            discPossessionChange(data["side"], true);
-            
-            // Update timeline
-            updateTimeline();
-            
-        } else if (data["subtype"] === "turnover") {
-            discPossessionChange(data["side"]);
-            
-            // Update timeline
-            updateTimeline();
-            
-        } else if (data["subtype"] === "timeout") {
-            timeout(data["side"]);
-            
-            // Update timeline
-            updateTimeline();
-            
-        } else if (data["subtype"] === "start") {
-            startMatch(data["timer_offset"]);
-            
-            // Clear and initialize timeline
-            clearTimeline();
-            
-        } else if (data["subtype"] === "end") {
-            end();
-            
-            // Final timeline update
-            updateTimeline();
+        switch (data.subtype) {
+            case "score":
+                score(teams[data.side].handle, data.data.assist, data.data.scorer);
+                setScores(data.data.a_score, data.data.h_score);
+                discPossessionChange(data.side);
+                break;
+            case "offence":
+                discPossessionChange(data.side, true);
+                break;
+            case "turnover":
+                discPossessionChange(data.side);
+                break;
+            case "timeout":
+                timeout(data.side);
+                break;
+            case "start":
+                startMatch(data.timer_offset);
+                clearTimeline();
+                break;
+            case "end":
+                end();
+                break;
         }
+        updateTimeline();
     }
 }
 
@@ -201,11 +185,16 @@ function setTeamJerseyColor(team, color) {
     teams[team]["handle"].css("border-color", color);
     teams[team]["roster_name_handle"].css("border-color", color);
     teams[team]["stats_name_handle"].css("border-color", color);
+    teams[team]["player_stats_name_handle"].css("border-color", color);
     
-    // Player stats view
-    if (teams[team]["player_stats_name_handle"] && teams[team]["player_stats_name_handle"].length) {
-        teams[team]["player_stats_name_handle"].css("border-color", color);
+    let timeline_elements = (team === "a") ? $(".timeline-event-away") : $(".timeline-event-home");
+    // Timeline event handles
+    if (timeline_elements && timeline_elements.length) {
+        for (let timeline_el of timeline_elements) {
+            $(timeline_el).css("background-color", color);
+        }
     }
+
 }
 
 function setScores(a, h) {
@@ -322,9 +311,9 @@ function statsUpdate(stats_data) {
 }
 
 function updatePlayerStats(player_stats) {
-    // Process player stats for both teams and show top 5 players
-    let away_player_stats = processTopPlayers(player_stats["a"], 5);
-    let home_player_stats = processTopPlayers(player_stats["h"], 5);
+    // Process player stats for both teams and show top Limit players
+    let away_player_stats = processTopPlayers(player_stats["a"], topPlayersStatsLimit);
+    let home_player_stats = processTopPlayers(player_stats["h"], topPlayersStatsLimit);
     
     // Update team names in the player stats view
     if (teams["a"]["full_name"]) {
@@ -632,17 +621,17 @@ function resetTimer() {
 }
 
 
-String.prototype.escapeDiacritics = function () {
-    return this.replace(/ą/g, 'a').replace(/Ą/g, 'A')
-        .replace(/ć/g, 'c').replace(/Ć/g, 'C')
-        .replace(/ę/g, 'e').replace(/Ę/g, 'E')
-        .replace(/ł/g, 'l').replace(/Ł/g, 'L')
-        .replace(/ń/g, 'n').replace(/Ń/g, 'N')
-        .replace(/ó/g, 'o').replace(/Ó/g, 'O')
-        .replace(/ś/g, 's').replace(/Ś/g, 'S')
-        .replace(/ż/g, 'z').replace(/Ż/g, 'Z')
-        .replace(/ź/g, 'z').replace(/Ź/g, 'Z');
-};
+// String.prototype.escapeDiacritics = function () {
+//     return this.replace(/ą/g, 'a').replace(/Ą/g, 'A')
+//         .replace(/ć/g, 'c').replace(/Ć/g, 'C')
+//         .replace(/ę/g, 'e').replace(/Ę/g, 'E')
+//         .replace(/ł/g, 'l').replace(/Ł/g, 'L')
+//         .replace(/ń/g, 'n').replace(/Ń/g, 'N')
+//         .replace(/ó/g, 'o').replace(/Ó/g, 'O')
+//         .replace(/ś/g, 's').replace(/Ś/g, 'S')
+//         .replace(/ż/g, 'z').replace(/Ż/g, 'Z')
+//         .replace(/ź/g, 'z').replace(/Ź/g, 'Z');
+// };
 
 // Timeline functions
 function clearTimeline() {
@@ -735,6 +724,8 @@ function updateTimeline() {
         const safeMaxTime = maxGameTime > 0 ? maxGameTime : 1;
         const position = (eventTime / safeMaxTime) * containerWidth;
         const timeout_width = 40;
+        const homeTimelineEventClass = "timeline-event-home";
+        const awayTimelineEventClass = "timeline-event-away";
         console.log("Event position:", position, "Time:", eventTime, "Max time:", safeMaxTime);
         
         // Handle different event types
@@ -745,6 +736,7 @@ function updateTimeline() {
             if (segmentWidth > 0) {
                 const segment = $("<div>")
                     .addClass("timeline-event")
+                    .addClass(currentTeam === "h" ? homeTimelineEventClass : awayTimelineEventClass)
                     .css({
                         left: lastPosition + "px",
                         width: segmentWidth + "px",
@@ -766,6 +758,7 @@ function updateTimeline() {
             if (segmentWidth > 0) {
                 const segment = $("<div>")
                     .addClass("timeline-event")
+                    .addClass(currentTeam === "h" ? homeTimelineEventClass : awayTimelineEventClass)
                     .css({
                         left: lastPosition + "px",
                         width: segmentWidth + "px", 
@@ -780,7 +773,8 @@ function updateTimeline() {
             const pointMarker = $("<div>")
                 .addClass("timeline-event-point")
                 .css({
-                    left: position + "px"
+                    left: position + "px",
+                    // backgroundColor: currentTeam === "h" ? homeColor : awayColor
                 });
             
             container.append(pointMarker);
@@ -799,6 +793,7 @@ function updateTimeline() {
                 if (segmentWidth > 0) {
                     const segment = $("<div>")
                         .addClass("timeline-event")
+                        .addClass(currentTeam === "h" ? homeTimelineEventClass : awayTimelineEventClass)
                         .css({
                             left: lastPosition + "px",
                             width: segmentWidth + "px",
@@ -821,11 +816,11 @@ function updateTimeline() {
                 .css({
                     left: position + timeout_width + "px"
                 });
-            
+            timeoutMarker.append("<p class=\"timeline-event-timeout-sign\">TO</p>");
             container.append(timeoutMarker);
             console.log("Added timeout marker at:", position);
         }
-        else if (event.y === "H") {  // Halftime event
+        else if (event.subtype === "halftime") {  // Halftime event
             // Create segment before halftime
             const segmentWidth = position - lastPosition;
             
