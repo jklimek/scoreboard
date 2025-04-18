@@ -316,6 +316,11 @@ li {
     transition: all .75s ease;
     opacity: 100%;
 }
+/* Flame icon for Hot Hand in live display */
+.flame-icon {
+    color: #f39c12;
+    margin-left: 5px;
+}
 
 .roster__name, .stats__name {
     border-radius: 2px;

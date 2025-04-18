@@ -28,6 +28,8 @@ var scorerHandle = $("#scorer");
 var assistHandle = $("#assist");
 var rosterHandle = $("#roster");
 var statsHandle = $("#stats");
+// Number of consecutive scoring events (per team) to trigger Hot Hand indicator
+var hotStreakLength = 3;
 
 var awayTeam = "AWA";
 var homeTeam = "HOM";
@@ -142,6 +144,8 @@ function parseEvent(data) {
                 score(teams[data.side].handle, data.data.assist, data.data.scorer);
                 setScores(data.data.a_score, data.data.h_score);
                 discPossessionChange(data.side);
+                // Highlight live scorer/assist if on hot streak
+                highlightHotHandLive(data);
                 break;
             case "offence":
                 discPossessionChange(data.side, true);
@@ -632,6 +636,41 @@ function resetTimer() {
 //         .replace(/ż/g, 'z').replace(/Ż/g, 'Z')
 //         .replace(/ź/g, 'z').replace(/Ź/g, 'Z');
 // };
+
+// Live Hot Hand indicator helper functions
+// Returns true if the given player number has been involved (scorer or assist) in the last hotStreakLength scores for that team
+function isHotHand(team, playerNo) {
+    var scores = gameEvents.filter(function(ev) {
+        return ev.subtype === "score" && ev.side === team;
+    });
+    var lastScores = scores.slice(-hotStreakLength-1,-1);
+    if (lastScores.length < hotStreakLength) {
+        console.log("lastScores.length < hotStreakLength")
+        return false;
+    }
+    return lastScores.every(function(ev) {
+        return ev.data.scorer === playerNo || ev.data.assist === playerNo;
+    });
+}
+
+// Highlight the live scorer/assist display if the player is on a hot streak
+function highlightHotHandLive(eventData) {
+    // Remove any existing flame icons
+    scorerHandle.find(".flame-icon").remove();
+    assistHandle.find(".flame-icon").remove();
+    var team = eventData.side;
+    var scorerNo = parseInt(eventData.data.scorer_no);
+    var assistNo = parseInt(eventData.data.assist_no);
+    console.log("scorer, assist nos, team", scorerNo, assistNo, team)
+    if (scorerNo && isHotHand(team, scorerNo)) {
+        console.log(team, scorerNo, "HOT HAND")
+        scorerHandle.append(' <i class="fas fa-fire flame-icon"></i>');
+    }
+    if (assistNo && assistNo !== "-1" && assistNo !== "" && isHotHand(team, assistNo)) {
+        console.log(team, assistNo, "HOT HAND")
+        assistHandle.append(' <i class="fas fa-fire flame-icon"></i>');
+    }
+}
 
 // Timeline functions
 function clearTimeline() {
