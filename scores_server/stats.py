@@ -1,145 +1,10 @@
 from __future__ import annotations
+import logging  # Added
 from typing import List, Dict, Any, Union
 
-# json_data = {"a": 15,
-#              "an": "Ultimatum",
-#              "e": [
-#                  # {"e": "h", "t": 0, "y": "O"},
-#                  {"e": "h", "t": 169, "y": "T"},
-#                  {"e": "a", "t": 184, "y": "T"},
-#                  {"e": "h", "t": 234, "y": "T"},
-#                  {"e": "a", "t": 253, "y": "T"},
-#                  {"e": "h", "t": 288, "y": "T"},
-#                  {"a": 24, "as": "1", "e": "a", "hs": "0", "s": 9, "t": 330, "y": "S"},
-#                  {"a": 97, "as": "1", "e": "h", "hs": "1", "s": 10, "t": 483, "y": "S"},
-#                  {"a": 21, "as": "2", "e": "a", "hs": "1", "s": 11, "t": 621, "y": "S"},
-#                  {"e": "h", "t": 734, "y": "T"},
-#                  {"a": 21, "as": "3", "e": "a", "hs": "1", "s": 49, "t": 741, "y": "S"},
-#                  {"a": 11, "as": "3", "e": "h", "hs": "2", "s": 9, "t": 843, "y": "S"},
-#                  {"a": 21, "as": "4", "e": "a", "hs": "2", "s": 69, "t": 929, "y": "S"},
-#                  {"e": "h", "t": 1060, "y": "T"},
-#                  {"a": 9, "as": "5", "e": "a", "hs": "2", "s": 19, "t": 1075, "y": "S"},
-#                  {"e": "h", "t": 1151, "y": "T"},
-#                  {"e": "a", "t": 1157, "y": "T"},
-#                  {"e": "h", "t": 1194, "y": "T"},
-#                  {"e": "a", "t": 1211, "y": "T"},
-#                  {"a": 20, "as": "5", "e": "h", "hs": "3", "s": 97, "t": 1229, "y": "S"},
-#                  {"a": 21, "as": "6", "e": "a", "hs": "3", "s": 11, "t": 1428, "y": "S"},
-#                  {"e": "h", "t": 1553, "y": "T"},
-#                  {"e": "a", "t": 1593, "y": "T"},
-#                  {"e": "h", "t": 1677, "y": "T"},
-#                  {"a": 26, "as": "7", "e": "a", "hs": "3", "s": 22, "t": 1704, "y": "S"},
-#                  {"e": "h", "t": 1804, "y": "T"},
-#                  {"e": "a", "t": 1811, "y": "T"},
-#                  {"e": "h", "t": 1872, "y": "T"},
-#                  {"e": "a", "t": 2015, "y": "T"},
-#                  {"e": "h", "t": 2068, "y": "T"},
-#                  {"e": "a", "t": 2074, "y": "T"},
-#                  {"a": 20, "as": "7", "e": "h", "hs": "4", "s": 97, "t": 2080, "y": "S"},
-#                  {"e": "a", "t": 2206, "y": "T"},
-#                  {"e": "h", "t": 2222, "y": "T"},
-#                  {"e": "a", "t": 2238, "y": "T"},
-#                  {"e": "h", "t": 2307, "y": "T"},
-#                  {"e": "a", "t": 2460, "y": "T"},
-#                  {"e": "h", "t": 2495, "y": "T"},
-#                  {"e": "a", "t": 2541, "y": "T"},
-#                  {"e": "h", "t": 2584, "y": "T"},
-#                  {"e": "a", "t": 2601, "y": "T"},
-#                  {"e": "h", "t": 2615, "y": "T"},
-#                  {"e": "a", "t": 2645, "y": "T"},
-#                  {"a": 11, "as": "7", "e": "h", "hs": "5", "s": 22, "t": 2656, "y": "S"},
-#                  {"a": 21, "as": "8", "e": "a", "hs": "5", "s": 18, "t": 2836, "y": "S"},
-#                  {"t": 2837, "y": "H"},
-#                  {"e": "a", "t": 2953, "y": "T"},
-#                  {"e": "h", "t": 2972, "y": "T"},
-#                  {"e": "a", "t": 2975, "y": "T"},
-#                  {"e": "h", "t": 3031, "y": "T"},
-#                  {"a": 21, "as": "9", "e": "a", "hs": "5", "s": 9, "t": 3044, "y": "S"},
-#                  {"e": "h", "t": 3159, "y": "T"},
-#                  {"e": "a", "t": 3185, "y": "T"},
-#                  {"e": "h", "t": 3207, "y": "T"},
-#                  {"e": "a", "t": 3231, "y": "T"},
-#                  {"e": "h", "t": 3445, "y": "T"},
-#                  {"e": "a", "t": 3453, "y": "T"},
-#                  {"e": "h", "t": 3470, "y": "T"},
-#                  {"e": "a", "t": 3518, "y": "T"},
-#                  {"a": 33, "as": "9", "e": "h", "hs": "6", "s": 11, "t": 3530, "y": "S"},
-#                  {"e": "a", "t": 3620, "y": "T"},
-#                  {"e": "h", "t": 3667, "y": "T"},
-#                  {"a": 28, "as": "10", "e": "a", "hs": "6", "s": 49, "t": 3677, "y": "S"},
-#                  {"e": "h", "t": 3826, "y": "T"},
-#                  {"a": 27, "as": "11", "e": "a", "hs": "6", "s": 9, "t": 3827, "y": "S"},
-#                  {"e": "h", "t": 3924, "y": "T"},
-#                  {"a": 26, "as": "12", "e": "a", "hs": "6", "s": 11, "t": 3949, "y": "S"},
-#                  {"e": "h", "t": 4086, "y": "T"},
-#                  {"e": "a", "t": 4114, "y": "T"},
-#                  {"e": "h", "t": 4154, "y": "T"},
-#                  {"e": "a", "t": 4165, "y": "T"},
-#                  {"e": "h", "t": 4261, "y": "T"},
-#                  {"e": "a", "t": 4398, "y": "T"},
-#                  {"e": "h", "t": 4442, "y": "T"},
-#                  {"a": 24, "as": "13", "e": "a", "hs": "6", "s": 44, "t": 4479, "y": "S"},
-#                  {"e": "h", "t": 4596, "y": "T"},
-#                  {"a": 5, "as": "14", "e": "a", "hs": "6", "s": 22, "t": 4608, "y": "S"},
-#                  {"a": 11, "as": "14", "e": "h", "hs": "7", "s": 20, "t": 4735, "y": "S"},
-#                  {"e": "a", "t": 4843, "y": "T"},
-#                  {"a": 11, "as": "14", "e": "h", "hs": "8", "s": 8, "t": 4854, "y": "S"},
-#                  {"e": "a", "t": 4929, "y": "T"},
-#                  {"a": 20, "as": "14", "e": "h", "hs": "9", "s": 97, "t": 5016, "y": "S"},
-#                  {"a": 69, "as": "15", "e": "a", "hs": "9", "s": 27, "t": 5111, "y": "S"},
-#                  {"t": 5112, "y": "E"}],
-#              "h": 9,
-#              "hn": "Ohana",
-#              "o": "e",
-#              "p": {"a": {"0": "Kamil Kiljan",
-#                          "11": "Jakub Klimek",
-#                          "15": "Cezary Przybyła",
-#                          "16": "Agata Żuk",
-#                          "18": "Milena Rusiecka",
-#                          "19": "Oliwia Deorocka",
-#                          "2": "Joanna Zawitowska",
-#                          "21": "Piotr Wrzaszcz",
-#                          "22": "Tomasz Bartniczak",
-#                          "23": "Marek Dubrawa",
-#                          "24": "Michał Gorzkowski",
-#                          "26": "Julia Hardy",
-#                          "27": "Honorata Ząbek",
-#                          "28": "Bartłomiej Smolarek",
-#                          "31": "Adam Broda",
-#                          "44": "Adam Mossakowski",
-#                          "49": "Oskar Żuchliński",
-#                          "5": "Maciej Fickowski",
-#                          "69": "Kamil Merch=elski",
-#                          "7": "Mikołaj Folaron-Pamuła",
-#                          "77": "Martyna Lis",
-#                          "8": "Sandra Lisiewska",
-#                          "9": "Bartłomiej Skopiński",
-#                          "99": "Anna Łukasik"},
-#                    "h": {"1": "Jakub Tumkielski",
-#                          "10": "Kamila Bąk",
-#                          "11": "Tomasz Gorczyca",
-#                          "14": "Piotr Sobecki",
-#                          "16": "Małgorzata Dalidonis",
-#                          "17": "Maja Świgońska",
-#                          "2": "Jan Zwolan",
-#                          "20": "Jakub Węglarz",
-#                          "22": "Andżelika Mianecka",
-#                          "23": "Karolina Skrobiszewska",
-#                          "24": "Łukasz Skierski",
-#                          "33": "Hubert Klimkowski",
-#                          "4": "Agata Przedpełska",
-#                          "5": "Magdalena Dudzińska",
-#                          "6": "Maria Filipska",
-#                          "60": "Krzysztof Krysa",
-#                          "8": "Matylda Lisiak",
-#                          "9": "Jakub Raczyński",
-#                          "97": "Marcin Głowacki"}},
-#              "ts": {"ds": 0, "stop": True, "time": "51110"}}
-#
-# game_events = json_data["e"]
-# players = json_data["p"]
-#
+# Large commented-out JSON block removed.
 
+logger = logging.getLogger(__name__)  # Added
 
 def get_rounded_percentage(a: Union[int, str], b: Union[int, str]) -> int:
     """
@@ -161,17 +26,23 @@ def get_rounded_percentage(a: Union[int, str], b: Union[int, str]) -> int:
 
 def count_d_o_points(game_events: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
     """
-    Count defensive and offensive points for each team.
-    
-    In Ultimate Frisbee:
-    - Offense points occur when the team that started with the disc scores
-    - Defense points occur when the team that didn't start with the disc forces a turnover and scores
-    
-    Note: In Ultimate Frisbee, the "O" event appears only once at the start of the game to 
-    indicate who starts with possession. After that, possession alternates after each point,
-    and flips at halftime if the first half ended with an odd number of points.
+    Count defensive and offensive points for each team based on game events.
+
+    In Ultimate Frisbee, the determination of an offensive vs. defensive point
+    depends on which team had possession at the start of that particular point:
+    - An "offense point" is scored by the team that had possession at the start of the point.
+    - A "defense point" is scored by the team that gained possession (usually after a turnover)
+      during the point and then scored.
+
+    Key events influencing possession for D/O point calculation:
+    - 'O' (Offense): Indicates initial possession at the very start of the game.
+    - 'S' (Score): After a score, the team that was scored upon receives possession for the next point.
+    - 'H' (Halftime): Possession typically flips. If Team A had possession for the point leading into
+      halftime, Team B gets possession for the point starting after halftime.
+    - 'T' (Turnover): Indicates a change of possession within a point. This is crucial for a
+      defensive score but doesn't change who *started* the point on offense.
     """
-    # Initialize points structure
+    # Initialize points structure to store counts for home ('h') and away ('a') teams
     d_o_points = {
         "a": {
             "offence_points": 0,
@@ -183,14 +54,16 @@ def count_d_o_points(game_events: List[Dict[str, Any]]) -> Dict[str, Dict[str, i
         }
     }
     
-    # Filter only events we need
-    relevant_events = list(filter(lambda ev: ev["y"] in ["S", "O", "H", "T"], game_events))
+    # Filter for events relevant to determining D/O points: Scores, initial Offense, Halftime, and Turnovers.
+    # Turnovers help confirm if a point involved a possession change, characteristic of many defensive scores.
+    relevant_events = [event for event in game_events if event["y"] in ["S", "O", "H", "T"]]
     
     if not relevant_events:
-        return d_o_points
+        return d_o_points  # No relevant events, so no points.
     
-    # First find all halftimes and scores to divide the game into parts
-    halftime_indices = []
+    # Identify indices of halftime and score events to segment the game.
+    # These are critical junctures where possession rules for the next point are applied.
+    halftime_event_indices = []
     score_indices = []
     
     for i, event in enumerate(relevant_events):
@@ -218,6 +91,11 @@ def count_d_o_points(game_events: List[Dict[str, Any]]) -> Dict[str, Dict[str, i
     
     # Process the game with precise tracking of who starts each point with possession
     current_offense_team = starting_offense
+    
+    logger.debug(
+        f"count_d_o_points: Initial offense: {current_offense_team}, "
+        f"{len(score_indices)} scores to process among {len(relevant_events)} relevant events."
+    )
     
     # Track if we've passed halftime
     passed_halftime = False
@@ -268,188 +146,240 @@ def count_d_o_points(game_events: List[Dict[str, Any]]) -> Dict[str, Dict[str, i
 
 def count_disc_possession(game_events: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Calculate disc possession time for each team as a percentage.
-    
+    Calculate disc possession time for each team as a percentage of the total game duration
+    covered by the provided events.
+
     Args:
-        game_events: List of game events including turnovers, scores, etc.
-        
+        game_events: A list of game event dictionaries. Each event is expected
+                     to have a 'y' key for the event type and a 't' key for the
+                     timestamp of the event. Relevant event types are 'O' (Offense set),
+                     'T' (Turnover), 'S' (Score), and 'H' (Halftime).
+
     Returns:
-        Dictionary with possession percentages and total time
+        A dictionary containing:
+        - 'a': Percentage of time the away team had possession.
+        - 'h': Percentage of time the home team had possession.
+        - 'total': The total duration of the game segment covered by the events (timestamp of the last event).
+                   Returns 0 for all if no relevant events are found.
     """
-    possession_game_events = list(filter(lambda ev: ev["y"] in ["T", "S", "O", "H"], game_events))
+    # Filter for events that signify a potential change in possession or define game segments.
+    possession_game_events = [event for event in game_events if event["y"] in ["T", "S", "O", "H"]]
     
-    # Handle empty events case
     if not possession_game_events:
-        return {
-            "a": 0,
-            "h": 0,
-            "total": 0
-        }
+        logger.debug("count_disc_possession: No relevant events for possession calculation.")
+        return {"a": 0, "h": 0, "total": 0}
     
-    disc_possession = {
-        "a": 0,
-        "h": 0,
-        "total": possession_game_events[-1]["t"]
+    # Initialize possession time counters for away ('a') and home ('h') teams.
+    disc_possession_time = {
+        "a": 0,  # Time in original units for away team
+        "h": 0,  # Time in original units for home team
+        "total": possession_game_events[-1]["t"] # Timestamp of the last event
     }
     
-    # Find first offense setting event
-    first_offense_event = None
+    # Determine the initial team on offense.
+    initial_event_for_possession = possession_game_events[0] 
     for event in possession_game_events:
-        if event["y"] == "O":
-            first_offense_event = event
+        if event["y"] == "O": 
+            initial_event_for_possession = event
             break
     
-    # If no explicit offense event found, use first event
-    if first_offense_event is None:
-        first_offense_event = possession_game_events[0]
+    current_possessing_team = initial_event_for_possession["e"] 
+    previous_event_time = 0 
+    logger.debug(
+        f"count_disc_possession: Initial possessing team: {current_possessing_team}, "
+        f"Total event time span: {disc_possession_time['total']} from {len(possession_game_events)} events."
+    )
+
+    # Iterate through each relevant event to calculate time segments and attribute possession.
+    for event in possession_game_events:
+        current_event_time = event["t"]
+        time_segment_duration = current_event_time - previous_event_time
+
+        # Attribute the time segment to the team that had possession *before* this event occurred.
+        if current_possessing_team in disc_possession_time: # Ensure team is 'a' or 'h'
+            disc_possession_time[current_possessing_team] += time_segment_duration
+        
+        # Update who has possession *after* this event, for the *next* segment.
+        event_type = event["y"]
+        event_team = event.get("e") # Team associated with the event (e.g., who turned over, who scored)
+
+        if event_type == "O":
+            # Offense event sets the possession to the specified team.
+            current_possessing_team = event_team
+        elif event_type == "T":
+            # Turnover: possession switches to the other team.
+            current_possessing_team = "h" if event_team == "a" else "a"
+        elif event_type == "S":
+            # Score: possession switches to the team that was scored upon.
+            current_possessing_team = "h" if event_team == "a" else "a" # If 'a' scored, 'h' gets disc.
+        elif event_type == "H":
+            # Halftime: possession typically flips from who had it leading into halftime.
+            # (Assuming current_possessing_team correctly reflects who had it before 'H' was processed)
+            current_possessing_team = "h" if current_possessing_team == "a" else "a"
+        
+        previous_event_time = current_event_time # Update previous_event_time for the next iteration.
     
-    # Initialize tracking variables
-    current_side = first_offense_event["e"]  # Current possession side
-    prev_time = 0  # Previous event timestamp
-    
-    for e in possession_game_events:
-        current_time = e["t"]
-        elapsed_time = current_time - prev_time
-        
-        # Handle different event types
-        if e["y"] == "O":
-            # Time is attributed to the team that had possession BEFORE this event
-            disc_possession[current_side] += elapsed_time
-            # Now switch to the new offense team
-            current_side = e["e"]
-        
-        elif e["y"] == "T":
-            # Time is attributed to the team that had possession BEFORE this event
-            # (which is the same team that committed the turnover)
-            disc_possession[current_side] += elapsed_time
-            # Switch possession to the other team for the next time period
-            current_side = "h" if current_side == "a" else "a"
-        
-        elif e["y"] == "S":
-            # Time is attributed to the team that had possession BEFORE this event
-            # (which is also the scoring team)
-            disc_possession[current_side] += elapsed_time
-            # After score, possession switches to the other team
-            current_side = "h" if e["e"] == "a" else "a"
-        
-        elif e["y"] == "H":
-            # Time is attributed to the team that had possession BEFORE this event
-            disc_possession[current_side] += elapsed_time
-            # At halftime, possession typically switches
-            current_side = "h" if current_side == "a" else "a"
-        
-        # Update previous time for next iteration
-        prev_time = current_time
-    
-    # Calculate percentages
-    if disc_possession["total"] == 0:
-        disc_possession["a"] = 0
-        disc_possession["h"] = 0
+    # Calculate possession percentages based on the total duration.
+    total_duration = disc_possession_time["total"]
+    if total_duration == 0:
+        # Avoid division by zero if total duration is zero.
+        disc_possession_time["a_percentage"] = 0.0
+        disc_possession_time["h_percentage"] = 0.0
     else:
-        disc_possession["a"] = round(disc_possession["a"] / disc_possession["total"] * 100, 1)
-        disc_possession["h"] = round(disc_possession["h"] / disc_possession["total"] * 100, 1)
+        disc_possession_time["a_percentage"] = round(disc_possession_time["a"] / total_duration * 100, 1)
+        disc_possession_time["h_percentage"] = round(disc_possession_time["h"] / total_duration * 100, 1)
         
-    return disc_possession
-
-
-def count_turnovers(game_events):
-    turnover_stats = {
-        "a": len(list(filter(lambda ev: ev["y"] == "T" and ev["e"] == "a", game_events))),
-        "h": len(list(filter(lambda ev: ev["y"] == "T" and ev["e"] == "h", game_events)))
+    # For backward compatibility or if raw times are preferred by caller,
+    # the original structure returned percentages directly in "a" and "h" keys.
+    # Let's return a more descriptive structure but also consider original if needed.
+    # The original function returned: {"a": percentage, "h": percentage, "total": total_time}
+    return {
+        "a": disc_possession_time["a_percentage"],
+        "h": disc_possession_time["h_percentage"],
+        "total": total_duration # Total time of events considered
     }
+
+
+def count_turnovers(game_events: List[Dict[str, Any]]) -> Dict[str, int]:
+    """Counts turnovers for each team."""
+    logger.debug(f"count_turnovers: Processing {len(game_events)} events.")
+    turnover_stats = {
+        "a": 0, # Away team turnovers
+        "h": 0  # Home team turnovers
+    }
+    for event in game_events:
+        if event.get("y") == "T": # "T" signifies a turnover event
+            team_committed_turnover = event.get("e") # "e" indicates the team
+            if team_committed_turnover == "a":
+                turnover_stats["a"] += 1
+            elif team_committed_turnover == "h":
+                turnover_stats["h"] += 1
+    logger.debug(f"Turnover counts: Away {turnover_stats['a']}, Home {turnover_stats['h']}.")
     return turnover_stats
 
 
-def count_timeouts(game_events):
+def count_timeouts(game_events: List[Dict[str, Any]]) -> Dict[str, int]:
+    """Counts timeouts called by each team."""
+    logger.debug(f"count_timeouts: Processing {len(game_events)} events.")
     timeout_stats = {
-        "a": len(list(filter(lambda ev: ev["y"] == "TO" and ev["e"] == "a", game_events))),
-        "h": len(list(filter(lambda ev: ev["y"] == "TO" and ev["e"] == "h", game_events)))
+        "a": 0, # Away team timeouts
+        "h": 0  # Home team timeouts
     }
+    for event in game_events:
+        if event.get("y") == "TO": # "TO" signifies a timeout event
+            team_called_timeout = event.get("e") # "e" indicates the team
+            if team_called_timeout == "a":
+                timeout_stats["a"] += 1
+            elif team_called_timeout == "h":
+                timeout_stats["h"] += 1
+    logger.debug(f"Timeout counts: Away {timeout_stats['a']}, Home {timeout_stats['h']}.")
     return timeout_stats
 
 
 def count_points_per_player(game_events: List[Dict[str, Any]], players: Dict[str, Dict[str, str]]) -> Dict[str, Dict[str, Any]]:
+    logger.debug(f"count_points_per_player: Processing {len(game_events)} events for player stats.")
     """
-    Count points per player statistics.
-    
+    Calculates and aggregates points (goals and assists) for each player.
+
     Args:
-        game_events: List of game events
-        players: Dictionary of players by team and number
-        
+        game_events: A list of game event dictionaries. Score events ('S') are
+                     processed, expecting 's' (scorer ID), 'a' (assist ID),
+                     and 'e' (team).
+        players: A dictionary mapping team ('a' or 'h') to another dictionary,
+                 which maps player jersey numbers (as strings) to player names.
+                 Example: {"a": {"10": "Player A"}, "h": {"5": "Player B"}}
+
     Returns:
-        Dictionary of player statistics, sorted by total points
+        A dictionary where keys are team identifiers ('a', 'h'). Each team's value
+        is another dictionary where keys are player jersey numbers (strings).
+        Each player's value is a dictionary with "name", "goals", "assists",
+        and "total" points. The players within each team are sorted by total points
+        (descending), then goals, then assists, then by name (ascending).
     """
-    player_stats = {
+    # Initialize structure for player statistics for both away ('a') and home ('h') teams.
+    player_stats_agg: Dict[str, Dict[str, Dict[str, Any]]] = { # Renamed to avoid conflict with module name
         "a": {},
         "h": {}
     }
 
-    for e in game_events:
-        if e["y"] == "S":
-            # Convert to strings to handle both string and integer inputs
-            scorer_no = str(e["s"])
-            assist_no = str(e["a"])
-            team = e["e"]
-            
-            # Skip events with invalid player numbers
-            if scorer_no == "-1" or assist_no == "-1":
-                continue
-                
-            # Process scorer
-            try:
-                # Initialize player stats if needed
-                if scorer_no not in player_stats[team]:
-                    player_stats[team][scorer_no] = {
-                        "name": players[team][scorer_no],
-                        "goals": 0,
-                        "assists": 0,
-                        "total": 0
-                    }
-                
-                # Count scorer stats
-                player_stats[team][scorer_no]["goals"] += 1
-                player_stats[team][scorer_no]["total"] += 1
-            except KeyError:
-                # Handle error when player number doesn't exist in roster
-                # Re-raise to ensure callers know there's a problem
-                raise KeyError(f"Player {scorer_no} not found in team {team} roster")
-            
-            # Handle assist stats (skip for Callahan)
-            if assist_no != "XX":
-                try:
-                    # Initialize player stats if needed
-                    if assist_no not in player_stats[team]:
-                        player_stats[team][assist_no] = {
-                            "name": players[team][assist_no],
-                            "goals": 0,
-                            "assists": 0,
-                            "total": 0
-                        }
-                    
-                    # Count assist stats
-                    player_stats[team][assist_no]["assists"] += 1
-                    player_stats[team][assist_no]["total"] += 1
-                except KeyError:
-                    # Handle error when player number doesn't exist in roster
-                    raise KeyError(f"Player {assist_no} not found in team {team} roster")
+    # Iterate through game events to find score events ('S').
+    for event in game_events:
+        if event.get("y") == "S": # Process only score events.
+            scorer_no = str(event.get("s")) # Scorer's jersey number.
+            assist_no = str(event.get("a")) # Assist's jersey number.
+            team = event.get("e")           # Team that scored ('a' or 'h').
 
-    # Sort player stats by total points, goals, assists, then name
-    sorted_stats = {}
+            if team not in player_stats_agg:
+                logger.warning(f"Score event has unknown team '{team}': {event}")
+                continue # Skip if team is not 'a' or 'h'.
+
+            # --- Process Scorer ---
+            # Ensure scorer number is valid (not the placeholder for invalid/unknown, e.g., "-1").
+            # Assuming config.INVALID_PLAYER_NO = "-1"
+            if scorer_no != "-1": 
+                try:
+                    # Initialize player in stats if not already present.
+                    if scorer_no not in player_stats_agg[team]:
+                        # Attempt to get player name; use a placeholder if not found.
+                        player_name = players.get(team, {}).get(scorer_no, f"Unknown Player {scorer_no}")
+                        player_stats_agg[team][scorer_no] = {"name": player_name, "goals": 0, "assists": 0, "total": 0}
+                    
+                    player_stats_agg[team][scorer_no]["goals"] += 1
+                    player_stats_agg[team][scorer_no]["total"] += 1
+                except KeyError as e_key: # Should be caught by .get for players[team] if team is invalid
+                    logger.error(f"KeyError processing scorer: Player number '{scorer_no}' in team '{team}'. Event: {event}. Error: {e_key}")
+                    # This path should ideally not be hit if players.get(team, {}) is used.
+                    # If it means players[team] itself is missing, that's a different issue.
+                    # For now, this matches original logic of potentially raising KeyError if players[team][scorer_no] fails.
+                    # To keep existing behavior of raising error:
+                    # raise KeyError(f"Player {scorer_no} not found in team {team} roster. Event: {event}") from e_key
+                    # If we want to be more resilient and log then continue:
+                    if scorer_no not in player_stats_agg[team]: # ensure it exists if error happened before init
+                         player_stats_agg[team][scorer_no] = {"name": f"Error Player {scorer_no}", "goals": 1, "assists": 0, "total": 1}
+                    else: # if error happened during increment
+                         player_stats_agg[team][scorer_no]["goals"] += 1 # try to salvage
+                         player_stats_agg[team][scorer_no]["total"] += 1
+
+
+            # --- Process Assist ---
+            # Ensure assist number is valid and not Callahan (e.g., "XX").
+            # Assuming config.INVALID_PLAYER_NO = "-1" and config.CALLAHAN_MARKER = "XX"
+            if assist_no != "-1" and assist_no != "XX":
+                try:
+                    # Initialize player in stats if not already present.
+                    if assist_no not in player_stats_agg[team]:
+                        player_name = players.get(team, {}).get(assist_no, f"Unknown Player {assist_no}")
+                        player_stats_agg[team][assist_no] = {"name": player_name, "goals": 0, "assists": 0, "total": 0}
+                    
+                    player_stats_agg[team][assist_no]["assists"] += 1
+                    player_stats_agg[team][assist_no]["total"] += 1
+                except KeyError as e_key:
+                    logger.error(f"KeyError processing assist: Player number '{assist_no}' in team '{team}'. Event: {event}. Error: {e_key}")
+                    # Similar to scorer, decide on error handling.
+                    # raise KeyError(f"Player {assist_no} not found in team {team} roster. Event: {event}") from e_key
+                    if assist_no not in player_stats_agg[team]:
+                         player_stats_agg[team][assist_no] = {"name": f"Error Player {assist_no}", "goals": 0, "assists": 1, "total": 1}
+                    else:
+                         player_stats_agg[team][assist_no]["assists"] += 1
+                         player_stats_agg[team][assist_no]["total"] += 1
     
-    for team in ["a", "h"]:
+    # Sort player statistics for each team.
+    sorted_player_stats: Dict[str, Dict[str, Any]] = {}
+    
+    for team_key in ["a", "h"]: # Use team_key to avoid conflict if 'team' variable is used inside loop
         # Sort by:
         # 1. Total points (descending)
         # 2. Goals (descending)
         # 3. Assists (descending)
         # 4. Player name (ascending)
-        sorted_stats[team] = dict(sorted(
-            player_stats[team].items(),
-            key=lambda x: (
-                -x[1]["total"],        # Sort by total points (descending)
-                -x[1]["goals"],        # Then by goals (descending)
-                -x[1]["assists"],      # Then by assists (descending)
-                x[1]["name"]           # Then by name (ascending)
+        sorted_player_stats[team_key] = dict(sorted(
+            player_stats_agg[team_key].items(), # Use player_stats_agg here
+            key=lambda item: (
+                -item[1]["total"],        # Sort by total points (descending)
+                -item[1]["goals"],        # Then by goals (descending)
+                -item[1]["assists"],      # Then by assists (descending)
+                item[1]["name"]           # Then by name (ascending)
             )
         ))
 
-    return sorted_stats
+    return sorted_player_stats

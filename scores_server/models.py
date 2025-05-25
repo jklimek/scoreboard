@@ -17,4 +17,4 @@ class GameState:
 
     def reset(self) -> None:
         """Reset all game state to initial values."""
-        self.__init__() 
+        self.__init__()

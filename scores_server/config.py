@@ -5,13 +5,15 @@ from dataclasses import dataclass
 from typing import Dict, Any, ClassVar
 import logging
 
-# Get logger from app.py
+# Logger for this module, configured by setup_logging() in app.py
 logger = logging.getLogger(__name__)
 
 @dataclass
 class Config:
     # API URLs
-    WIND_URL: str = os.getenv("WIND_URL", "http://192.168.10.13/")
+    WIND_URL: str = os.getenv("WIND_URL", "http://192.168.10.13/") # Default for local dev/testing if not set
+    SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/" # Default for Production/Development
+    WEBSOCKET_URL: str = "ws://klimek.jakub.tech:5005/" # Default for Production/Development
     
     # Server settings
     FLASK_HOST: str = "0.0.0.0"
@@ -55,14 +57,13 @@ class Config:
 
 class ProductionConfig(Config):
     FLASK_DEBUG = False
-    # Add production-specific settings
-    SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/"
-    WEBSOCKET_URL: str = "ws://klimek.jakub.tech:5005/"
+    # SCORES_URL and WEBSOCKET_URL are inherited from Config (Prod/Dev default)
+    # Add any production-specific overrides here if they differ from Config defaults
+
 class DevConfig(Config):
     FLASK_DEBUG = True
-    # Add production-specific settings
-    SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/"
-    WEBSOCKET_URL: str = "ws://klimek.jakub.tech:5005/"
+    # SCORES_URL and WEBSOCKET_URL are inherited from Config (Prod/Dev default)
+    # Add any dev-specific overrides here if they differ from Config defaults
 
 class TestingConfig(Config):
     FLASK_DEBUG = True
