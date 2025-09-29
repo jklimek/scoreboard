@@ -21,7 +21,8 @@ Temporary Items
 .idea
 .history
 CLAUDE.md
-.vscode 
+.vscode
+.venv
 minimap/__pycache__
 minimap/heatmap_logs
 minimap/yolov8s.pt
