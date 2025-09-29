@@ -21,6 +21,14 @@ Temporary Items
 .idea
 .history
 CLAUDE.md
+.vscode 
+minimap/__pycache__
+minimap/heatmap_logs
+minimap/yolov8s.pt
+minimap/yolov8m.pt
+minimap/templates/__pycache__
+minimap/templates/static
+minimap/venv
 scores_server/__pycache__
 scores_html/static/images/bg.png
 json_api/daty.json

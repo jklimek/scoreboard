@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ultimate Heatmap</title>
+    <style>
+        html, body { margin: 0; height: 100%; background: #ff00ff; color: #ddd; font-family: sans-serif; }
+        #wrap { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+        #canvas { flex: 1 1 auto; background: transparent; display: block; }
+        #info { padding: 6px 10px; font-size: 12px; color: #aaa; }
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <canvas id="canvas"></canvas>
+        <div id="info">Heatmap overlay - polling /heatmap.png</div>
+    </div>
+    <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let fieldW = {{ FIELD_W }};
+    let fieldH = {{ FIELD_H }};
+
+    function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const w = window.innerWidth;
+        const h = window.innerHeight - 24;
+        const aspect = fieldW / fieldH;
+        let drawW = w;
+        let drawH = Math.round(w / aspect);
+        if (drawH > h) { drawH = h; drawW = Math.round(h * aspect); }
+        canvas.style.width = drawW + 'px';
+        canvas.style.height = drawH + 'px';
+        canvas.width = Math.round(drawW * dpr);
+        canvas.height = Math.round(drawH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    async function drawHeat() {
+        try {
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const w = parseInt(canvas.style.width);
+                const h = parseInt(canvas.style.height);
+                ctx.drawImage(img, 0, 0, w, h);
+            };
+            img.src = '/heatmap.png?ts=' + Date.now();
+        } catch (e) { }
+        requestAnimationFrame(drawHeat);
+    }
+    drawHeat();
+    </script>
+</body>
+<html>
+
+

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ultimate Minimap</title>
+    <style>
+        html, body { margin: 0; height: 100%; background: #ff00ff; color: #ddd; font-family: sans-serif; }
+        #wrap { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+        #canvas { flex: 1 1 auto; background: transparent; display: block; }
+        #info { padding: 6px 10px; font-size: 12px; color: #aaa; }
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <canvas id="canvas"></canvas>
+        <div id="info">Live minimap - polling /state</div>
+    </div>
+    <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let fieldW = {{ FIELD_W }};
+    let fieldH = {{ FIELD_H }};
+    const FIELD_M_W_M = {{ FIELD_M_W }};
+    const ENDZONE_M = 15;
+
+    function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const w = window.innerWidth;
+        const h = window.innerHeight - 24;
+        const aspect = fieldW / fieldH;
+        let drawW = w;
+        let drawH = Math.round(w / aspect);
+        if (drawH > h) { drawH = h; drawW = Math.round(h * aspect); }
+        canvas.style.width = drawW + 'px';
+        canvas.style.height = drawH + 'px';
+        canvas.width = Math.round(drawW * dpr);
+        canvas.height = Math.round(drawH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function draw(state) {
+        if (!state) return;
+        fieldW = state.field_w || fieldW;
+        fieldH = state.field_h || fieldH;
+        resizeCanvas();
+        const w = parseInt(canvas.style.width);
+        const h = parseInt(canvas.style.height);
+        const scaleX = w / fieldW;
+        const scaleY = h / fieldH;
+        ctx.clearRect(0, 0, w, h);
+        // field lines (white) over pink page background
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
+        const zoneX = (ENDZONE_M / FIELD_M_W_M) * w;
+        ctx.beginPath();
+        ctx.moveTo(Math.round(zoneX) + 0.5, 0);
+        ctx.lineTo(Math.round(zoneX) + 0.5, h);
+        ctx.moveTo(Math.round(w - zoneX) + 0.5, 0);
+        ctx.lineTo(Math.round(w - zoneX) + 0.5, h);
+        ctx.stroke();
+        // players
+        const players = state.players || [];
+        const defaultColors = ['#ff4d4d', '#4da6ff'];
+        const teamColors = (state.team_colors && state.team_colors.length === 2) ? state.team_colors : defaultColors;
+        for (const p of players) {
+            const x = p.x * scaleX;
+            const y = p.y * scaleY;
+            const color = teamColors[(p.team === 0) ? 0 : 1];
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(Math.round(x) + 0.5, Math.round(y) + 0.5, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    async function poll() {
+        try {
+            const r = await fetch('/state', { cache: 'no-store' });
+            if (r.ok) {
+                const s = await r.json();
+                draw(s);
+            }
+        } catch (e) { /* ignore */ }
+        requestAnimationFrame(poll);
+    }
+    poll();
+    </script>
+</body>
+<html>
+
+
