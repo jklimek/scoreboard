@@ -31,6 +31,7 @@ minimap/templates/__pycache__
 minimap/templates/static
 minimap/venv
 scores_server/__pycache__
+scores_html/__pycache__
 scores_html/static/images/bg.png
 json_api/daty.json
 json_api/match_caly.json

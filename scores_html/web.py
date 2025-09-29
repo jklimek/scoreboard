@@ -82,6 +82,11 @@ def player_stats():
     return render_template('player_stats.html')
 
 
+@app.route('/field_scoreboard')
+def field_scoreboard():
+    return render_template('field_scoreboard.html')
+
+
 def filter_matches(matches_list, field):
     return [m for m in matches_list if m['field'] == field]
 

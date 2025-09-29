@@ -1,0 +1,185 @@
+/* Field Scoreboard CSS for 1920x1080 full screen display */
+/* Designed to be visible from the side of the field with large numbers */
+
+@font-face {
+    font-family: 'Myriad Pro Bold';
+    src: url('../fonts/MyriadPro-Bold.woff2') format('woff2'),
+         url('../fonts/MyriadPro-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000;
+    font-family: 'Myriad Pro Bold', Arial, sans-serif;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.field-scoreboard {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000;
+}
+
+/* Score Container - Main scores display */
+.score-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4vh;
+    gap: 3vw;
+}
+
+.home-score, .away-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    border-radius: 2vw;
+    box-shadow: 0 2vh 4vh rgba(0, 0, 0, 0.5);
+    min-width: 15vw;
+    min-height: 20vh;
+}
+
+#home-score, #away-score {
+    font-size: 20vw;
+    font-weight: bold;
+    color: #000000;
+    line-height: 1;
+    padding: 1vw;
+    text-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.3);
+}
+
+.colon {
+    font-size: 18vw;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.7);
+    margin: 0 1vw;
+}
+
+/* Timer Container - Timer display below scores */
+.timer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.timer-display {
+    background-color: #ffffff;
+    border-radius: 1.5vw;
+    padding: 1.5vh 3vw;
+    box-shadow: 0 2vh 4vh rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 6vh;
+}
+
+#timer-minutes, #timer-seconds {
+    font-size: 10vw;
+    font-weight: bold;
+    color: #000000;
+    line-height: 1;
+    text-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.3);
+}
+
+#timer-hundredths {
+    font-size: 6vw;
+    opacity: 0.8;
+    margin-left: 0.5vw;
+    font-weight: bold;
+    color: #000000;
+    line-height: 1;
+    text-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.3);
+}
+
+/* Style the colon separators in timer */
+.timer-display .colon {
+    font-size: 6vw;
+    font-weight: bold;
+    color: #000000;
+    line-height: 1;
+    text-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.3);
+    margin: 0 0.5vw;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 1366px) {
+    #home-score, #away-score {
+        font-size: 18vw;
+        min-width: 12vw;
+        min-height: 18vh;
+    }
+
+    .colon {
+        font-size: 16vw;
+    }
+
+    #timer-minutes, #timer-seconds {
+        font-size: 9vw;
+    }
+
+    #timer-hundredths {
+        font-size: 5.5vw;
+    }
+
+    .timer-display .colon {
+        font-size: 9vw;
+    }
+
+    .timer-display {
+        padding: 1.2vh 2.5vw;
+        min-height: 5vh;
+    }
+
+    .score-container {
+        gap: 2.5vw;
+        margin-bottom: 3vh;
+    }
+}
+
+@media (max-width: 768px) {
+    #home-score, #away-score {
+        font-size: 16vw;
+        min-width: 10vw;
+        min-height: 16vh;
+    }
+
+    .colon {
+        font-size: 14vw;
+    }
+
+    #timer-minutes, #timer-seconds {
+        font-size: 8vw;
+    }
+
+    #timer-hundredths {
+        font-size: 5vw;
+    }
+
+    .timer-display .colon {
+        font-size: 8vw;
+    }
+
+    .timer-display {
+        padding: 1vh 2vw;
+        min-height: 4vh;
+    }
+
+    .score-container {
+        gap: 2vw;
+        margin-bottom: 2.5vh;
+    }
+}

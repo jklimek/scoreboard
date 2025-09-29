@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Field Scoreboard</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://kit.fontawesome.com/e939364dd5.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/field_scoreboard.css') }}">
+</head>
+<body>
+    <div class="field-scoreboard">
+        <div class="score-container">
+            <div class="home-score">
+                <span id="home-score">0</span>
+            </div>
+
+            <div class="colon">:</div>
+
+            <div class="away-score">
+                <span id="away-score">0</span>
+            </div>
+        </div>
+
+        <div class="timer-container">
+            <div class="timer-display">
+                <span id="timer-minutes">00</span><span class="colon">:</span><span id="timer-seconds">00</span><span class="colon">:</span><span id="timer-hundredths">00</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/easytimer.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/field_scoreboard.js') }}"></script>
+</body>
+</html>
