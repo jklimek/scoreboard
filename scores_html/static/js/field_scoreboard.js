@@ -19,6 +19,8 @@ var awayScoreHandle = $("#away-score");
 var timerMinutesHandle = $("#timer-minutes");
 var timerSecondsHandle = $("#timer-seconds");
 var timerHundredthsHandle = $("#timer-hundredths");
+var homeTeamNameHandle = $("#home-team-name");
+var awayTeamNameHandle = $("#away-team-name");
 
 // Initialize WebSocket connection
 websocketConnection();
@@ -76,6 +78,10 @@ function parseEvent(data) {
         }
     }
 
+    if (data.hasOwnProperty("team_name")) {
+        setTeamName(data["team"], data["team_name"], data["team_name_full"]);
+    }
+
     // Handle timer events
     if (data.hasOwnProperty("timer_reset")) {
         resetTimer();
@@ -97,6 +103,19 @@ function setScores(a, h) {
     homeScore = h;
     awayScoreHandle.text(a.toString());
     homeScoreHandle.text(h.toString());
+}
+
+function setTeamName(team, name, fullName) {
+    var displayName = fullName && fullName.length ? fullName : name;
+    if (!displayName || !displayName.length) {
+        return;
+    }
+
+    if (team === "h") {
+        homeTeamNameHandle.text(displayName.toUpperCase());
+    } else if (team === "a") {
+        awayTeamNameHandle.text(displayName.toUpperCase());
+    }
 }
 
 function startTimer(offset = 0) {

@@ -1,5 +1,16 @@
 /* Field Scoreboard CSS for 1920x1080 full screen display */
-/* Designed to be visible from the side of the field with large numbers */
+/* Optimised for stadium scoreboards, TVs, and ultrawide monitors */
+
+:root {
+    --score-font-size: clamp(8rem, 16vw, 26rem);
+    --score-colon-font-size: clamp(6rem, 12vw, 20rem);
+    --timer-primary-font-size: clamp(4rem, 8vw, 12rem);
+    --timer-hundredths-font-size: clamp(2.5rem, 4.5vw, 6rem);
+    --timer-colon-font-size: clamp(2.5rem, 4.5vw, 6rem);
+    --score-border-radius: clamp(1.5rem, 2.5vw, 4rem);
+    --timer-border-radius: clamp(1rem, 1.8vw, 3rem);
+    --panel-shadow: 0 2vh 4vh rgba(0, 0, 0, 0.5);
+}
 
 @font-face {
     font-family: 'Myriad Pro Bold';
@@ -30,6 +41,8 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #000000;
+    padding: 4vh 4vw;
+    box-sizing: border-box;
 }
 
 /* Score Container - Main scores display */
@@ -38,7 +51,8 @@ body {
     align-items: center;
     justify-content: center;
     margin-bottom: 4vh;
-    gap: 3vw;
+    gap: clamp(2rem, 6vw, 8rem);
+    width: min(92vw, 1800px);
 }
 
 .home-score, .away-score {
@@ -46,27 +60,38 @@ body {
     align-items: center;
     justify-content: center;
     background-color: #ffffff;
-    border-radius: 2vw;
-    box-shadow: 0 2vh 4vh rgba(0, 0, 0, 0.5);
-    min-width: 15vw;
-    min-height: 20vh;
+    border-radius: var(--score-border-radius);
+    box-shadow: var(--panel-shadow);
+    min-width: clamp(18rem, 22vw, 28rem);
+    min-height: clamp(18rem, 26vh, 34rem);
+    padding: clamp(1.5rem, 2vw, 3rem) clamp(1rem, 1.8vw, 3rem);
 }
 
 #home-score, #away-score {
-    font-size: 20vw;
+    font-size: var(--score-font-size);
     font-weight: bold;
     color: #000000;
     line-height: 1;
-    padding: 1vw;
+    padding: clamp(0.5rem, 1vw, 1.5rem);
     text-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.3);
 }
 
+.team-label {
+    font-size: clamp(1.5rem, 2.5vw, 4rem);
+    letter-spacing: 0.05em;
+    color: #1a1a1a;
+    opacity: 0.85;
+    margin-bottom: clamp(0.5rem, 1vh, 1.5rem);
+    text-transform: uppercase;
+    text-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.2);
+}
+
 .colon {
-    font-size: 18vw;
+    font-size: var(--score-colon-font-size);
     font-weight: bold;
     color: #ffffff;
     text-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.7);
-    margin: 0 1vw;
+    margin: 0 clamp(1rem, 2vw, 3rem);
 }
 
 /* Timer Container - Timer display below scores */
@@ -78,17 +103,18 @@ body {
 
 .timer-display {
     background-color: #ffffff;
-    border-radius: 1.5vw;
-    padding: 1.5vh 3vw;
-    box-shadow: 0 2vh 4vh rgba(0, 0, 0, 0.5);
+    border-radius: var(--timer-border-radius);
+    padding: clamp(1rem, 2vh, 2.5rem) clamp(2rem, 3vw, 4rem);
+    box-shadow: var(--panel-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 6vh;
+    min-height: clamp(6rem, 10vh, 12rem);
+    min-width: min(80vw, 1200px);
 }
 
 #timer-minutes, #timer-seconds {
-    font-size: 10vw;
+    font-size: var(--timer-primary-font-size);
     font-weight: bold;
     color: #000000;
     line-height: 1;
@@ -96,9 +122,9 @@ body {
 }
 
 #timer-hundredths {
-    font-size: 6vw;
+    font-size: var(--timer-hundredths-font-size);
     opacity: 0.8;
-    margin-left: 0.5vw;
+    margin-left: clamp(0.5rem, 1vw, 1.5rem);
     font-weight: bold;
     color: #000000;
     line-height: 1;
@@ -107,12 +133,12 @@ body {
 
 /* Style the colon separators in timer */
 .timer-display .colon {
-    font-size: 6vw;
+    font-size: var(--timer-colon-font-size);
     font-weight: bold;
     color: #000000;
     line-height: 1;
     text-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.3);
-    margin: 0 0.5vw;
+    margin: 0 clamp(0.5rem, 1vw, 1.5rem);
 }
 
 /* Responsive adjustments for smaller screens */
