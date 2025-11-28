@@ -11,6 +11,7 @@ Icon
 .Spotlight-V100
 .TemporaryItems
 .Trashes
+**/*.pyc
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 .AppleDB
@@ -19,6 +20,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 .idea
+.venv
 .history
 CLAUDE.md
 .vscode 
