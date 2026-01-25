@@ -174,8 +174,25 @@ function setTeamJerseyColor(team, color) {
 }
 
 function setScores(a, h) {
-    $("#ta-score").text(a.toString());
-    $("#th-score").text(h.toString());
+    var taScoreEl = $("#ta-score");
+    var thScoreEl = $("#th-score");
+
+    // Check if scores changed and animate if GSAP is available
+    if (typeof ScoreboardAnimations !== 'undefined') {
+        if (parseInt(taScoreEl.text()) !== a) {
+            ScoreboardAnimations.animateScoreChange(taScoreEl[0], a);
+        } else {
+            taScoreEl.text(a.toString());
+        }
+        if (parseInt(thScoreEl.text()) !== h) {
+            ScoreboardAnimations.animateScoreChange(thScoreEl[0], h);
+        } else {
+            thScoreEl.text(h.toString());
+        }
+    } else {
+        taScoreEl.text(a.toString());
+        thScoreEl.text(h.toString());
+    }
 }
 
 function startOffence() {
@@ -184,30 +201,42 @@ function startOffence() {
 
 function startMatch(offset) {
     startTimer(offset);
-    setAssistAndScorerTexts("", "START");
-    scorerHandle.addClass("active");
-    timerHandle.addClass("team-score-animation");
-    setTimeout(function () {
-        timerHandle.removeClass("team-score-animation");
-    }, 8000);
-    setTimeout(function () {
-        $("#scorer").removeClass("active");
-    }, 4000);
+    if (typeof ScoreboardAnimations !== 'undefined') {
+        // Use GSAP animations
+        ScoreboardAnimations.animateMatchStart(offset);
+    } else {
+        // Fallback to original implementation
+        setAssistAndScorerTexts("", "START");
+        scorerHandle.addClass("active");
+        timerHandle.addClass("team-score-animation");
+        setTimeout(function () {
+            timerHandle.removeClass("team-score-animation");
+        }, 8000);
+        setTimeout(function () {
+            $("#scorer").removeClass("active");
+        }, 4000);
+    }
 }
 
 function end() {
     stopTimer();
     teams["a"]["score_handle"].removeClass("disc-possession");
     teams["h"]["score_handle"].removeClass("disc-possession");
-    setAssistAndScorerTexts("", "KONIEC MECZU");
-    timerHandle.addClass("team-score-animation");
-    setTimeout(function () {
-        timerHandle.removeClass("team-score-animation");
-    }, 8000);
-    scorerHandle.addClass("active");
-    setTimeout(function () {
-        scorerHandle.removeClass("active");
-    }, 10000);
+    if (typeof ScoreboardAnimations !== 'undefined') {
+        // Use GSAP animations
+        ScoreboardAnimations.animateMatchEnd();
+    } else {
+        // Fallback to original implementation
+        setAssistAndScorerTexts("", "KONIEC MECZU");
+        timerHandle.addClass("team-score-animation");
+        setTimeout(function () {
+            timerHandle.removeClass("team-score-animation");
+        }, 8000);
+        scorerHandle.addClass("active");
+        setTimeout(function () {
+            scorerHandle.removeClass("active");
+        }, 10000);
+    }
 }
 
 function discPossessionChange(team, offence = false) {
@@ -227,14 +256,19 @@ function discPossessionChange(team, offence = false) {
 
 
 function windAngleUpdate(windAngleTarget) {
-
-    $({rotation: windAngle}).animate({rotation: windAngleTarget}, {
-        duration: 300,
-        easing: 'swing',
-        step: function (now, fx) {
-            windArrowHandle.css({transform: 'rotate(' + (this.rotation - 45) % 360 + 'deg)'});
-        }
-    });
+    if (typeof gsap !== 'undefined' && typeof OverlayAnimations !== 'undefined') {
+        // Use GSAP animation
+        OverlayAnimations.animateWindArrow(windArrowHandle[0], windAngleTarget);
+    } else {
+        // Fallback to jQuery animation
+        $({rotation: windAngle}).animate({rotation: windAngleTarget}, {
+            duration: 300,
+            easing: 'swing',
+            step: function (now, fx) {
+                windArrowHandle.css({transform: 'rotate(' + (this.rotation - 45) % 360 + 'deg)'});
+            }
+        });
+    }
     windAngle = windAngleTarget
 }
 
@@ -487,47 +521,89 @@ function windUpdate(windAngle, windSpeed, windTemp, windHum) {
 
 function toggleWind(toggle) {
     console.log("Toggle wind: ", toggle);
-    if (toggle) {
-        windBoxHandle.addClass("active");
+    if (typeof OverlayAnimations !== 'undefined') {
+        // Use GSAP animations
+        if (toggle) {
+            OverlayAnimations.showWind(windBoxHandle[0]);
+        } else {
+            OverlayAnimations.hideWind(windBoxHandle[0]);
+        }
     } else {
-        windBoxHandle.removeClass("active");
+        // Fallback to CSS class toggle
+        if (toggle) {
+            windBoxHandle.addClass("active");
+        } else {
+            windBoxHandle.removeClass("active");
+        }
     }
 }
 
 function toggleRoster(toggle) {
     console.log("Toggle roster: ", toggle);
-    if (toggle) {
-        rosterHandle.addClass("active");
+    if (typeof OverlayAnimations !== 'undefined') {
+        // Use GSAP animations
+        if (toggle) {
+            OverlayAnimations.showRoster(rosterHandle[0]);
+        } else {
+            OverlayAnimations.hideRoster(rosterHandle[0]);
+        }
     } else {
-        rosterHandle.removeClass("active");
+        // Fallback to CSS class toggle
+        if (toggle) {
+            rosterHandle.addClass("active");
+        } else {
+            rosterHandle.removeClass("active");
+        }
     }
 }
 
 function toggleStats(toggle) {
     console.log("Toggle stats: ", toggle);
-    if (toggle) {
-        statsHandle.addClass("active");
+    if (typeof OverlayAnimations !== 'undefined') {
+        // Use GSAP animations
+        if (toggle) {
+            OverlayAnimations.showStats(statsHandle[0]);
+        } else {
+            OverlayAnimations.hideStats(statsHandle[0]);
+        }
     } else {
-        statsHandle.removeClass("active");
+        // Fallback to CSS class toggle
+        if (toggle) {
+            statsHandle.addClass("active");
+        } else {
+            statsHandle.removeClass("active");
+        }
     }
 }
 
 function timeout(team) {
-    setAssistAndScorerTexts("", "TIMEOUT");
-    animateScorerIn(teams[team]["handle"]);
-    setTimeout(function () {
-        animateScorerOut(teams[team]["handle"])
-    }, 50000);
+    if (typeof ScoreboardAnimations !== 'undefined') {
+        // Use GSAP animations
+        ScoreboardAnimations.animateTimeout(teams[team]["handle"][0]);
+    } else {
+        // Fallback to original implementation
+        setAssistAndScorerTexts("", "TIMEOUT");
+        animateScorerIn(teams[team]["handle"]);
+        setTimeout(function () {
+            animateScorerOut(teams[team]["handle"])
+        }, 50000);
+    }
 }
 
 function score(team, assist, scorer) {
-    setAssistAndScorerTexts(assist, scorer);
-    animateScorerIn(team);
-    setTimeout(animateAssistIn, 1000);
-    setTimeout(animateAssistOut, 8000);
-    setTimeout(function () {
-        animateScorerOut(team)
-    }, 9000);
+    if (typeof ScoreboardAnimations !== 'undefined') {
+        // Use GSAP animations
+        ScoreboardAnimations.animateScore(team[0], scorer, assist);
+    } else {
+        // Fallback to original implementation
+        setAssistAndScorerTexts(assist, scorer);
+        animateScorerIn(team);
+        setTimeout(animateAssistIn, 1000);
+        setTimeout(animateAssistOut, 8000);
+        setTimeout(function () {
+            animateScorerOut(team)
+        }, 9000);
+    }
 }
 
 function setAssistAndScorerTexts(assist, scorer) {

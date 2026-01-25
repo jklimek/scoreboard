@@ -1,0 +1,424 @@
+/**
+ * Animation Utility CSS
+ *
+ * Base styles for animation support including:
+ * - GPU acceleration hints
+ * - Animation utility classes
+ * - Clip-path based reveal classes
+ * - Z-index layering system
+ */
+
+/* ==========================================
+   GPU Acceleration & Performance
+   ========================================== */
+
+/* Elements that will be animated should have these properties */
+.will-animate {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* For elements with complex transforms */
+.will-animate-complex {
+    will-change: transform, opacity, clip-path;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Remove will-change after animation completes (JS should add/remove) */
+.animation-complete {
+    will-change: auto;
+}
+
+
+/* ==========================================
+   Animation State Classes
+   ========================================== */
+
+/* Hidden states for animation starting points */
+.anim-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.anim-hidden-left {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.anim-hidden-right {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.anim-hidden-up {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+.anim-hidden-down {
+    opacity: 0;
+    transform: translateY(100%);
+}
+
+.anim-hidden-scale {
+    opacity: 0;
+    transform: scale(0);
+}
+
+/* Visible states */
+.anim-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0) translateY(0) scale(1);
+}
+
+
+/* ==========================================
+   Clip-Path Reveal Classes
+   ========================================== */
+
+/* Wipe reveals */
+.clip-hidden-left {
+    clip-path: inset(0 100% 0 0);
+}
+
+.clip-hidden-right {
+    clip-path: inset(0 0 0 100%);
+}
+
+.clip-hidden-up {
+    clip-path: inset(100% 0 0 0);
+}
+
+.clip-hidden-down {
+    clip-path: inset(0 0 100% 0);
+}
+
+.clip-hidden-center-h {
+    clip-path: inset(0 50% 0 50%);
+}
+
+.clip-hidden-center-v {
+    clip-path: inset(50% 0 50% 0);
+}
+
+.clip-visible {
+    clip-path: inset(0 0 0 0);
+}
+
+/* Clip-path transitions */
+.clip-transition {
+    transition: clip-path 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.clip-transition-fast {
+    transition: clip-path 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.clip-transition-slow {
+    transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+
+/* ==========================================
+   Z-Index Layering System
+   ========================================== */
+
+:root {
+    /* Layer hierarchy */
+    --z-base: 1;
+    --z-scoreboard: 100;
+    --z-names-graphics: 200;
+    --z-overlay-panel: 500;
+    --z-overlay-content: 501;
+    --z-transition: 900;
+    --z-flash: 999;
+    --z-debug: 9999;
+}
+
+/* Apply z-index to elements */
+.layer-base { z-index: var(--z-base); }
+.layer-scoreboard { z-index: var(--z-scoreboard); }
+.layer-names { z-index: var(--z-names-graphics); }
+.layer-overlay { z-index: var(--z-overlay-panel); }
+.layer-overlay-content { z-index: var(--z-overlay-content); }
+.layer-transition { z-index: var(--z-transition); }
+.layer-flash { z-index: var(--z-flash); }
+
+
+/* ==========================================
+   Easing Custom Properties
+   ========================================== */
+
+:root {
+    /* Standard easings */
+    --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+    --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+    --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+
+    /* Bounce/back easings */
+    --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-out-back-strong: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Broadcast-style (smooth professional feel) */
+    --ease-broadcast-in: cubic-bezier(0.7, 0, 0.36, 1);
+    --ease-broadcast-out: cubic-bezier(0.64, 0.06, 0.3, 1);
+    --ease-broadcast-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+    /* Elastic */
+    --ease-elastic: cubic-bezier(0.64, 0.06, 0.3, 1.29);
+
+    /* Snappy (for quick actions) */
+    --ease-snap: cubic-bezier(0.4, 0, 0, 1);
+}
+
+
+/* ==========================================
+   Duration Custom Properties
+   ========================================== */
+
+:root {
+    --duration-instant: 0.1s;
+    --duration-fast: 0.25s;
+    --duration-normal: 0.5s;
+    --duration-slow: 0.75s;
+    --duration-very-slow: 1s;
+}
+
+
+/* ==========================================
+   Animation Keyframes
+   ========================================== */
+
+/* Pulse effect */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.anim-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Gentle float */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.anim-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Attention shake */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+.anim-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Glow effect */
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    }
+}
+
+.anim-glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* Score flash (for when score changes) */
+@keyframes score-flash {
+    0% {
+        transform: scale(1);
+        background-color: var(--box-point-accent-color);
+    }
+    20% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        background-color: var(--box-bg-color);
+    }
+}
+
+.anim-score-flash {
+    animation: score-flash 0.6s var(--ease-out-back);
+}
+
+/* Slide in from left */
+@keyframes slide-in-left {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.anim-slide-in-left {
+    animation: slide-in-left var(--duration-normal) var(--ease-broadcast-out);
+}
+
+/* Slide in from right */
+@keyframes slide-in-right {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.anim-slide-in-right {
+    animation: slide-in-right var(--duration-normal) var(--ease-broadcast-out);
+}
+
+/* Slide in from bottom */
+@keyframes slide-in-up {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.anim-slide-in-up {
+    animation: slide-in-up var(--duration-normal) var(--ease-broadcast-out);
+}
+
+/* Slide in from top */
+@keyframes slide-in-down {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.anim-slide-in-down {
+    animation: slide-in-down var(--duration-normal) var(--ease-broadcast-out);
+}
+
+/* Fade in with scale */
+@keyframes fade-in-scale {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.anim-fade-in-scale {
+    animation: fade-in-scale var(--duration-normal) var(--ease-out-back);
+}
+
+/* Pop in */
+@keyframes pop-in {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.anim-pop-in {
+    animation: pop-in var(--duration-normal) var(--ease-out-back);
+}
+
+
+/* ==========================================
+   Transition Flash Overlay
+   ========================================== */
+
+#transition-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    pointer-events: none;
+    z-index: var(--z-flash);
+    opacity: 0;
+}
+
+
+/* ==========================================
+   Stagger Delay Utilities
+   ========================================== */
+
+/* Use these with animation-delay for stagger effects */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+.stagger-7 { animation-delay: 0.35s; }
+.stagger-8 { animation-delay: 0.4s; }
+.stagger-9 { animation-delay: 0.45s; }
+.stagger-10 { animation-delay: 0.5s; }
+
+
+/* ==========================================
+   Animation Fill Modes
+   ========================================== */
+
+.anim-fill-forwards {
+    animation-fill-mode: forwards;
+}
+
+.anim-fill-backwards {
+    animation-fill-mode: backwards;
+}
+
+.anim-fill-both {
+    animation-fill-mode: both;
+}
+
+
+/* ==========================================
+   Reduced Motion Support
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

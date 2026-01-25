@@ -27,7 +27,7 @@ websocketConnection();
 
 function websocketConnection() {
     // Use the same WebSocket URL as the main scoreboard
-    websocket = new WebSocket("ws://localhost:5005/");
+    websocket = new WebSocket("ws://scoreboard.jakub.tech:5005/");
     websocket.onopen = function (evt) {
         onOpen(evt)
     };
@@ -99,10 +99,20 @@ function parseEvent(data) {
 }
 
 function setScores(a, h) {
+    // Animate score changes if GSAP is available
+    if (typeof FieldScoreboardAnimations !== 'undefined') {
+        if (awayScore !== a) {
+            FieldScoreboardAnimations.animateScoreChange('away', a);
+        }
+        if (homeScore !== h) {
+            FieldScoreboardAnimations.animateScoreChange('home', h);
+        }
+    } else {
+        awayScoreHandle.text(a.toString());
+        homeScoreHandle.text(h.toString());
+    }
     awayScore = a;
     homeScore = h;
-    awayScoreHandle.text(a.toString());
-    homeScoreHandle.text(h.toString());
 }
 
 function setTeamName(team, name, fullName) {
@@ -111,10 +121,19 @@ function setTeamName(team, name, fullName) {
         return;
     }
 
-    if (team === "h") {
-        homeTeamNameHandle.text(displayName.toUpperCase());
-    } else if (team === "a") {
-        awayTeamNameHandle.text(displayName.toUpperCase());
+    if (typeof FieldScoreboardAnimations !== 'undefined') {
+        // Use GSAP animation for team name change
+        if (team === "h") {
+            FieldScoreboardAnimations.animateTeamNameChange('home', displayName);
+        } else if (team === "a") {
+            FieldScoreboardAnimations.animateTeamNameChange('away', displayName);
+        }
+    } else {
+        if (team === "h") {
+            homeTeamNameHandle.text(displayName.toUpperCase());
+        } else if (team === "a") {
+            awayTeamNameHandle.text(displayName.toUpperCase());
+        }
     }
 }
 
@@ -258,3 +277,16 @@ document.addEventListener('visibilitychange', function() {
 // Initialize with zeros and show 15-minute countdown
 setScores(0, 0);
 resetTimer();
+
+// Initialize animations on page load
+$(document).ready(function() {
+    if (typeof FieldScoreboardAnimations !== 'undefined') {
+        // Initialize the animation module
+        FieldScoreboardAnimations.init();
+
+        // Play entrance animation after a short delay
+        setTimeout(function() {
+            FieldScoreboardAnimations.animateEntrance();
+        }, 100);
+    }
+});

@@ -2,14 +2,20 @@
 /* Optimised for stadium scoreboards, TVs, and ultrawide monitors */
 
 :root {
-    --score-font-size: clamp(8rem, 16vw, 26rem);
+    --score-font-size: clamp(13rem, 26vw, 42rem);
     --score-colon-font-size: clamp(6rem, 12vw, 20rem);
-    --timer-primary-font-size: clamp(4rem, 8vw, 12rem);
-    --timer-hundredths-font-size: clamp(2.5rem, 4.5vw, 6rem);
-    --timer-colon-font-size: clamp(2.5rem, 4.5vw, 6rem);
+    --timer-primary-font-size: clamp(17rem, 22vw, 19rem);
+    --timer-hundredths-font-size: clamp(5.5rem, 12.5vw, 13rem);
+    --timer-colon-font-size: clamp(2.5rem, 5.5vw, 14rem);
     --score-border-radius: clamp(1.5rem, 2.5vw, 4rem);
     --timer-border-radius: clamp(1rem, 1.8vw, 3rem);
     --panel-shadow: 0 2vh 4vh rgba(0, 0, 0, 0.5);
+
+    /* Animation colors */
+    --flash-color-gold: #FFD700;
+    --flash-color-white: rgba(255, 255, 255, 0.8);
+    --warning-color: #FFA500;
+    --critical-color: #FF4444;
 }
 
 @font-face {
@@ -37,26 +43,21 @@ body {
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
+    align-content: center;
     background-color: #000000;
     padding: 4vh 4vw;
     box-sizing: border-box;
+    gap: clamp(1rem, 3vw, 4rem);
 }
 
-/* Score Container - Main scores display */
+/* Score Container - Individual score wrappers */
 .score-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 4vh;
-    gap: clamp(2rem, 6vw, 8rem);
-    width: min(92vw, 1800px);
-}
-
-.home-score, .away-score {
-    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: #ffffff;
@@ -64,7 +65,36 @@ body {
     box-shadow: var(--panel-shadow);
     min-width: clamp(18rem, 22vw, 28rem);
     min-height: clamp(18rem, 26vh, 34rem);
-    padding: clamp(1.5rem, 2vw, 3rem) clamp(1rem, 1.8vw, 3rem);
+    padding: clamp(1rem, 1.5vw, 2rem) clamp(1rem, 1.8vw, 3rem);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.score-container.home,
+.score-container.away {
+    /* Specific styles for home/away if needed */
+}
+
+/* Colon container between scores */
+.colon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.colon-container > .colon {
+    font-size: var(--score-colon-font-size);
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.7);
+}
+
+.home-score, .away-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 
 #home-score, #away-score {
@@ -72,26 +102,23 @@ body {
     font-weight: bold;
     color: #000000;
     line-height: 1;
-    padding: clamp(0.5rem, 1vw, 1.5rem);
+    padding: 0;
     text-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.3);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center center;
 }
 
 .team-label {
-    font-size: clamp(1.5rem, 2.5vw, 4rem);
+    font-size: clamp(1.5rem, 2.5vw, 3rem);
     letter-spacing: 0.05em;
     color: #1a1a1a;
     opacity: 0.85;
-    margin-bottom: clamp(0.5rem, 1vh, 1.5rem);
+    margin-top: clamp(0.5rem, 1vh, 1.5rem);
     text-transform: uppercase;
     text-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.2);
-}
-
-.colon {
-    font-size: var(--score-colon-font-size);
-    font-weight: bold;
-    color: #ffffff;
-    text-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.7);
-    margin: 0 clamp(1rem, 2vw, 3rem);
 }
 
 /* Timer Container - Timer display below scores */
@@ -99,9 +126,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    flex-basis: 100%;
+    margin-top: clamp(1rem, 2vh, 3rem);
 }
 
-.timer-display {
+.timer-display,
+.timer {
     background-color: #ffffff;
     border-radius: var(--timer-border-radius);
     padding: clamp(1rem, 2vh, 2.5rem) clamp(2rem, 3vw, 4rem);
@@ -111,6 +142,7 @@ body {
     justify-content: center;
     min-height: clamp(6rem, 10vh, 12rem);
     min-width: min(80vw, 1200px);
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 #timer-minutes, #timer-seconds {
@@ -132,7 +164,8 @@ body {
 }
 
 /* Style the colon separators in timer */
-.timer-display .colon {
+.timer-display .colon,
+.timer .colon {
     font-size: var(--timer-colon-font-size);
     font-weight: bold;
     color: #000000;
@@ -144,7 +177,7 @@ body {
 /* Responsive adjustments for smaller screens */
 @media (max-width: 1366px) {
     #home-score, #away-score {
-        font-size: 18vw;
+        font-size: 22vw;
         min-width: 12vw;
         min-height: 18vh;
     }
@@ -178,7 +211,7 @@ body {
 
 @media (max-width: 768px) {
     #home-score, #away-score {
-        font-size: 16vw;
+        font-size: 20vw;
         min-width: 10vw;
         min-height: 16vh;
     }

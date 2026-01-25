@@ -9,32 +9,40 @@
     <script src="https://kit.fontawesome.com/e939364dd5.js" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/field_scoreboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
 </head>
 <body>
     <div class="field-scoreboard">
-        <div class="score-container">
+        <div class="score-container home will-animate">
             <div class="home-score">
-                <div class="team-label" id="home-team-name">HOME</div>
                 <span id="home-score">0</span>
-            </div>
-
-            <div class="colon">:</div>
-
-            <div class="away-score">
-                <div class="team-label" id="away-team-name">AWAY</div>
-                <span id="away-score">0</span>
+                <div class="team-label" id="home-team-name">HOME</div>
             </div>
         </div>
 
-        <div class="timer-container">
-            <div class="timer-display">
+        <div class="colon-container will-animate">
+            <div class="colon">:</div>
+        </div>
+
+        <div class="score-container away will-animate">
+            <div class="away-score">
+                <span id="away-score">0</span>
+                <div class="team-label" id="away-team-name">AWAY</div>
+            </div>
+        </div>
+
+        <div class="timer-container will-animate">
+            <div class="timer timer-display">
                 <span id="timer-minutes">00</span><span class="colon">:</span><span id="timer-seconds">00</span><span class="colon">:</span><span id="timer-hundredths">00</span>
             </div>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='js/easytimer.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/animations/core.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/animations/field-scoreboard.js') }}"></script>
     <script src="{{ url_for('static', filename='js/field_scoreboard.js') }}"></script>
 </body>
 </html>
