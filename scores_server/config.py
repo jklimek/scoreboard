@@ -56,13 +56,14 @@ class Config:
 class ProductionConfig(Config):
     FLASK_DEBUG = False
     # Add production-specific settings
-    SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/"
-    WEBSOCKET_URL: str = "ws://klimek.jakub.tech:5005/"
+    SCORES_URL: str = "https://ultiscores.com/4x/ext/watchlive.php/"
+    WEBSOCKET_URL: str = "ws://scoreboard.jakub.tech:5005/"
 
 class TestingConfig(Config):
     FLASK_DEBUG = True
     # Add testing-specific settings
-    SCORES_URL: str = "https://scores.frisbee.pl/test3/ext/watchlive.php/"
+    # SCORES_URL: str = "https://scores.frisbee.pl/test3/ext/watchlive.php/"
+    SCORES_URL: str = "https://ultiscores.com/4x/ext/watchlive.php/"
     WEBSOCKET_URL: str = "ws://localhost:5005/"
 
 # Select config based on environment

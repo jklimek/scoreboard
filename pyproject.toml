@@ -1,0 +1,18 @@
+[project]
+name = "scoreboard"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "flask",
+    "flask_cors",
+    "requests",
+    "gunicorn",
+    "websockets",
+    "SimpleWebSocketServer"
+]
+
+[tool.uv]
+# Add any specific uv configurations here if needed
+

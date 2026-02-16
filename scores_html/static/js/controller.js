@@ -1,6 +1,6 @@
 function init() {
     // document.myform.url.value = "ws://scores.jakub.tech:5005/";
-    document.myform.url.value = "ws://localhost:5005/";
+    document.myform.url.value = "ws://scoreboard.jakub.tech:5005/";
     document.myform.disconnectButton.disabled = true;
 }
 
