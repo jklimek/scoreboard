@@ -1,0 +1,376 @@
+:root {
+  --bg: #090b10;
+  --panel: rgba(17, 22, 33, 0.88);
+  --line: rgba(138, 170, 255, 0.28);
+  --text: #e8edf9;
+  --muted: #9ba6c4;
+  --accent: #8ca7ff;
+  --success: #4de39a;
+  --danger: #ff6d93;
+  --warning: #ffd46a;
+  --shadow: 0 14px 38px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Avenir Next", sans-serif;
+  color: var(--text);
+  background: radial-gradient(80vw 70vh at 12% 10%, #121b31 0%, var(--bg) 65%);
+  min-height: 100vh;
+}
+
+.noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+    radial-gradient(circle at 78% 64%, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
+  background-size: 8px 8px, 10px 10px;
+}
+
+.shell {
+  width: min(1280px, 100% - 2rem);
+  margin: 1rem auto 2.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.topbar {
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.3rem, 2.2vw, 2.1rem);
+}
+
+h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+h3 {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pill {
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(140, 167, 255, 0.15);
+  border: 1px solid var(--line);
+  font-size: 0.82rem;
+}
+
+.controls {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+  gap: 0.8rem;
+  align-items: end;
+}
+
+.control-block {
+  display: grid;
+  gap: 0.35rem;
+}
+
+label {
+  font-size: 0.77rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid rgba(140, 167, 255, 0.35);
+  border-radius: 10px;
+  background: rgba(9, 11, 16, 0.75);
+  color: var(--text);
+  padding: 0.65rem 0.75rem;
+  outline: none;
+}
+
+.color-input {
+  min-height: 44px;
+  padding: 0.25rem;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+}
+
+.actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.custom-overlay {
+  padding: 0.95rem 1rem 1rem;
+}
+
+.custom-overlay-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.custom-overlay-row {
+  display: grid;
+  gap: 0.72rem;
+  align-items: end;
+}
+
+.custom-overlay-row--main {
+  grid-template-columns: auto 1fr 1.2fr 1.2fr minmax(5rem, 0.8fr);
+}
+
+.custom-overlay-row--player {
+  grid-template-columns: minmax(0, 12rem) 1fr auto;
+  align-items: end;
+}
+
+.custom-overlay-row--player .control-block--wide {
+  min-width: 0;
+}
+
+.custom-overlay-actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-end;
+}
+
+.control-block--narrow {
+  max-width: 6rem;
+}
+
+.control-block--wide {
+  min-width: 0;
+}
+
+.toggle-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.55rem;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.toggle-line input {
+  width: auto;
+}
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #08111f;
+  transition: transform 0.15s ease, filter 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.btn.subtle {
+  background: #ccd8ff;
+}
+
+.btn.success {
+  background: var(--success);
+}
+
+.btn.danger {
+  background: var(--danger);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.metric {
+  padding: 0.9rem 1rem;
+}
+
+.metric-value {
+  margin: 0;
+  font-size: clamp(1.2rem, 2vw, 2rem);
+  font-weight: 700;
+}
+
+.metric-subtle {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.context {
+  padding: 0.9rem 1rem;
+}
+
+.context-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.context p {
+  margin: 0.2rem 0 0;
+  min-height: 2.4rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.panel-section {
+  padding: 1rem;
+}
+
+.panel-section .view-grid {
+  padding: 0;
+  padding-bottom: 0.25rem;
+}
+
+.panel-section .logs {
+  padding: 1rem;
+}
+
+.view-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.view-card {
+  flex: 1 1 0;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(5, 8, 14, 0.5);
+}
+
+.view-card-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.view-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.view-count {
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-width: 1ch;
+}
+
+.dot {
+  width: 0.64rem;
+  height: 0.64rem;
+  border-radius: 99px;
+  background: #45516d;
+}
+
+.dot.green {
+  background: var(--success);
+  box-shadow: 0 0 10px rgba(77, 227, 154, 0.75);
+}
+
+.dot.red {
+  background: var(--danger);
+  box-shadow: 0 0 10px rgba(255, 109, 147, 0.65);
+}
+
+.logs {
+  margin: 0;
+  min-height: 180px;
+  max-height: 280px;
+  overflow: auto;
+  background: rgba(7, 10, 16, 0.8);
+  border-top: 1px solid rgba(140, 167, 255, 0.2);
+  border-radius: 0 0 16px 16px;
+  padding: 0.85rem;
+  font-family: "Consolas", "SF Mono", monospace;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 1024px) {
+  .controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .custom-overlay-row--main {
+    grid-template-columns: 1fr 1fr;
+  }
+  .custom-overlay-row--main .toggle-line {
+    grid-column: 1 / -1;
+  }
+  .custom-overlay-row--player {
+    grid-template-columns: 1fr;
+  }
+  .custom-overlay-actions {
+    grid-column: 1 / -1;
+  }
+  .actions {
+    grid-column: 1 / -1;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .context-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

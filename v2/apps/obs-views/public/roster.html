@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OBS Roster</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-view-type="roster">
+    <div class="overlay">
+      <section class="card section split">
+        <article class="team-home-accent panel-column">
+          <h1 id="home-roster-title">Home Roster</h1>
+          <table id="home-roster-table" class="overlay-table"></table>
+        </article>
+        <article class="team-away-accent panel-column">
+          <h1 id="away-roster-title">Away Roster</h1>
+          <table id="away-roster-table" class="overlay-table"></table>
+        </article>
+      </section>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

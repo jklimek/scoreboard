@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OBS Wind</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-view-type="wind">
+    <div class="overlay">
+      <section class="card section">
+        <h1>Wind Sensor</h1>
+        <p class="muted">Wind integration placeholder for sensor pipeline.</p>
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div class="label">Direction</div>
+            <div class="value" id="wind-direction">-</div>
+          </div>
+          <div class="stat-tile">
+            <div class="label">Speed</div>
+            <div class="value" id="wind-speed">-</div>
+          </div>
+          <div class="stat-tile">
+            <div class="label">Temperature</div>
+            <div class="value" id="wind-temp">-</div>
+          </div>
+          <div class="stat-tile">
+            <div class="label">Humidity</div>
+            <div class="value" id="wind-hum">-</div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

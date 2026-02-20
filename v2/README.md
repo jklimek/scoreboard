@@ -1,0 +1,56 @@
+# Scoreboard V2
+
+V2 is a full rewrite of the scoreboard platform with a modern, typed, realtime-first architecture.
+
+## Goals
+
+- Single deployable system with clear internal service boundaries.
+- Adaptive polling of UltiScores with robust backoff and recovery.
+- Typed websocket contracts with role-based clients.
+- Dedicated applications for:
+  - OBS views
+  - Control panel
+  - Commentator hub
+
+## Directory Layout
+
+- `apps/api` - FastAPI gateway (REST + websocket)
+- `apps/control-panel` - Operator UI
+- `apps/commentator-hub` - Commentator UI
+- `apps/obs-views` - OBS-ready views
+- `services/reactive_poller` - Adaptive UltiScores polling engine
+- `services/match_orchestrator` - Match selection and loop control
+- `services/stats_engine` - Stats aggregation and advanced metrics
+- `services/connection_registry` - Client identity, heartbeat, and view status
+- `shared/contracts` - Typed models for REST and websocket payloads
+- `infra` - Container/runtime assets
+
+## Quick Start
+
+Run these from the repository root (`/home/kuba/dev/scoreboard`):
+
+1. Create virtualenv:
+   - `python3 -m venv v2/.venv`
+2. Install dependencies:
+   - `v2/.venv/bin/python -m pip install -e 'v2[dev]'`
+3. Configure endpoints:
+   - copy `v2/.env.example` to `v2/.env`
+   - for local testing data, keep `SCOREBOARD_V2_ENV=development` (uses `ULTISCORES_TEST_URL`)
+   - to force a custom endpoint, set `ULTISCORES_URL`
+4. Run API:
+   - `PYTHONPATH=. v2/.venv/bin/uvicorn v2.apps.api.main:app --reload --host 0.0.0.0 --port 8100`
+5. Open UIs:
+   - `http://localhost:8100/control-panel`
+   - `http://localhost:8100/commentator-hub`
+   - `http://localhost:8100/obs/scoreboard`
+
+## Frontend Build
+
+Frontend apps are TypeScript-based and bundled with esbuild.
+
+- Install frontend tooling:
+  - `cd v2 && npm install`
+- Build:
+  - `npm run build:web`
+- Watch:
+  - `npm run watch:web`

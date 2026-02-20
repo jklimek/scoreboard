@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scoreboard V2 Control Panel</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="noise"></div>
+    <main class="shell">
+      <header class="topbar panel">
+        <div>
+          <p class="kicker">Scoreboard V2</p>
+          <h1>Control Panel</h1>
+        </div>
+        <div class="pill" id="ws-status">WS: connecting</div>
+      </header>
+
+      <section class="controls panel">
+        <div class="control-block">
+          <label for="mode">Mode</label>
+          <select id="mode">
+            <option value="AUTO">AUTO</option>
+            <option value="MANUAL">MANUAL</option>
+          </select>
+        </div>
+        <div class="control-block">
+          <label for="field-id">Field</label>
+          <input id="field-id" type="text" value="1" placeholder="1" />
+        </div>
+        <div class="control-block">
+          <label for="manual-game-id">Manual game ID</label>
+          <input id="manual-game-id" type="number" placeholder="optional" />
+        </div>
+        <div class="control-block">
+          <label for="home-jersey-color" id="home-jersey-color-label">Home jersey color</label>
+          <input id="home-jersey-color" class="jscolor color-input" type="text" value="ffffff" />
+        </div>
+        <div class="control-block">
+          <label for="away-jersey-color" id="away-jersey-color-label">Away jersey color</label>
+          <input id="away-jersey-color" class="jscolor color-input" type="text" value="ffffff" />
+        </div>
+        <div class="actions">
+          <button id="save-selection" class="btn subtle">Apply Selection</button>
+          <button id="start-loop" class="btn success">Start Loop</button>
+          <button id="stop-loop" class="btn danger">Stop Loop</button>
+        </div>
+      </section>
+
+      <section class="panel custom-overlay">
+        <h2>Custom OBS Overlay</h2>
+        <div class="custom-overlay-layout">
+          <div class="custom-overlay-row custom-overlay-row--main">
+            <label class="toggle-line" for="custom-overlay-enabled">
+              <input id="custom-overlay-enabled" type="checkbox" checked />
+              <span>Enabled</span>
+            </label>
+            <div class="control-block">
+              <label for="custom-overlay-title">Title</label>
+              <input id="custom-overlay-title" type="text" value="INFO" />
+            </div>
+            <div class="control-block">
+              <label for="custom-overlay-primary">Primary text</label>
+              <input id="custom-overlay-primary" type="text" placeholder="Main message" />
+            </div>
+            <div class="control-block">
+              <label for="custom-overlay-secondary">Secondary text</label>
+              <input id="custom-overlay-secondary" type="text" placeholder="Optional detail" />
+            </div>
+            <div class="control-block control-block--narrow">
+              <label for="custom-overlay-display-ms">Display (ms)</label>
+              <input id="custom-overlay-display-ms" type="number" min="1500" step="100" value="6500" />
+            </div>
+          </div>
+          <div class="custom-overlay-row custom-overlay-row--player">
+            <div class="control-block">
+              <label for="custom-overlay-team">Team</label>
+              <select id="custom-overlay-team">
+                <option value="">None</option>
+                <option value="h">Home</option>
+                <option value="a">Away</option>
+              </select>
+            </div>
+            <div class="control-block control-block--wide">
+              <label for="custom-overlay-player">Player</label>
+              <select id="custom-overlay-player">
+                <option value="">No player selected</option>
+              </select>
+            </div>
+            <div class="custom-overlay-actions">
+              <button id="custom-overlay-send" class="btn subtle">Send Overlay</button>
+              <button id="custom-overlay-clear" class="btn danger">Clear Overlay</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <article class="panel metric">
+          <h2>Poller State</h2>
+          <p id="poller-state" class="metric-value">-</p>
+          <p id="poller-enabled" class="metric-subtle">enabled: -</p>
+        </article>
+        <article class="panel metric">
+          <h2>Current Interval</h2>
+          <p id="poller-interval" class="metric-value">-</p>
+          <p class="metric-subtle">adaptive live interval</p>
+        </article>
+        <article class="panel metric">
+          <h2>Error Rate</h2>
+          <p id="poller-errors" class="metric-value">-</p>
+          <p id="poller-requests" class="metric-subtle">requests: -</p>
+        </article>
+      </section>
+
+      <section class="panel context">
+        <h2>Match Context</h2>
+        <div class="context-grid">
+          <div>
+            <h3>Last</h3>
+            <p id="ctx-last">-</p>
+          </div>
+          <div>
+            <h3>Current</h3>
+            <p id="ctx-current">-</p>
+          </div>
+          <div>
+            <h3>Next</h3>
+            <p id="ctx-next">-</p>
+          </div>
+          <div>
+            <h3>Selected</h3>
+            <p id="ctx-selected">-</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel panel-section">
+        <h2>OBS View Connections</h2>
+        <div id="view-status-grid" class="view-grid"></div>
+      </section>
+
+      <section class="panel panel-section">
+        <h2>Live Logs</h2>
+        <pre id="logs" class="logs"></pre>
+      </section>
+    </main>
+    <script src="./jscolor.js"></script>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

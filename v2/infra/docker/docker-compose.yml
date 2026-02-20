@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  scoreboard-v2:
+    build:
+      context: ../../..
+      dockerfile: v2/infra/docker/Dockerfile
+    container_name: scoreboard-v2
+    ports:
+      - "8100:8100"
+    env_file:
+      - ../../.env
+    restart: unless-stopped

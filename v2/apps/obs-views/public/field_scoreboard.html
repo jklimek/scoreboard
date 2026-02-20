@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OBS Field Scoreboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-view-type="field_scoreboard">
+    <div class="overlay overlay-scoreboard overlay-field-scoreboard">
+      <section class="field-chip-wrap">
+        <h1 id="field-label" class="field-chip">FIELD -</h1>
+      </section>
+      <section class="scoreboard-shell">
+        <article class="team-card team-home-accent" id="home-team-card">
+          <div class="score-wrap" id="home-score-wrap">
+            <div class="score" id="home-score">0</div>
+            <div class="timeout-dots" id="home-timeouts" aria-label="Home timeouts left"></div>
+          </div>
+          <div class="name-row">
+            <div class="name" id="home-name">HOME</div>
+          </div>
+        </article>
+        <article class="timer-card card">
+          <div class="timer-value" id="game-clock">00:00</div>
+        </article>
+        <article class="team-card team-away-accent" id="away-team-card">
+          <div class="score-wrap" id="away-score-wrap">
+            <div class="score" id="away-score">0</div>
+            <div class="timeout-dots" id="away-timeouts" aria-label="Away timeouts left"></div>
+          </div>
+          <div class="name-row">
+            <div class="name" id="away-name">AWAY</div>
+          </div>
+        </article>
+      </section>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,453 @@
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433062055}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433063055}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433064055}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433065055}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433066055}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433067056}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433068057}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433069056}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433070057}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433071057}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433073095}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433073096}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433074095}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433075095}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433076096}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433077096}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433078096}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433079096}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433080096}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433081097}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433082098}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433083098}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433084099}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433085099}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433086100}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433087100}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433088101}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433089101}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433090102}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433091103}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433092103}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433093103}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433094104}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433095104}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433096105}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433097106}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433098106}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433099105}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433100106}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433101107}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433102107}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433103182}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433103182}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433104183}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433105183}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433106183}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433107184}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433108185}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433109185}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433110184}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433111185}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433112185}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433113186}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433114186}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433115187}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433116186}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433117187}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433118188}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433119188}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433120189}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433121189}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433122189}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433123190}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433124189}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433125189}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433126189}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433127190}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433128189}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433129189}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433130190}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433131190}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433132190}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433133273}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433133274}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433134275}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433135274}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433136274}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433137275}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433138275}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433139275}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433140275}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433141275}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433142276}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433143276}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433144277}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433145278}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433146279}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433147279}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433148280}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433149280}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433150281}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433151281}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433152282}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433153281}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433154281}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433155282}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433156283}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433157283}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433158284}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433159284}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433160285}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433161286}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433162286}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433163369}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433163370}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433164370}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433165370}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433166371}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433167372}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433168372}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433169373}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433170374}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433171374}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433172375}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433173376}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433174375}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433175375}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433176376}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433177376}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433178377}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433179377}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433180377}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433181378}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433182378}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433183378}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433184379}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433185379}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433186379}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433187379}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433188380}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433189380}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433190380}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433191380}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433192382}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433193493}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433193494}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433194494}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433195494}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433196493}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433197493}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433198494}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433199495}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433200495}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433201496}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433202497}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433203497}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433204498}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433205497}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433206497}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433207497}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433208497}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433209498}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433210498}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433211499}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433212500}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433213501}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433214501}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433215501}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433216501}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433217502}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433218502}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433219503}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433220502}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433221503}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433222504}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433223592}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433223593}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433224594}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433225594}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433226595}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433227596}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433228597}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433229597}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433230597}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433231596}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433232597}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433233596}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433234596}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433235597}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433236598}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433237598}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433238598}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433239599}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433240599}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433241600}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433242600}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433243601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433244601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433245602}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433246601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433247601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433248602}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433249602}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433250602}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433251602}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433252603}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433253701}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433253701}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433254702}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433255703}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433256703}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433257704}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433258703}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433259704}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433260703}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433261703}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433262703}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433263703}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433264704}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433265704}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433266703}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433267704}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433268705}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433269705}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433270706}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433271707}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433272707}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433273706}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433274706}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433275706}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433277071}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433277071}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433278072}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433279072}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433280072}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433281073}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433282073}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433283075}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433284075}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433285076}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433286076}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433287077}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433288077}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433289077}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433290078}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433291078}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433292079}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433293080}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433294080}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433295081}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433296082}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433297081}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433298082}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433299083}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433300083}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433301084}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433302084}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433303085}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433304086}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433305086}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433306087}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433307157}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433307157}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433308158}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433309158}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433310158}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433311159}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433312158}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433313159}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433314160}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433315160}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433319030}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433319030}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433320031}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433321031}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433322031}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433323032}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433324033}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433325034}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433326034}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433327033}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433328034}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433329034}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433330035}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433331035}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433332036}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433333037}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433334036}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433335036}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433336037}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433337036}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433338037}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433339037}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433340038}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433341038}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433342039}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433343039}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433344039}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433345040}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433346039}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433347040}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433348041}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433349107}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433349108}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433350107}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433351108}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433352107}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433353108}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433354109}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433355109}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433356109}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433357109}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433358109}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433359109}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433360110}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433361110}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433362111}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433363112}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433364112}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433365113}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433366112}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433367113}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433368113}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433369113}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433370113}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433371114}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433372114}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433373113}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433374114}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433375115}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433376116}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433377116}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433378116}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433379216}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433379217}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433380216}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433381217}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433382217}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433383217}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433384218}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433385219}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433386218}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433387219}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433388220}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433389219}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433390220}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433391221}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433392222}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433393223}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433394223}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433395223}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433396224}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433397224}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433398224}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433399224}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433400225}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433401225}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433402225}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433403226}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433404225}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433405226}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433406226}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433407227}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433408227}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433409818}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433409819}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433410820}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433411820}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433412820}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433413819}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433414820}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433415820}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433416820}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433417820}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433418821}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433419821}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433420821}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433421822}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433422823}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433423822}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433424823}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433425822}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433426824}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433427825}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433428826}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433429826}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433430826}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433431826}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433432826}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433433827}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433434828}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433435829}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433436830}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433437831}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433438830}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433439924}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433439925}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433440926}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433441926}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433442927}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433443928}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433444928}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433445929}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433446930}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433447930}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433448931}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433449931}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433450931}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433451931}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433452931}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433453932}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433454932}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433455933}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433456934}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433457934}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433458934}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433459935}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433460934}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433461935}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: no game_id", "data": {"enabled": true, "game_id": null}, "hypothesisId": "A", "timestamp": 1771433462935}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433465600}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433465600}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433466600}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433467600}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433468601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433469601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433470601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433471601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433472601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433473601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433474601}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433475602}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433476603}
+{"sessionId": "46947d", "location": "poller.py", "message": "loop skip: not enabled", "data": {"enabled": false}, "hypothesisId": "B", "timestamp": 1771433477603}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 0}, "hypothesisId": "E", "timestamp": 1771433478603}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 1}, "hypothesisId": "E", "timestamp": 1771433479974}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 2}, "hypothesisId": "E", "timestamp": 1771433481068}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 3}, "hypothesisId": "E", "timestamp": 1771433482177}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 4}, "hypothesisId": "E", "timestamp": 1771433483315}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 5}, "hypothesisId": "E", "timestamp": 1771433484489}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 6}, "hypothesisId": "E", "timestamp": 1771433485691}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 7}, "hypothesisId": "E", "timestamp": 1771433486809}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 8}, "hypothesisId": "E", "timestamp": 1771433487900}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 9}, "hypothesisId": "E", "timestamp": 1771433489034}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 10}, "hypothesisId": "E", "timestamp": 1771433490168}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 11}, "hypothesisId": "E", "timestamp": 1771433491328}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 12}, "hypothesisId": "E", "timestamp": 1771433492428}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 13}, "hypothesisId": "E", "timestamp": 1771433493548}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 14}, "hypothesisId": "E", "timestamp": 1771433494722}
+{"sessionId": "46947d", "location": "poller.py", "message": "schedule fetch done", "data": {"type": "list", "len": 0, "game_ids": null}, "hypothesisId": "D", "timestamp": 1771433495900}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 15}, "hypothesisId": "E", "timestamp": 1771433495901}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 16}, "hypothesisId": "E", "timestamp": 1771433497120}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 17}, "hypothesisId": "E", "timestamp": 1771433498353}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 18}, "hypothesisId": "E", "timestamp": 1771433499548}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 19}, "hypothesisId": "E", "timestamp": 1771433500698}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 20}, "hypothesisId": "E", "timestamp": 1771433501786}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 21}, "hypothesisId": "E", "timestamp": 1771433502994}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 22}, "hypothesisId": "E", "timestamp": 1771433504175}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 23}, "hypothesisId": "E", "timestamp": 1771433505258}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 24}, "hypothesisId": "E", "timestamp": 1771433506358}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 25}, "hypothesisId": "E", "timestamp": 1771433507493}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 26}, "hypothesisId": "E", "timestamp": 1771433508733}
+{"sessionId": "46947d", "location": "poller.py", "message": "entering _poll_live_match", "data": {"game_id": 1064, "total_requests_before": 27}, "hypothesisId": "E", "timestamp": 1771433509837}

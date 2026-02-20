@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OBS Stats</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-view-type="stats">
+    <div class="overlay overlay-stats">
+      <section class="card section stats-panel stats-panel-compact">
+        <header class="stats-header">
+          <div class="stats-team-name team-home-accent" id="stats-home-name">HOME</div>
+          <h1>Team Statistics</h1>
+          <div class="stats-team-name team-away-accent" id="stats-away-name">AWAY</div>
+        </header>
+        <div id="stats-grid" class="stat-comparison-grid center-origin-stat-grid"></div>
+        <div class="advanced-block">
+          <h2>Advanced Metrics</h2>
+          <div id="advanced-grid" class="advanced-comparison-grid"></div>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

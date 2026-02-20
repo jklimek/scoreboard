@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OBS Player Stats</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-view-type="player_stats">
+    <div class="overlay">
+      <section class="card section split">
+        <article class="team-home-accent panel-column">
+          <h1 id="home-player-title">Home Players</h1>
+          <table id="home-player-table" class="overlay-table"></table>
+        </article>
+        <article class="team-away-accent panel-column">
+          <h1 id="away-player-title">Away Players</h1>
+          <table id="away-player-table" class="overlay-table"></table>
+        </article>
+      </section>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

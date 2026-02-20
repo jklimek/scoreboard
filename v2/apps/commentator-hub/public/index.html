@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scoreboard V2 Commentator Hub</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="hub-shell">
+      <header class="hub-header glass">
+        <div>
+          <p class="micro">Commentator Hub</p>
+          <h1 id="teams-title">HOME vs AWAY</h1>
+        </div>
+        <div class="headline-metrics">
+          <div class="score-chip"><span id="home-score">0</span></div>
+          <span class="separator">:</span>
+          <div class="score-chip"><span id="away-score">0</span></div>
+          <div class="clock" id="game-clock">00:00</div>
+        </div>
+      </header>
+
+      <section class="toolbar glass">
+        <div class="toolbar-item">
+          <label for="player-filter">Player Search</label>
+          <input id="player-filter" type="text" placeholder="name or #number" />
+        </div>
+        <div class="toolbar-item checks">
+          <label><input type="checkbox" value="score" checked /> Scores</label>
+          <label><input type="checkbox" value="turnover" checked /> Turnovers</label>
+          <label><input type="checkbox" value="timeout" checked /> Timeouts</label>
+          <label><input type="checkbox" value="offence" checked /> Offence</label>
+          <label><input type="checkbox" value="end" checked /> End</label>
+        </div>
+      </section>
+
+      <section class="layout">
+        <article class="glass panel">
+          <h2>Momentum</h2>
+          <div id="momentum-cards" class="momentum-grid"></div>
+        </article>
+        <article class="glass panel timeline-panel">
+          <h2>Match Timeline</h2>
+          <ul id="timeline"></ul>
+        </article>
+        <article class="glass panel">
+          <h2>Player Compare</h2>
+          <div class="tables">
+            <div>
+              <h3>Home</h3>
+              <table id="home-player-table"></table>
+            </div>
+            <div>
+              <h3>Away</h3>
+              <table id="away-player-table"></table>
+            </div>
+          </div>
+        </article>
+        <article class="glass panel notes-panel">
+          <h2>Quick Notes</h2>
+          <textarea id="notes" placeholder="Persistent notes for commentary points..."></textarea>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
