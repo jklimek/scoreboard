@@ -20,7 +20,7 @@ class ObsViewType(str, Enum):
     SCOREBOARD = "scoreboard"
     STATS = "stats"
     ROSTER = "roster"
-    WIND = "wind"
+    COMMENTATOR_HUB = "commentator_hub"
     MATCHES = "matches"
     FIELD_SCOREBOARD = "field_scoreboard"
     PLAYER_STATS = "player_stats"

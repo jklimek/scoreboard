@@ -80,7 +80,9 @@ class ConnectionRegistry:
         clients = await self.list_clients()
         view_counts: Dict[ObsViewType, int] = {view: 0 for view in ObsViewType}
         for client in clients:
-            if client.role == ClientRole.OBS_VIEW and client.view_type is not None:
+            if client.role == ClientRole.COMMENTATOR_HUB:
+                view_counts[ObsViewType.COMMENTATOR_HUB] += 1
+            elif client.role == ClientRole.OBS_VIEW and client.view_type is not None:
                 view_counts[client.view_type] += 1
 
         status: List[ViewStatus] = []

@@ -60,7 +60,7 @@ class ScoresServer:
         while True:
             self.logger.debug("Checking for score updates...")
             if (any(self.game_server.state.players) and 
-                int(self.game_server.state.game_number) >= 1000 and 
+                int(self.game_server.state.game_number) >= 0 and 
                 not self.game_server.state.stopped_game):
                 
                 self.logger.debug(f"Current game time: {self.game_server.state.game_time}")

@@ -48,9 +48,13 @@ Run these from the repository root (`/home/kuba/dev/scoreboard`):
    - `python3 -m venv v2/.venv`
 2. Install dependencies:
    - `v2/.venv/bin/python -m pip install -e 'v2[dev]'`
-3. Run API:
+3. Configure endpoints:
+   - copy `v2/.env.example` to `v2/.env`
+   - for local testing data, keep `SCOREBOARD_V2_ENV=development` (uses `ULTISCORES_TEST_URL`)
+   - to force a custom endpoint, set `ULTISCORES_URL`
+4. Run API:
    - `PYTHONPATH=. v2/.venv/bin/uvicorn v2.apps.api.main:app --reload --host 0.0.0.0 --port 8100`
-4. Open UIs:
+5. Open UIs:
    - `http://localhost:8100/control-panel`
    - `http://localhost:8100/commentator-hub`
    - `http://localhost:8100/obs/scoreboard`
