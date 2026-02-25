@@ -27,9 +27,14 @@ body {
 
 
     /* HMP 2025 */
-    --box-bg-color: #CCCCA0;
+    /* --box-bg-color: #CCCCA0;
     --box-font-color: #5866E1;
-    --box-point-accent-color: #bc4920;
+    --box-point-accent-color: #bc4920; */
+
+    /* HMP 2026 */
+    --box-bg-color: #f8e994;
+    --box-font-color: #0c0c0c;
+    --box-point-accent-color: #9d0521;
 
     --box-point-accent-fade-color: var(--box-bg-color);
 

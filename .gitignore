@@ -37,3 +37,7 @@ scores_server/logs/scores_server.log
 scores_server/models/__pycache__/*
 scores_server/server/__pycache__/*
 scores_server/tests/__pycache__/*
+.venv/
+scores_server/.venv/
+scores_html/.venv/
+
