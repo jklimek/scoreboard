@@ -548,7 +548,7 @@ function timeout(team) {
     animateScorerIn(teams[team]["handle"]);
     setTimeout(function () {
         animateScorerOut(teams[team]["handle"])
-    }, 50000);
+    }, 20000);
 }
 
 function score(team, assist, scorer) {
