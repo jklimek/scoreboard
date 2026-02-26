@@ -1,6 +1,8 @@
 function init() {
-    // document.myform.url.value = "ws://scores.jakub.tech:5005/";
-    document.myform.url.value = "ws://localhost:5005/";
+    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    document.myform.url.value = window.location.port === "8000"
+        ? `${wsProtocol}://${window.location.hostname}:5005/`
+        : `${wsProtocol}://${window.location.host}/ws/`;
     document.myform.disconnectButton.disabled = true;
 }
 

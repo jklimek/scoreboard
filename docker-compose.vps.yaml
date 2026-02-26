@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  scoreboard-app:
+    image: klimekjakub/scoreboard:2.1-hmp26
+    environment:
+      - RUN_ENV=production
+    restart: unless-stopped
+    expose:
+      - "8000"
+      - "5005"
+    networks:
+      shared-proxy-network:
+        aliases:
+          - scoreboard-app
+
+networks:
+  shared-proxy-network:
+    external: true
+    name: ultimatum_app-network

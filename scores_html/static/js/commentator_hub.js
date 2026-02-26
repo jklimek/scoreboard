@@ -143,22 +143,7 @@ function requestInitialData() {
         
         // Set loading flag to prevent multiple concurrent requests
         isDataLoading = true;
-        
-        // Request team data
-        websocket.send(JSON.stringify({
-            "request_type": "team_data"
-        }));
-        
-        // Request player data
-        websocket.send(JSON.stringify({
-            "request_type": "player_data"
-        }));
-        
-        // Request stats data
-        websocket.send(JSON.stringify({
-            "request_type": "stats"
-        }));
-        
+
         // Also explicitly request game state for current game ID
         websocket.send(JSON.stringify({
             "type": "request_game_state"
@@ -187,6 +172,17 @@ function handleWebSocketData(data) {
     if (data.type === "game") {
         // Listen for game ID changes and refresh all data
         if (data.game_number) {
+            if (lastGameId === null) {
+                lastGameId = data.game_number;
+                console.log("Initial game ID detected:", data.game_number);
+                return;
+            }
+
+            if (lastGameId === data.game_number) {
+                console.log("Received existing game ID, skipping refresh:", data.game_number);
+                return;
+            }
+
             console.log("New game ID detected, refreshing data:", data.game_number);
             
             // If we have final match data and we're asked to load a different match,

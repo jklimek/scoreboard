@@ -692,18 +692,21 @@ class GameServer:
             }))
         
         # Send jersey colors
-        if self.state.home_jersey_color:
+        home_jersey_color = getattr(self.state, "home_jersey_color", "")
+        away_jersey_color = getattr(self.state, "away_jersey_color", "")
+
+        if home_jersey_color:
             client.sendMessage(json.dumps({
                 "type": "jersey_color",
                 "team": "h",
-                "jersey_color": self.state.home_jersey_color
+                "jersey_color": home_jersey_color
             }))
         
-        if self.state.away_jersey_color:
+        if away_jersey_color:
             client.sendMessage(json.dumps({
                 "type": "jersey_color",
                 "team": "a",
-                "jersey_color": self.state.away_jersey_color
+                "jersey_color": away_jersey_color
             }))
         
         # Send player data

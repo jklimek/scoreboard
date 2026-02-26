@@ -1,10 +1,10 @@
-version: '3'
-
 services:
   scoreboard:
-    image: klimekjakub/scoreboard:2.0-hmp25
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      - RUN_ENV=production
+      - RUN_ENV=testing
     ports:
       - "8000:8000"
       - "5005:5005"

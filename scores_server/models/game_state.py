@@ -13,6 +13,8 @@ class GameState:
     away_score: int = 0
     home_team_name: str = ""
     away_team_name: str = ""
+    home_jersey_color: str = ""
+    away_jersey_color: str = ""
     scores_requests_count: int = 0
 
     def reset(self) -> None:

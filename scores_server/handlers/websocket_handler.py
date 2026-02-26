@@ -12,15 +12,30 @@ class WebSocketHandler(WebSocket):
         """Handle incoming WebSocket messages."""
         try:
             data = json.loads(self.data)
-            if data["type"] in ["team", "jersey_color"]:
+
+            if not isinstance(data, dict):
+                self.logger.warning(f"Ignoring non-object WebSocket message: {data}")
+                return
+
+            message_type = data.get("type")
+            if not message_type:
+                if "request_type" in data:
+                    self.logger.debug(
+                        f"Ignoring unsupported legacy request_type message: {data.get('request_type')}"
+                    )
+                else:
+                    self.logger.warning(f"Ignoring WebSocket message without type: {data}")
+                return
+
+            if message_type in ["team", "jersey_color"]:
                 self.game_server.handle_team_setting_message(data)
-            elif data["type"] == "game":
+            elif message_type == "game":
                 self.game_server.handle_game_setting_message(data)
-            elif data["type"] == "wind":
+            elif message_type == "wind":
                 self.game_server.handle_wind_setting_message(data)
-            elif data["type"] == "stats":
+            elif message_type == "stats":
                 self.game_server.handle_stats_setting_message(data)
-            elif data["type"] == "request_game_state":
+            elif message_type == "request_game_state":
                 self.logger.info("Game state request received")
                 # Send current game state data to requesting client
                 if self.game_server.state.game_number:
@@ -28,12 +43,14 @@ class WebSocketHandler(WebSocket):
                     self.game_server.send_game_state_to_client(self)
                 else:
                     self.logger.info("No active game to send state for")
-            elif data["type"] == "clear_text":
+            elif message_type == "clear_text":
                 self.logger.info("Manual text clear requested")
                 self.game_server.send_message_to_all({
                     "type": "clear_text",
                     "clear": True
                 })
+            else:
+                self.logger.warning(f"Ignoring unknown WebSocket message type: {message_type}")
         except json.JSONDecodeError as e:
             self.logger.error(f"Error decoding message: {e}", exc_info=True)
         except Exception as e:

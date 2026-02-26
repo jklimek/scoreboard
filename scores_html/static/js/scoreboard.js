@@ -66,8 +66,11 @@ var teams = {
 };
 
 function websocketConnection() {
-    // websocket = new WebSocket("ws://scores.jakub.tech:5005/");
-    websocket = new WebSocket("ws://localhost:5005/");
+    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsUrl = window.location.port === "8000"
+        ? `${wsProtocol}://${window.location.hostname}:5005/`
+        : `${wsProtocol}://${window.location.host}/ws/`;
+    websocket = new WebSocket(wsUrl);
     websocket.onopen = function (evt) {
         onOpen(evt)
     };

@@ -1,25 +1,16 @@
-# Builder stage
-FROM python:3.11-slim-buster AS builder
+FROM python:3.11-slim-bullseye
+
+RUN apt-get update && apt-get install -y --no-install-recommends supervisor && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # Copy requirements and install dependencies
-COPY scores_server/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY scores_server/requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy the application code
+# Copy application code
 COPY scores_server /app/scores_server
 COPY scores_html /app/scores_html
-
-# Final stage
-FROM python:3.11-slim-buster
-
-RUN apt-get update && apt-get install -y supervisor --no-install-recommends && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Copy built artifacts from builder stage
-COPY --from=builder /app /app
 
 # Copy supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
