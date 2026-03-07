@@ -23,13 +23,13 @@ function doConnect() {
 }
 
 function onOpen(evt) {
-    writeToScreen("Websocket connected\n");
+    writeToScreen("WebSocket connected\n");
     document.myform.connectButton.disabled = true;
     document.myform.disconnectButton.disabled = false;
 }
 
 function onClose(evt) {
-    writeToScreen("Websocket disconnected\n");
+    writeToScreen("WebSocket disconnected\n");
     document.myform.connectButton.disabled = false;
     document.myform.disconnectButton.disabled = true;
 }
@@ -99,7 +99,7 @@ function setGame() {
 
         doSend(message);
     } else {
-        writeToScreen("Provide proper game number\n");
+        writeToScreen("Provide a valid event ID\n");
     }
 
 }

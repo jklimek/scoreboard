@@ -55,20 +55,20 @@ class Config:
 
 class ProductionConfig(Config):
     FLASK_DEBUG = False
-    # Add production-specific settings
-    SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/"
-    WEBSOCKET_URL: str = "ws://klimek.jakub.tech:5005/"
+    SCORES_URL: str = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
+    WEBSOCKET_URL: str = os.getenv("WEBSOCKET_URL", "ws://klimek.jakub.tech:5005/")
+
+
 class DevConfig(Config):
     FLASK_DEBUG = True
-    # Add production-specific settings
-    SCORES_URL: str = "https://scores.frisbee.pl/ext/watchlive.php/"
-    WEBSOCKET_URL: str = "ws://klimek.jakub.tech:5005/"
+    SCORES_URL: str = os.getenv("SCORES_URL", "https://scores.frisbee.pl/ext/watchlive.php/")
+    WEBSOCKET_URL: str = os.getenv("WEBSOCKET_URL", "ws://klimek.jakub.tech:5005/")
+
 
 class TestingConfig(Config):
     FLASK_DEBUG = True
-    # Add testing-specific settings
-    SCORES_URL: str = "https://scores.frisbee.pl/test3/ext/watchlive.php/"
-    WEBSOCKET_URL: str = "ws://localhost:5005/"
+    SCORES_URL: str = os.getenv("SCORES_URL", "https://scores.frisbee.pl/test3/ext/watchlive.php/")
+    WEBSOCKET_URL: str = os.getenv("WEBSOCKET_URL", "ws://localhost:5005/")
 
 # Select config based on environment
 env = os.getenv("RUN_ENV", "testing")

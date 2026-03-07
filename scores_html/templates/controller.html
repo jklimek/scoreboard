@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Stream Controller</title>
+    <title>Live Display Controller</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='images/favicon.ico') }}">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -21,15 +21,15 @@
     <div class="row">
 
         <div class="col-8">
-            <h2>Game</h2>
+            <h2>Event</h2>
             <div class="row">
                 <div class="col">
                     <form>
                         <div class="form-group">
-                            <label for="gameNumber">Game number</label>
+                            <label for="gameNumber">Event ID</label>
                             <input type="text" class="form-control" pattern="[1-9][0-9]{3}" id="gameNumber"
-                                   placeholder="Enter game number...">
-                            <button type="button" onClick="setGame();" class="btn btn-success btn-block">Set the game
+                                   placeholder="Enter event ID...">
+                            <button type="button" onClick="setGame();" class="btn btn-success btn-block">Load event
                             </button>
                         </div>
 
@@ -40,11 +40,11 @@
 
             <div class="row">
                 <div class="col-6">
-                    <h3>Team HOME</h3>
+                    <h3>Home side</h3>
                     <h3 id="teamHomeName">-</h3>
                     <form>
                         <div class="form-group">
-                            <label for="jerseyInputA">Jerseys color</label>
+                            <label for="jerseyInputA">Primary color</label>
                             <input id="jerseyInputA" class="jscolor form-control"
                                    onchange="jerseysColor(this.jscolor, 'h')" value="FFFFFF">
                         </div>
@@ -52,11 +52,11 @@
 
                 </div>
                 <div class="col-6">
-                    <h3>Team AWAY</h3>
+                    <h3>Away side</h3>
                     <h3 id="teamAwayName">-</h3>
                     <form>
                         <div class="form-group">
-                            <label for="jerseyInputB">Jerseys color</label>
+                            <label for="jerseyInputB">Primary color</label>
                             <input id="jerseyInputB" class="jscolor form-control"
                                    onchange="jerseysColor(this.jscolor, 'a')" value="FFFFFF">
                         </div>
@@ -104,14 +104,14 @@
             </div> -->
         </div>
         <div class="col-4">
-            <h2>Websockets</h2>
+            <h2>WebSocket</h2>
             <form name="myform">
                 <div class="form-group">
-                    <!--<label for="wsLogTextarea">Websocket log:</label>-->
+                    <!--<label for="wsLogTextarea">WebSocket log:</label>-->
                     <textarea class="form-control" id="wsLogTextarea" name="wslog" rows="20"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="wsUrl">Websocket url</label>
+                    <label for="wsUrl">WebSocket URL</label>
                     <input type="url" name="url" class="form-control" id="wsUrl" value=""
                            placeholder="Autofilled from current domain">
                 </div>

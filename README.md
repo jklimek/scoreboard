@@ -1,169 +1,121 @@
-# Ultimate Frisbee Scoreboard System
+# Live Event Scoreboard Platform
 
-_AI generated README lol_
+Real-time event display platform for scoreboards, controller panels, rosters, and derived statistics.
 
-A comprehensive real-time scores and statistics tracking system designed for Ultimate Frisbee matches, featuring live score updates, player statistics, wind conditions, and team rosters.
+The current implementation is wired to an Ultimate Frisbee live feed, but the project structure is broader than that:
 
-## Features
+- `scores_server/` provides the polling loop, in-memory state, websocket fan-out, and stat packaging.
+- `scores_html/` provides browser views for the display, controller, schedules, rosters, and stats.
+- Sport-specific behavior is mostly isolated to the upstream feed format and a small set of derived metrics such as offense/defense points and disc possession.
 
-- Real-time score tracking and updates
-- Match timer
-- Player rosters with jersey numbers
-- Individual player statistics (goals, assists)
-- Team statistics (points, possession time, turnovers)
-- Wind direction and speed display
-- Beautiful, customizable interface with team colors
-- Disc possession indicator
+## Overview
 
-## System Architecture
+The application has two runtime services:
 
-The application consists of two main components:
+1. Backend server
+   - Polls an upstream event feed
+   - Tracks current match state
+   - Broadcasts updates to connected clients over WebSockets
+   - Computes derived statistics from the event stream
+2. Frontend server
+   - Serves scoreboard and operator views
+   - Renders live state pushed over WebSockets
+   - Exposes dedicated pages for controller, schedule, roster, and analytics views
 
-1. Backend Server (scores_server)
-- Python Flask application for game state management
-- WebSocket server for real-time communication
-- Statistics calculation engine
-- External API integration for match data
-2. Frontend Client (scores_html)
-- Web-based controller interface
-- Scoreboard display
-- Statistics and roster views
-- Real-time updates via WebSockets
+## Reusable Core
 
-## Installation & Setup
+These parts are already generic enough to reuse for other sports or event formats:
 
-### Docker Installation (Recommended)
+- Flask app bootstrapping and deployment packaging
+- Background polling thread and websocket server
+- Shared `GameState` model for live state
+- Browser-based operator and display surfaces
+- Team color overrides and manual display control
+- Schedule and roster pages backed by a JSON feed
 
-1. Clone the repository:
+## Current Sport-Specific Areas
+
+These parts still assume the current Ultimate feed and event semantics:
+
+- Default upstream endpoint points to `scores.frisbee.pl`
+- Event codes such as `O`, `T`, `S`, `H`, `TO`, `E`
+- Derived metrics for offense/defense points and disc possession
+- Callahan-specific assist handling
+- Some CSS and JS naming still refer to `scoreboard`
+
+If you want to adapt this to another sport, the cleanest seam is the feed adapter plus the derived-stat functions in [scores_server/stats.py](/home/kuba/dev/scoreboard/scores_server/stats.py) and event preparation in [scores_server/models/game_server.py](/home/kuba/dev/scoreboard/scores_server/models/game_server.py).
+
+## Architecture
+
+High-level architecture and generalization notes live in [ARCHITECTURE.md](/home/kuba/dev/scoreboard/ARCHITECTURE.md).
+
+## Run With Docker
+
+```bash
+docker-compose up --build
 ```
-git clone https://github.com/jklimek/scoreboard.git
-cd scoreboard
-```
-2. Start the application using Docker Compose:
-docker-compose up
-3. Access the application:
-- Scoreboard: http://localhost:8000/scoreboard
-- Controller: http://localhost:8000/controller
-- Statistics: http://localhost:8000/stats
-- Roster: http://localhost:8000/roster
-- Player Stats: http://localhost:8000/pstats
 
-### Manual Installation
+Default endpoints:
 
-1. Clone the repository:
-```
-git clone https://github.com/jklimek/scoreboard.git
-cd scoreboard
-```
-2. Install dependencies:
-```
+- Display: `http://localhost:8000/scoreboard`
+- Controller: `http://localhost:8000/controller`
+- Schedule: `http://localhost:8000/matches`
+- Team stats: `http://localhost:8000/stats`
+- Player stats: `http://localhost:8000/player_stats`
+- Roster: `http://localhost:8000/roster`
+
+## Run Manually
+
+Install backend dependencies:
+
+```bash
 pip install -r scores_server/requirements.txt
 ```
-3. Start the backend server:
-```
+
+Start the backend:
+
+```bash
 cd scores_server
 gunicorn -b 0.0.0.0:5000 app:app
 ```
-4. In a separate terminal, start the frontend server:
-```
+
+Start the frontend:
+
+```bash
 cd scores_html
 gunicorn -b 0.0.0.0:8000 web:app
 ```
-5. Access the application at http://localhost:8000
 
-## Using the Controller
+## Configuration
 
-The controller interface allows you to manage all aspects of the scoreboard system.
+Useful environment variables:
 
-### Connecting to the Server
+- `RUN_ENV`: `production`, `dev`, or `testing`
+- `SCORES_URL`: upstream schedule/live-data endpoint
+- `WEBSOCKET_URL`: websocket endpoint advertised to clients
+- `WIND_URL`: optional wind data source
 
-1. Open http://localhost:8000/controller in your web browser
-2. Enter the WebSocket URL in the connection field (default: `ws://localhost:5005/`)
-3. Click "Connect" to establish connection
-
-### Setting Up a Match
-
-1. Load Match:
-- Enter the match ID in the "Game number" field
-- Click "Set the game" to load match information
-- The system will automatically fetch team names and rosters
-2. Configure Teams:
-- Set jersey colors for home and away teams using the color pickers
-- Team names are auto-populated but can be manually adjusted
-3. Manage Players:
-- Player rosters are automatically loaded from the match data
-- Player numbers and names can be adjusted if needed
-
-
-## Advanced Usage
-
-### Using External Wind Data
-
-The system can integrate with a weather API to display real-time wind conditions:
-
-1. Connect a compatible weather station
-2. Configure the API endpoint in config.py
-3. Wind data will automatically update on the scoreboard
-
-### Customizing the Display
-
-Appearance can be customized by modifying:
-
-- Team colors through the controller interface
-- Background images and overall theme in the CSS files
-- Display layout in the template files
+The defaults still target the current Ultimate deployment, but those endpoints are now intended to be overridden per environment.
 
 ## Development
 
-### Running in Development Mode
+Run the backend in development:
 
-1. Start the backend server in debug mode:
-```
+```bash
 cd scores_server
 python app.py
 ```
-2. Start the frontend server in debug mode:
-```
+
+Run the frontend in development:
+
+```bash
 cd scores_html
 python web.py
 ```
 
-### Testing
+Run tests:
 
-Run tests with:
-```
+```bash
 cd scores_server
 pytest tests/
 ```
-
-Test a specific file:
-```
-cd scores_server
-pytest tests/test_stats.py -v
-```
-
-## Troubleshooting
-
-WebSocket Connection Issues:
-- Ensure the WebSocket server port (`5005`) is not blocked by a firewall
-- Check that the WebSocket URL matches your network configuration
-- For local development, use `ws://localhost:5005/`
-- For remote access, use `ws://your-server-ip:5005/`
-
-Missing Player Data:
-- Verify that the match ID exists and has player information
-- Check the console for any API error messages
-
-Display Not Updating:
-- Refresh the browser cache
-- Verify the WebSocket connection is active
-- Check the browser console for JavaScript errors
-
-
-### Acknowledgments
-
-- Created for the Ultimate Frisbee community
-- Design inspired by professional sports broadcasting systems
-
----
-For more information, feature requests, or bug reports, please open an issue on our GitHub repository.

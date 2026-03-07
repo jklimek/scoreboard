@@ -23,7 +23,9 @@
 
 body {
     opacity: 0.9;
-    --main-bg-color: #ff00ff;
+    /* --main-bg-color: #ff00ff; */
+    --main-bg-color: transparent;
+    
     /* --main-bg-color: #e5e5e5; */
 
 
