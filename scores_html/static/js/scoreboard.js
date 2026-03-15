@@ -1,5 +1,35 @@
 /* global $ */
 
+// Performance optimization: Cache all DOM selectors on page load
+var DOMCache = {};
+
+$(document).ready(function() {
+    // Cache all DOM elements once
+    DOMCache.timer = $("#timer");
+    DOMCache.timerMinutes = $("#timer-minutes");
+    DOMCache.timerSeconds = $("#timer-seconds");
+    DOMCache.windBox = $("#wind");
+    DOMCache.windArrow = $("#wind-direction-arrow");
+    DOMCache.windSpeed = $("#wind-speed");
+    DOMCache.windTemp = $("#wind-temp");
+    DOMCache.windHum = $("#wind-hum");
+    DOMCache.scorer = $("#scorer");
+    DOMCache.assist = $("#assist");
+    DOMCache.roster = $("#roster");
+    DOMCache.stats = $("#stats");
+    DOMCache.taScore = $("#ta-score");
+    DOMCache.thScore = $("#th-score");
+    DOMCache.ta = $("#ta");
+    DOMCache.th = $("#th");
+    DOMCache.taScoreBox = $("#ta-score-box");
+    DOMCache.thScoreBox = $("#th-score-box");
+});
+
+var websocket;
+var reconnectInterval = 5000; // 5 seconds
+var maxReconnectAttempts = 10;
+var reconnectAttempts = 0;
+
 websocketConnection();
 var timer = new Timer();
 var time = 0;
@@ -15,73 +45,113 @@ var events = [];
 var windAngle = 0;
 var windSpeed = "-";
 
-var timerHandle = $("#timer");
-var windBoxHandle = $("#wind");
-var windArrowHandle = $("#wind-direction-arrow");
-var windSpeedHandle = $("#wind-speed");
-var windTempHandle = $("#wind-temp");
-var windHumHandle = $("#wind-hum");
-var scorerHandle = $("#scorer");
-var assistHandle = $("#assist");
-var rosterHandle = $("#roster");
-var statsHandle = $("#stats");
+// Backward compatibility references (deprecated - use DOMCache instead)
+var timerHandle, windBoxHandle, windArrowHandle, windSpeedHandle, windTempHandle, windHumHandle;
+var scorerHandle, assistHandle, rosterHandle, statsHandle;
 
 var awayTeam = "AWA";
 var homeTeam = "HOM";
 
+// Initialize teams object - DOM elements will be cached in $(document).ready
 var teams = {
     a: {
         full_name: "",
         name: awayTeam.toString().split("-")[0],
-        jerseys: awayTeam,
-        handle: $("#ta"),
-        stats_handle: $("#stats__ta-stats"),
-        stats_name_handle: $("#stats__ta-name"),
-        roster_name_handle: $("#roster__ta-name"),
-        roster_players_handle: $("#roster__ta-roster"),
-        player_stats_handle: $("#player-stats__ta-stats"),
-        player_stats_name_handle: $("#player-stats__ta-name"),
-        score_handle: $("#ta-score-box")
+        jerseys: awayTeam
     },
     h: {
         full_name: "",
         name: homeTeam.toString().split("-")[0],
-        jerseys: homeTeam,
-        handle: $("#th"),
-        stats_handle: $("#stats__th-stats"),
-        stats_name_handle: $("#stats__th-name"),
-        roster_name_handle: $("#roster__th-name"),
-        roster_players_handle: $("#roster__th-roster"),
-        player_stats_handle: $("#player-stats__th-stats"),
-        player_stats_name_handle: $("#player-stats__th-name"),
-        score_handle: $("#th-score-box")
+        jerseys: homeTeam
     }
 };
 
+// Cache team-related DOM elements after page load
+$(document).ready(function() {
+    teams.a.handle = $("#ta");
+    teams.a.stats_handle = $("#stats__ta-stats");
+    teams.a.stats_name_handle = $("#stats__ta-name");
+    teams.a.roster_name_handle = $("#roster__ta-name");
+    teams.a.roster_players_handle = $("#roster__ta-roster");
+    teams.a.player_stats_handle = $("#player-stats__ta-stats");
+    teams.a.player_stats_name_handle = $("#player-stats__ta-name");
+    teams.a.score_handle = $("#ta-score-box");
+    
+    teams.h.handle = $("#th");
+    teams.h.stats_handle = $("#stats__th-stats");
+    teams.h.stats_name_handle = $("#stats__th-name");
+    teams.h.roster_name_handle = $("#roster__th-name");
+    teams.h.roster_players_handle = $("#roster__th-roster");
+    teams.h.player_stats_handle = $("#player-stats__th-stats");
+    teams.h.player_stats_name_handle = $("#player-stats__th-name");
+    teams.h.score_handle = $("#th-score-box");
+    
+    // Set backward compatibility references
+    timerHandle = DOMCache.timer;
+    windBoxHandle = DOMCache.windBox;
+    windArrowHandle = DOMCache.windArrow;
+    windSpeedHandle = DOMCache.windSpeed;
+    windTempHandle = DOMCache.windTemp;
+    windHumHandle = DOMCache.windHum;
+    scorerHandle = DOMCache.scorer;
+    assistHandle = DOMCache.assist;
+    rosterHandle = DOMCache.roster;
+    statsHandle = DOMCache.stats;
+});
+
 function websocketConnection() {
-    // websocket = new WebSocket("ws://scores.jakub.tech:5005/");
-    websocket = new WebSocket("ws://localhost:5005/");
-    websocket.onopen = function (evt) {
-        onOpen(evt)
-    };
-    websocket.onclose = function (evt) {
-        onClose(evt)
-    };
-    websocket.onmessage = function (evt) {
-        onMessage(evt)
-    };
-    websocket.onerror = function (evt) {
-        onError(evt)
-    };
+    // Auto-detect WebSocket URL based on window location
+    var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var wsHost = window.location.hostname || 'localhost';
+    var wsUrl = wsProtocol + '//' + wsHost + ':5005/';
+    
+    console.log('Connecting to WebSocket: ' + wsUrl);
+    
+    try {
+        websocket = new WebSocket(wsUrl);
+        
+        websocket.onopen = function (evt) {
+            onOpen(evt);
+        };
+        
+        websocket.onclose = function (evt) {
+            onClose(evt);
+        };
+        
+        websocket.onmessage = function (evt) {
+            onMessage(evt);
+        };
+        
+        websocket.onerror = function (evt) {
+            onError(evt);
+        };
+    } catch (e) {
+        console.error('WebSocket connection failed:', e);
+        scheduleReconnect();
+    }
+}
+
+function scheduleReconnect() {
+    if (reconnectAttempts < maxReconnectAttempts) {
+        reconnectAttempts++;
+        console.log('Reconnecting in ' + (reconnectInterval / 1000) + ' seconds... (Attempt ' + reconnectAttempts + '/' + maxReconnectAttempts + ')');
+        setTimeout(function() {
+            websocketConnection();
+        }, reconnectInterval);
+    } else {
+        console.error('Max reconnection attempts reached. Please refresh the page.');
+    }
 }
 
 
 function onOpen(evt) {
     console.log("Websocket connected\n");
+    reconnectAttempts = 0; // Reset reconnection counter on successful connection
 }
 
 function onClose(evt) {
     console.log("Websocket disconnected\n");
+    scheduleReconnect();
 }
 
 function onMessage(evt) {
@@ -92,8 +162,8 @@ function onMessage(evt) {
 }
 
 function onError(evt) {
-    console.log('error: ' + evt.error + '\n');
-    websocket.close();
+    console.log('WebSocket error: ' + (evt.error || 'Unknown error') + '\n');
+    // Don't close here - let onClose handle reconnection
 }
 
 function parseEvent(data) {
@@ -174,8 +244,15 @@ function setTeamJerseyColor(team, color) {
 }
 
 function setScores(a, h) {
-    $("#ta-score").text(a.toString());
-    $("#th-score").text(h.toString());
+    // Use cached DOM elements for better performance
+    if (DOMCache.taScore && DOMCache.thScore) {
+        DOMCache.taScore.text(a.toString());
+        DOMCache.thScore.text(h.toString());
+    } else {
+        // Fallback for initialization
+        $("#ta-score").text(a.toString());
+        $("#th-score").text(h.toString());
+    }
 }
 
 function startOffence() {
@@ -565,18 +642,29 @@ function startTimer(offset = 0) {
         var timeString = timer.getTimeValues().toString();
         var secondsString = addPrefixZeroToTime(timer.getTimeValues().seconds);
         var minutesString = addPrefixZeroToTime(timer.getTotalTimeValues().minutes);
-        $("#timer-minutes").text(minutesString);
-        $("#timer-seconds").text(secondsString);
+        // Use cached DOM elements
+        if (DOMCache.timerMinutes && DOMCache.timerSeconds) {
+            DOMCache.timerMinutes.text(minutesString);
+            DOMCache.timerSeconds.text(secondsString);
+        } else {
+            $("#timer-minutes").text(minutesString);
+            $("#timer-seconds").text(secondsString);
+        }
     });
 }
 
-// lazy shit, should've divide and set just strings
 function setTimer(offset = 0) {
     stopTimer();
     var secondsString = addPrefixZeroToTime(offset % 60);
     var minutesString = addPrefixZeroToTime(Math.floor(offset / 60));
-    $("#timer-minutes").text(minutesString);
-    $("#timer-seconds").text(secondsString);
+    // Use cached DOM elements
+    if (DOMCache.timerMinutes && DOMCache.timerSeconds) {
+        DOMCache.timerMinutes.text(minutesString);
+        DOMCache.timerSeconds.text(secondsString);
+    } else {
+        $("#timer-minutes").text(minutesString);
+        $("#timer-seconds").text(secondsString);
+    }
 }
 
 function addPrefixZeroToTime(time) {
@@ -592,8 +680,14 @@ function stopTimer() {
 
 function resetTimer() {
     timer.stop();
-    $("#timer-minutes").text("00");
-    $("#timer-seconds").text("00");
+    // Use cached DOM elements
+    if (DOMCache.timerMinutes && DOMCache.timerSeconds) {
+        DOMCache.timerMinutes.text("00");
+        DOMCache.timerSeconds.text("00");
+    } else {
+        $("#timer-minutes").text("00");
+        $("#timer-seconds").text("00");
+    }
 }
 
 
