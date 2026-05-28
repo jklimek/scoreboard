@@ -3,20 +3,20 @@
 Ultimate Frisbee Minimap Service
 Standalone script that:
  - Calibrates a static wide camera to a top-down field using 4 clicked points
- - Runs YOLOv8 person detection + ByteTrack identity persistence
+ - Runs YOLO26 person detection (GPU) + ByteTrack identity persistence
  - Converts detections to feet points, warps them to field coords
  - Smooths positions with a Kalman filter per track
  - Differentiates two teams by jersey color (HSV EMA + KMeans fallback)
  - Filters to in-field players and caps to 5v5 per team
  - Produces live minimap PNG and heatmap overlays, saves temporal snapshots
- - Serves the current minimap.png over HTTP for OBS Browser Source
+ - Serves a live browser minimap and JSON state for OBS Browser Source
 
 Dependencies:
  pip install opencv-python ultralytics numpy scikit-learn flask
 
 Run:
  python ultimate_minimap_service.py --source 0
- Then in OBS add a Browser Source pointing to http://localhost:5000/minimap.png
+ Then in OBS add a Browser Source pointing to http://localhost:5000/
 
 Notes: configure constants below for FIELD size and TEAM HSV protos.
 """
@@ -55,9 +55,21 @@ CALIB_PAD_FRAC_X = 1.0  # 1.0 means pad equals frame width
 CALIB_PAD_FRAC_Y = 0.5  # 1.0 means pad equals frame height
 
 # Tracking/association tuning
-TRACK_ASSOC_THRESH = 45.0     # px in field coords for association gating
+TRACKER_CONFIG = "bytetrack.yaml"
+STABLE_REID_THRESH = 65.0     # field px for reusing a minimap ID after tracker respawn
+MAX_PLAYER_SPEED_MPS = 9.5    # reject detections that imply impossible field-space motion
+MAX_MOTION_GATE_PX = 140.0
+BASE_MOTION_GATE_PX = 35.0
+MIN_TRACK_HITS = 3            # new tracks must persist before entering the OBS minimap
+BOUNDARY_TRACK_HITS = 5       # sideline-like detections need a longer history
+FIELD_BOUNDARY_MARGIN_PX = 35.0
+FIELD_OUTER_MARGIN_PX = 25.0
+SLOT_RESERVE_SEC = 8.0        # hold missing player slots to avoid far-away replacements
+SLOT_REPLACE_THRESH = 85.0
 TRACK_FORGET_SEC = 3.5        # time to forget tracks without detections
-GHOST_ALPHA = 0.5             # rendering factor for predicted-only tracks
+TRACK_COAST_SEC = 1.25        # publish Kalman predictions through short detector misses
+GHOST_ALPHA = 0.5             # rendering alpha for predicted-only tracks
+TEAM_SWITCH_MARGIN = 3.0      # vote lead required before changing team assignment
 
 # Team HSV prototypes (tune on-site). If None -> will cluster automatically after enough samples
 TEAM_HSV_PROTOS = None
@@ -67,9 +79,26 @@ TEAM_HSV_PROTOS = None
 JERSEY_EMA_ALPHA = 0.2
 MAX_PLAYERS_PER_TEAM = 5
 
-MODEL_NAME = "yolov8s.pt"  # change to yolov8s/yolov8m if you have more compute
-YOLO_CONF = 0.2
-IMG_SZ = 1280
+# YOLO26-X: latest Ultralytics detector (NMS-free, best mAP). Auto-downloads on first run.
+_MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_NAME = "yolo26x.pt"
+MODEL_PATH = os.path.join(_MODEL_DIR, MODEL_NAME)
+MODEL_URL = "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x.pt"
+YOLO_CONF = 0.25
+IMG_SZ = 1920          # wide camera; RTX 5090 has headroom at 1920
+PERSON_CLASS = 0       # COCO "person"
+USE_HALF = True        # FP16 on CUDA
+
+
+def _resolve_device():
+    try:
+        import torch
+        return 0 if torch.cuda.is_available() else "cpu"
+    except ImportError:
+        return "cpu"
+
+
+DEVICE = _resolve_device()
 
 # HTTP server settings for OBS
 HTTP_HOST = "0.0.0.0"
@@ -267,6 +296,65 @@ class Kalman2D:
         return self.x[:2].copy()
 
 
+class TrackState:
+    def __init__(self, tid, bbox, feet_field, hsv, now, dt):
+        self.id = int(tid)
+        self.bbox = bbox
+        self.feet_field = np.asarray(feet_field, dtype=np.float32)
+        self.smoothed = np.asarray(feet_field, dtype=np.float32)
+        self.kalman = Kalman2D(self.smoothed[0], self.smoothed[1], dt=dt)
+        self.hsv_ema = hsv.copy() if hsv is not None else None
+        self.team = None
+        self.team_votes = np.zeros(2, dtype=np.float32)
+        self.first_seen = now
+        self.last_seen = now
+        self.last_update = now
+        self.matched = True
+        self.alpha = 1.0
+        self.hits = 1
+        self.rejected_updates = 0
+
+    def update_detection(self, bbox, feet_field, hsv, now, dt):
+        self.bbox = bbox
+        self.feet_field = np.asarray(feet_field, dtype=np.float32)
+        self.kalman.dt = dt
+        self.kalman.predict()
+        self.smoothed = self.kalman.update(self.feet_field)
+        if hsv is not None:
+            if self.hsv_ema is None:
+                self.hsv_ema = hsv.copy()
+            else:
+                self.hsv_ema = (1.0 - JERSEY_EMA_ALPHA) * self.hsv_ema + JERSEY_EMA_ALPHA * hsv
+        self.last_seen = now
+        self.last_update = now
+        self.matched = True
+        self.alpha = 1.0
+        self.hits += 1
+        self.rejected_updates = 0
+
+    def coast(self, now, dt):
+        self.kalman.dt = dt
+        self.smoothed = self.kalman.predict()
+        self.last_update = now
+        self.matched = False
+        age = max(0.0, now - self.last_seen)
+        fade = 1.0 - min(1.0, age / max(TRACK_COAST_SEC, 1e-6))
+        self.alpha = max(GHOST_ALPHA, fade) if age <= TRACK_COAST_SEC else 0.0
+
+    def reject_detection(self):
+        self.rejected_updates += 1
+
+    def apply_team_sample(self, candidate_team):
+        if candidate_team not in (0, 1):
+            return
+        self.team_votes[candidate_team] += 1.0
+        other = 1 - candidate_team
+        if self.team is None:
+            self.team = candidate_team
+        elif candidate_team != self.team and self.team_votes[candidate_team] >= self.team_votes[other] + TEAM_SWITCH_MARGIN:
+            self.team = candidate_team
+
+
 # ---------------- HEATMAP & STATS ----------------
 HEATMAP_ALPHA = 0.6
 
@@ -399,6 +487,14 @@ def point_in_field(pt):
     return cv2.pointPolygonTest(FIELD_POLY, tuple(pt), False) >= 0
 
 
+def point_near_field(pt):
+    x, y = float(pt[0]), float(pt[1])
+    return (
+        -FIELD_OUTER_MARGIN_PX <= x <= FIELD_W + FIELD_OUTER_MARGIN_PX and
+        -FIELD_OUTER_MARGIN_PX <= y <= FIELD_H + FIELD_OUTER_MARGIN_PX
+    )
+
+
 def filter_active_players(dets, team_by_id):
     dets_in = [d for d in dets if d[3] is not None and point_in_field(d[3])]
     team0 = [d for d in dets_in if team_by_id.get(d[0], 0) == 0]
@@ -419,8 +515,25 @@ class VisionService:
         self.source = source
         self.H = H
         self.src_corners = src_corners
-        self.model = YOLO(MODEL_NAME)
-        self.kalmans = {}
+        model_path = MODEL_PATH if os.path.isfile(MODEL_PATH) else MODEL_NAME
+        self.device = DEVICE
+        self.use_half = USE_HALF and self.device != "cpu"
+        print(f"Loading {MODEL_NAME} on device={self.device} half={self.use_half}")
+        self.model = YOLO(model_path)
+        # CUDA warmup so first real frame is not a latency spike
+        dummy = np.zeros((720, 1280, 3), dtype=np.uint8)
+        self.model.predict(
+            dummy, conf=YOLO_CONF, classes=[PERSON_CLASS], imgsz=IMG_SZ,
+            device=self.device, half=self.use_half, verbose=False,
+        )
+        self.tracks = {}
+        self.raw_to_stable_id = {}
+        self.next_stable_id = 0
+        self.active_ids = set()
+        self.team_slots_locked = {0: False, 1: False}
+        self.slot_reservations = {0: [], 1: []}
+        self.team_hsv_protos = TEAM_HSV_PROTOS.copy() if TEAM_HSV_PROTOS is not None else None
+        self.team_protos_frozen = TEAM_HSV_PROTOS is not None
         self.hsv_ema = {}
         self.team_by_id = {}
         self.last_seen = {}
@@ -429,6 +542,13 @@ class VisionService:
         self.latest_minimap = None
         self.latest_state = None
         self.last_bbox = {}
+        self.metrics = {
+            "capture_fps": 0.0,
+            "inference_ms": 0.0,
+            "state_fps": 0.0,
+            "players": 0,
+            "tracks": 0,
+        }
         self.debug_views = debug_views
         self.running = True
 
@@ -454,203 +574,284 @@ class VisionService:
     def stop(self):
         self.running = False
 
+    def _ema_metric(self, key, value, alpha=0.12):
+        old = float(self.metrics.get(key, 0.0))
+        self.metrics[key] = float(value if old <= 0 else (1.0 - alpha) * old + alpha * value)
+
+    def _estimate_team_for_hsv(self, hsv_vec):
+        if hsv_vec is None:
+            return None
+        if self.team_hsv_protos is not None:
+            return nearest_team_id(hsv_vec, self.team_hsv_protos)
+        return 1 if hsv_vec[2] < 128 else 0
+
+    def _learn_team_protos_once(self):
+        if self.team_protos_frozen or len(self.hsv_ema) < 6:
+            return
+        try:
+            ids = list(self.hsv_ema.keys())
+            X = np.stack([self.hsv_ema[i] for i in ids], axis=0)
+            kmeans = KMeans(n_clusters=2, n_init="auto", random_state=0).fit(X)
+            labels = kmeans.labels_.astype(int)
+            proto0 = X[labels == 0].mean(axis=0)
+            proto1 = X[labels == 1].mean(axis=0)
+            if proto0[2] < proto1[2]:
+                self.team_hsv_protos = np.stack([proto1, proto0]).astype(np.float32)
+                bright_label, dark_label = 1, 0
+            else:
+                self.team_hsv_protos = np.stack([proto0, proto1]).astype(np.float32)
+                bright_label, dark_label = 0, 1
+            for tid, lbl in zip(ids, labels):
+                track = self.tracks.get(tid)
+                if track is None:
+                    continue
+                team = 1 if lbl == dark_label else 0
+                track.team = team
+                track.team_votes[team] += TEAM_SWITCH_MARGIN
+                self.team_by_id[tid] = team
+            self.team_protos_frozen = True
+            print(f"Learned fixed team HSV prototypes: {self.team_hsv_protos}")
+        except Exception as e:
+            print(f"Could not learn team HSV prototypes: {e}")
+
+    def _motion_gate_px(self, track, now):
+        age = max(1.0 / 30.0, now - track.last_seen)
+        speed_px_s = MAX_PLAYER_SPEED_MPS / PX_TO_M
+        gate = BASE_MOTION_GATE_PX + speed_px_s * min(age, TRACK_COAST_SEC)
+        return min(MAX_MOTION_GATE_PX, gate)
+
+    def _is_natural_detection(self, track, feet_field, now):
+        if track is None or track.smoothed is None:
+            return True
+        dist = float(np.linalg.norm(np.asarray(feet_field, dtype=np.float32) - track.smoothed))
+        return dist <= self._motion_gate_px(track, now)
+
+    def _required_hits_for_track(self, track):
+        if track.smoothed is None:
+            return MIN_TRACK_HITS
+        x, y = float(track.smoothed[0]), float(track.smoothed[1])
+        near_boundary = (
+            x < FIELD_BOUNDARY_MARGIN_PX or
+            x > FIELD_W - FIELD_BOUNDARY_MARGIN_PX or
+            y < FIELD_BOUNDARY_MARGIN_PX or
+            y > FIELD_H - FIELD_BOUNDARY_MARGIN_PX
+        )
+        return BOUNDARY_TRACK_HITS if near_boundary else MIN_TRACK_HITS
+
+    def _reserve_slot(self, tid, now):
+        track = self.tracks.get(tid)
+        if track is None or track.smoothed is None:
+            return
+        team = int(self.team_by_id.get(tid, 0))
+        reservation = {
+            "id": int(tid),
+            "pos": track.smoothed.copy(),
+            "until": now + SLOT_RESERVE_SEC,
+        }
+        self.slot_reservations.setdefault(team, []).append(reservation)
+
+    def _cleanup_slot_reservations(self, now):
+        for team in (0, 1):
+            self.slot_reservations[team] = [
+                r for r in self.slot_reservations.get(team, [])
+                if r["until"] > now
+            ]
+
+    def _near_reserved_slot(self, team, smoothed):
+        reservations = self.slot_reservations.get(team, [])
+        if not reservations:
+            return False
+        pos = np.asarray(smoothed, dtype=np.float32)
+        return any(float(np.linalg.norm(pos - r["pos"])) <= SLOT_REPLACE_THRESH for r in reservations)
+
+    def _stable_id_for_detection(self, raw_tid, feet_field, matched_ids, now):
+        raw_tid = int(raw_tid)
+        mapped_id = self.raw_to_stable_id.get(raw_tid)
+        if mapped_id in self.tracks and mapped_id not in matched_ids:
+            if not self._is_natural_detection(self.tracks[mapped_id], feet_field, now):
+                return None
+            return mapped_id
+
+        best_id = None
+        best_dist = STABLE_REID_THRESH
+        for tid, track in self.tracks.items():
+            if tid in matched_ids or track.smoothed is None:
+                continue
+            dist = float(np.linalg.norm(np.asarray(feet_field, dtype=np.float32) - track.smoothed))
+            if dist < best_dist and self._is_natural_detection(track, feet_field, now):
+                best_dist = dist
+                best_id = tid
+
+        if best_id is None:
+            best_id = self.next_stable_id
+            self.next_stable_id += 1
+
+        self.raw_to_stable_id[raw_tid] = best_id
+        return best_id
+
+    def _active_track_tuples(self, now):
+        self._cleanup_slot_reservations(now)
+        candidates = []
+        for tid, track in self.tracks.items():
+            if track.alpha <= 0.0 or track.smoothed is None:
+                continue
+            if not point_near_field(track.smoothed):
+                continue
+            if tid not in self.active_ids and track.hits < self._required_hits_for_track(track):
+                continue
+            candidates.append((tid, track.bbox, track.feet_field, track.smoothed))
+
+        def track_rank(item):
+            tid = item[0]
+            track = self.tracks[tid]
+            age = now - track.last_seen
+            area = 0.0
+            if track.bbox is not None:
+                x1, y1, x2, y2 = track.bbox
+                area = max(0.0, float((x2 - x1) * (y2 - y1)))
+            return (0 if track.matched else 1, age, -area)
+
+        active = []
+        for team in (0, 1):
+            team_tracks = [d for d in candidates if self.team_by_id.get(d[0], 0) == team]
+            previous_ids = {tid for tid in self.active_ids if self.team_by_id.get(tid, 0) == team}
+            previous = [d for d in team_tracks if d[0] in self.active_ids]
+            selected = sorted(previous, key=track_rank)[:MAX_PLAYERS_PER_TEAM]
+            selected_ids = {d[0] for d in selected}
+            reserved_missing = [
+                tid for tid in previous_ids
+                if tid in self.tracks and tid not in selected_ids and now - self.tracks[tid].last_seen <= TRACK_FORGET_SEC
+            ]
+            slots_open = MAX_PLAYERS_PER_TEAM - len(selected) - len(reserved_missing)
+            if slots_open > 0:
+                fresh = [d for d in team_tracks if d[0] not in selected_ids]
+                if self.team_slots_locked.get(team, False):
+                    fresh = [
+                        d for d in fresh
+                        if self._near_reserved_slot(team, self.tracks[d[0]].smoothed)
+                    ]
+                selected.extend(sorted(fresh, key=track_rank)[:slots_open])
+            if len(selected) == MAX_PLAYERS_PER_TEAM:
+                self.team_slots_locked[team] = True
+            active.extend(selected)
+
+        selected_ids = {d[0] for d in active}
+        for team in (0, 1):
+            team_count = sum(1 for d in active if self.team_by_id.get(d[0], 0) == team)
+            if team_count >= MAX_PLAYERS_PER_TEAM or self.team_slots_locked.get(team, False):
+                continue
+            unused = [d for d in candidates if d[0] not in selected_ids]
+            needed = MAX_PLAYERS_PER_TEAM - team_count
+            for d in sorted(unused, key=track_rank)[:needed]:
+                tid = d[0]
+                self.team_by_id[tid] = team
+                track = self.tracks.get(tid)
+                if track is not None:
+                    track.team = team
+                    track.team_votes[team] += TEAM_SWITCH_MARGIN
+                active.append(d)
+                selected_ids.add(tid)
+            if sum(1 for d in active if self.team_by_id.get(d[0], 0) == team) == MAX_PLAYERS_PER_TEAM:
+                self.team_slots_locked[team] = True
+
+        self.active_ids = {d[0] for d in active}
+        return active
+
     def _run_loop(self):
         cap = cv2.VideoCapture(self.source)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         self.calibrate(cap)
 
-        # Simple tracking variables
-        next_id = 0
-        track_history = {}  # id -> list of recent positions
-        max_history = 10
-
         fps_ts = time.time()
-        fps = 0.0
 
         while self.running:
+            loop_start = time.time()
             ret, frame = cap.read()
             if not ret:
                 print("End of video or failed to read frame")
                 break
-                
+
             now = time.time()
             dt = max(1/60.0, now - fps_ts)
             fps_ts = now
+            self._ema_metric("capture_fps", 1.0 / dt)
 
-            # Run YOLO prediction on the frame
-            results = self.model.predict(
+            infer_start = time.time()
+            results = self.model.track(
                 frame,
+                persist=True,
+                tracker=TRACKER_CONFIG,
                 conf=YOLO_CONF,
-                classes=None,  # person class
+                classes=[PERSON_CLASS],
                 imgsz=IMG_SZ,
+                device=self.device,
+                half=self.use_half,
                 verbose=False,
-                iou=0.45,
-                augment=True,
             )
-            
-            dets = []
-            if results[0].boxes is not None and len(results[0].boxes) > 0:
-                boxes = results[0].boxes.xyxy.cpu().numpy()
-                confs = results[0].boxes.conf.cpu().numpy()
+            self._ema_metric("inference_ms", (time.time() - infer_start) * 1000.0)
 
-                # Collect current detections (feet in field coords)
-                det_list = []  # list of dicts with bbox, feet_px, feet_field, hsv
-                for i, (box, conf) in enumerate(zip(boxes, confs)):
-                    x1, y1, x2, y2 = box
-                    bbox = (x1, y1, x2, y2)
+            matched_ids = set()
+            result = results[0]
+            if result.boxes is not None and len(result.boxes) > 0 and result.boxes.id is not None:
+                boxes = result.boxes.xyxy.cpu().numpy()
+                raw_track_ids = result.boxes.id.int().cpu().numpy()
+
+                for box, raw_tid in zip(boxes, raw_track_ids):
+                    bbox = tuple(float(v) for v in box)
                     feet_px = feet_point_xyxy(bbox)
                     feet_field = warp_point(feet_px, self.H)
                     patch = bbox_torso_patch(frame, bbox)
                     hsv = hsv_mean(patch)
-                    det_list.append({"bbox": bbox, "feet_px": feet_px, "feet_field": feet_field, "hsv": hsv})
+                    tid = self._stable_id_for_detection(raw_tid, feet_field, matched_ids, now)
+                    if tid is None:
+                        mapped_id = self.raw_to_stable_id.get(int(raw_tid))
+                        if mapped_id in self.tracks:
+                            self.tracks[mapped_id].reject_detection()
+                        continue
 
-                # Build previous track positions
-                existing_ids = list(self.kalmans.keys())
-                prev_pos = {}
-                for tid in existing_ids:
-                    kf = self.kalmans[tid]
-                    prev_pos[tid] = np.array([float(kf.x[0]), float(kf.x[1])], dtype=np.float32)
-
-                # Greedy one-to-one association by nearest neighbor in field space
-                ASSOC_THRESH = TRACK_ASSOC_THRESH
-                unmatched_dets = set(range(len(det_list)))
-                unmatched_tracks = set(existing_ids)
-                pairs = []  # (tid, det_index)
-
-                while unmatched_dets and unmatched_tracks:
-                    best = None
-                    best_dist = float('inf')
-                    for di in unmatched_dets:
-                        dpos = det_list[di]["feet_field"]
-                        for tid in unmatched_tracks:
-                            tpos = prev_pos.get(tid)
-                            if tpos is None:
-                                continue
-                            dist = float(np.linalg.norm(dpos - tpos))
-                            if dist < best_dist:
-                                best_dist = dist
-                                best = (tid, di)
-                    if best is None or best_dist > ASSOC_THRESH:
-                        break
-                    tid, di = best
-                    pairs.append((tid, di))
-                    unmatched_tracks.discard(tid)
-                    unmatched_dets.discard(di)
-
-                # Create new tracks with gating: only if there is available capacity per team
-                new_pairs = []  # (new_tid, det_index)
-                # Estimate team for the detection using prototypes or brightness
-                def estimate_team_for_det(det):
-                    if TEAM_HSV_PROTOS is not None and det["hsv"] is not None:
-                        return nearest_team_id(det["hsv"], TEAM_HSV_PROTOS)
-                    if det["hsv"] is not None:
-                        # simple rule: lower V => dark team 1
-                        return 1 if det["hsv"][2] < 128 else 0
-                    return 0
-
-                # Current active counts per team
-                active_ids = set([tid for tid, _, _, _ in dets])
-                team_counts = {0: 0, 1: 0}
-                for tid in active_ids:
-                    team_counts[self.team_by_id.get(tid, 0)] += 1
-
-                for di in list(unmatched_dets):
-                    det = det_list[di]
-                    est_team = estimate_team_for_det(det)
-                    if team_counts[est_team] >= MAX_PLAYERS_PER_TEAM:
-                        continue  # skip spawning beyond 5 per team
-                    new_tid = next_id
-                    next_id += 1
-                    new_pairs.append((new_tid, di))
-                    unmatched_dets.discard(di)
-                    team_counts[est_team] += 1
-
-                # Update tracks for matched pairs
-                for tid, di in pairs + new_pairs:
-                    det = det_list[di]
-                    bbox = det["bbox"]
-                    feet_field = det["feet_field"]
-                    hsv = det["hsv"]
-
-                    # track history (for optional debugging)
-                    if tid not in track_history:
-                        track_history[tid] = []
-                    track_history[tid].append(feet_field)
-                    if len(track_history[tid]) > max_history:
-                        track_history[tid].pop(0)
-
-                    # jersey EMA
-                    if hsv is not None:
-                        if tid not in self.hsv_ema:
-                            self.hsv_ema[tid] = hsv
-                        else:
-                            self.hsv_ema[tid] = (1.0 - JERSEY_EMA_ALPHA) * self.hsv_ema[tid] + JERSEY_EMA_ALPHA * hsv
-
-                    # team assignment if prototypes provided
-                    if TEAM_HSV_PROTOS is not None and tid in self.hsv_ema:
-                        self.team_by_id[tid] = nearest_team_id(self.hsv_ema[tid], TEAM_HSV_PROTOS)
-
-                    # Kalman update
-                    if tid not in self.kalmans:
-                        self.kalmans[tid] = Kalman2D(feet_field[0], feet_field[1], dt=dt)
-                        smoothed = feet_field
+                    if tid not in self.tracks:
+                        self.tracks[tid] = TrackState(tid, bbox, feet_field, hsv, now, dt)
                     else:
-                        kf = self.kalmans[tid]
-                        kf.dt = dt
-                        kf.predict()
-                        smoothed = kf.update(feet_field)
+                        self.tracks[tid].update_detection(bbox, feet_field, hsv, now, dt)
 
-                    self.last_seen[tid] = now
-                    dets.append((tid, bbox, feet_field, smoothed))
+                    track = self.tracks[tid]
+                    matched_ids.add(tid)
+                    self.last_seen[tid] = track.last_seen
+                    if track.hsv_ema is not None:
+                        self.hsv_ema[tid] = track.hsv_ema
+                    candidate_team = self._estimate_team_for_hsv(track.hsv_ema)
+                    track.apply_team_sample(candidate_team)
+                    self.team_by_id[tid] = int(track.team if track.team is not None else 0)
 
-            # cleanup stale tracks (allow longer persistence to reduce blinking)
-            stale = [tid for tid, tstamp in self.last_seen.items() if now - tstamp > TRACK_FORGET_SEC]
-            for tid in stale:
-                self.last_seen.pop(tid, None)
-                self.kalmans.pop(tid, None)
-                self.hsv_ema.pop(tid, None)
-                self.team_by_id.pop(tid, None)
-                track_history.pop(tid, None)
-
-            # if no TEAM_HSV_PROTOS provided, try to learn stable prototypes once
-            if TEAM_HSV_PROTOS is None and len(self.hsv_ema) >= 6 and len(self.team_by_id) < len(self.hsv_ema):
-                try:
-                    ids = list(self.hsv_ema.keys())
-                    X = np.stack([self.hsv_ema[i] for i in ids], axis=0)
-                    # KMeans to separate two jersey colors
-                    kmeans = KMeans(n_clusters=2, n_init="auto", random_state=0).fit(X)
-                    labels = kmeans.labels_.astype(int)
-                    # compute prototype HSV centers
-                    proto0 = X[labels == 0].mean(axis=0)
-                    proto1 = X[labels == 1].mean(axis=0)
-                    # Ensure consistent mapping: darker jersey -> team 1, brighter -> team 0 (or vice versa)
-                    v0 = proto0[2]
-                    v1 = proto1[2]
-                    if v0 < v1:
-                        proto_dark, proto_bright = proto0, proto1
-                        dark_label, bright_label = 0, 1
+            for tid, track in list(self.tracks.items()):
+                age = now - track.last_seen
+                if tid not in matched_ids:
+                    if age <= TRACK_COAST_SEC:
+                        track.coast(now, dt)
+                    elif tid in self.active_ids and age <= SLOT_RESERVE_SEC:
+                        track.coast(now, dt)
+                        track.alpha = GHOST_ALPHA
                     else:
-                        proto_dark, proto_bright = proto1, proto0
-                        dark_label, bright_label = 1, 0
-                    # Assign: team 1 = dark, team 0 = bright (change if you prefer)
-                    for tid, lbl in zip(ids, labels):
-                        self.team_by_id[tid] = 1 if lbl == dark_label else 0
-                except Exception:
-                    pass
+                        track.alpha = 0.0
+                        track.matched = False
+                expire_after = SLOT_RESERVE_SEC if tid in self.active_ids else TRACK_FORGET_SEC
+                if age > expire_after:
+                    if tid in self.active_ids:
+                        self._reserve_slot(tid, now)
+                    self.tracks.pop(tid, None)
+                    self.hsv_ema.pop(tid, None)
+                    self.team_by_id.pop(tid, None)
+                    self.last_seen.pop(tid, None)
+                    self.active_ids.discard(tid)
+                    for raw_tid, stable_id in list(self.raw_to_stable_id.items()):
+                        if stable_id == tid:
+                            self.raw_to_stable_id.pop(raw_tid, None)
 
-            # filter to in-field + 5v5
-            active = filter_active_players(dets, self.team_by_id)
-            # additional cap: if more than 5 per team remain, keep the ones with longest recent visibility
-            team0 = [d for d in active if self.team_by_id.get(d[0], 0) == 0]
-            team1 = [d for d in active if self.team_by_id.get(d[0], 1) == 1]
-            def sort_by_recency(lst):
-                return sorted(lst, key=lambda d: -(now - self.last_seen.get(d[0], 0.0)))
-            if len(team0) > MAX_PLAYERS_PER_TEAM:
-                team0 = sort_by_recency(team0)[:MAX_PLAYERS_PER_TEAM]
-            if len(team1) > MAX_PLAYERS_PER_TEAM:
-                team1 = sort_by_recency(team1)[:MAX_PLAYERS_PER_TEAM]
-            active = team0 + team1
+            self._learn_team_protos_once()
+
+            # filter to in-field + 5v5, keeping coasting tracks visible briefly
+            active = self._active_track_tuples(now)
 
             # update analytics & heatmaps
             self.analytics.decay()
@@ -675,7 +876,7 @@ class VisionService:
                     cv2.putText(overlay, "Warp Error", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
             # derive team display colors from HSV prototypes or EMA
-            team_colors_hex, team_colors_bgr = compute_team_colors(TEAM_HSV_PROTOS, self.hsv_ema, self.team_by_id)
+            team_colors_hex, team_colors_bgr = compute_team_colors(self.team_hsv_protos, self.hsv_ema, self.team_by_id)
 
             # draw dots for active players on overlay (top-down)
             if self.debug_views and overlay is not None:
@@ -695,25 +896,35 @@ class VisionService:
                     cv2.circle(frame, (int(fx), int(fy)), 6, color, -1)
                     cv2.putText(frame, f"{tid}", (int(fx) + 8, int(fy) - 4), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
 
-            # no ghost rendering here to keep canvas, overlay, and camera_debug consistent
-
             # update in-memory live state for HTTP server
             with self.minimap_lock:
-                # publish only currently active (capped 5v5) to keep canvas in sync
+                # Publish matched and briefly coasting tracks so OBS does not blink on detector misses.
                 players = []
                 for tid, bbox, feet_field, smoothed in active:
                     team = int(self.team_by_id.get(tid, 0))
+                    track = self.tracks.get(tid)
+                    age_ms = 0.0 if track is None else max(0.0, (now - track.last_seen) * 1000.0)
+                    alpha = 1.0 if track is None else float(track.alpha)
                     players.append({
                         "id": int(tid),
-                        "x": float(smoothed[0]),
-                        "y": float(smoothed[1]),
+                        "x": float(np.clip(smoothed[0], 0, FIELD_W)),
+                        "y": float(np.clip(smoothed[1], 0, FIELD_H)),
                         "team": team,
+                        "alpha": alpha,
+                        "visible": bool(track.matched) if track is not None else True,
+                        "age_ms": age_ms,
                     })
+                loop_ms = max(1e-6, time.time() - loop_start)
+                self._ema_metric("state_fps", 1.0 / loop_ms)
+                self.metrics["players"] = len(players)
+                self.metrics["tracks"] = len(self.tracks)
                 self.latest_state = {
                     "field_w": FIELD_W,
                     "field_h": FIELD_H,
                     "players": players,
                     "team_colors": team_colors_hex,
+                    "metrics": self.metrics.copy(),
+                    "updated_at": now,
                     "ts": time.time(),
                 }
                 if self.debug_views and overlay is not None:
@@ -759,12 +970,28 @@ def heatmap_png():
 @app.route('/state')
 def state_endpoint():
     global vision_instance
-    default_state = {"field_w": FIELD_W, "field_h": FIELD_H, "players": [], "ts": time.time()}
+    default_state = {
+        "field_w": FIELD_W,
+        "field_h": FIELD_H,
+        "players": [],
+        "metrics": {},
+        "updated_at": time.time(),
+        "ts": time.time(),
+    }
     if vision_instance is None:
         return jsonify(default_state)
     with vision_instance.minimap_lock:
         st = vision_instance.latest_state if vision_instance.latest_state is not None else default_state
         return jsonify(st)
+
+
+@app.route('/metrics')
+def metrics_endpoint():
+    global vision_instance
+    if vision_instance is None:
+        return jsonify({})
+    with vision_instance.minimap_lock:
+        return jsonify(vision_instance.metrics.copy())
 
 
 def start_http_server():

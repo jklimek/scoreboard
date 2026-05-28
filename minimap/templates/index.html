@@ -41,15 +41,18 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    function draw(state) {
-        if (!state) return;
-        fieldW = state.field_w || fieldW;
-        fieldH = state.field_h || fieldH;
-        resizeCanvas();
+    const info = document.getElementById('info');
+    const POLL_MS = 40; // 25 Hz network updates; rendering still uses requestAnimationFrame.
+    const SMOOTHING = 14;
+    const DROP_AFTER_MS = 1400;
+    let latestTeamColors = ['#ff4d4d', '#4da6ff'];
+    let displayTracks = new Map();
+    let lastRenderTs = performance.now();
+    let polling = false;
+
+    function drawField() {
         const w = parseInt(canvas.style.width);
         const h = parseInt(canvas.style.height);
-        const scaleX = w / fieldW;
-        const scaleY = h / fieldH;
         ctx.clearRect(0, 0, w, h);
         // field lines (white) over pink page background
         ctx.strokeStyle = '#ffffff';
@@ -62,34 +65,103 @@
         ctx.moveTo(Math.round(w - zoneX) + 0.5, 0);
         ctx.lineTo(Math.round(w - zoneX) + 0.5, h);
         ctx.stroke();
-        // players
+    }
+
+    function receiveState(state) {
+        if (!state) return;
+        const nextFieldW = state.field_w || fieldW;
+        const nextFieldH = state.field_h || fieldH;
+        if (nextFieldW !== fieldW || nextFieldH !== fieldH) {
+            fieldW = nextFieldW;
+            fieldH = nextFieldH;
+            resizeCanvas();
+        }
+
         const players = state.players || [];
         const defaultColors = ['#ff4d4d', '#4da6ff'];
-        const teamColors = (state.team_colors && state.team_colors.length === 2) ? state.team_colors : defaultColors;
+        latestTeamColors = (state.team_colors && state.team_colors.length === 2) ? state.team_colors : defaultColors;
+        const now = performance.now();
+
         for (const p of players) {
+            const id = String(p.id);
+            const existing = displayTracks.get(id);
+            if (existing) {
+                existing.targetX = p.x;
+                existing.targetY = p.y;
+                existing.targetAlpha = p.alpha ?? 1;
+                existing.team = p.team;
+                existing.lastSeen = now;
+            } else {
+                displayTracks.set(id, {
+                    x: p.x,
+                    y: p.y,
+                    targetX: p.x,
+                    targetY: p.y,
+                    alpha: p.alpha ?? 1,
+                    targetAlpha: p.alpha ?? 1,
+                    team: p.team,
+                    lastSeen: now,
+                });
+            }
+        }
+
+        const metrics = state.metrics || {};
+        const ageMs = state.updated_at ? Math.max(0, (Date.now() / 1000 - state.updated_at) * 1000) : 0;
+        info.textContent = `Live minimap - players ${players.length} tracks ${metrics.tracks ?? '-'} inference ${Math.round(metrics.inference_ms || 0)}ms state ${Math.round(metrics.state_fps || 0)}fps age ${Math.round(ageMs)}ms`;
+    }
+
+    function render(ts) {
+        const dt = Math.min(0.05, Math.max(0.001, (ts - lastRenderTs) / 1000));
+        lastRenderTs = ts;
+        const blend = 1 - Math.exp(-SMOOTHING * dt);
+        const w = parseInt(canvas.style.width);
+        const h = parseInt(canvas.style.height);
+        const scaleX = w / fieldW;
+        const scaleY = h / fieldH;
+        const now = performance.now();
+
+        drawField();
+        for (const [id, p] of displayTracks) {
+            const age = now - p.lastSeen;
+            if (age > DROP_AFTER_MS) {
+                displayTracks.delete(id);
+                continue;
+            }
+            p.x += (p.targetX - p.x) * blend;
+            p.y += (p.targetY - p.y) * blend;
+            const staleFade = age > 500 ? Math.max(0, 1 - ((age - 500) / (DROP_AFTER_MS - 500))) : 1;
+            p.alpha += ((p.targetAlpha * staleFade) - p.alpha) * blend;
+
             const x = p.x * scaleX;
             const y = p.y * scaleY;
-            const color = teamColors[(p.team === 0) ? 0 : 1];
+            const color = latestTeamColors[(p.team === 0) ? 0 : 1];
+            ctx.globalAlpha = Math.max(0.15, Math.min(1, p.alpha));
             ctx.fillStyle = color;
             ctx.beginPath();
-            ctx.arc(Math.round(x) + 0.5, Math.round(y) + 0.5, 6, 0, Math.PI * 2);
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
             ctx.fill();
         }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(render);
     }
 
     async function poll() {
+        if (polling) return;
+        polling = true;
         try {
             const r = await fetch('/state', { cache: 'no-store' });
             if (r.ok) {
                 const s = await r.json();
-                draw(s);
+                receiveState(s);
             }
         } catch (e) { /* ignore */ }
-        requestAnimationFrame(poll);
+        polling = false;
     }
+    setInterval(poll, POLL_MS);
     poll();
+    requestAnimationFrame(render);
     </script>
 </body>
-<html>
+</html>
 
 
