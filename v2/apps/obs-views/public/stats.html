@@ -4,20 +4,63 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>OBS Stats</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Barlow+Semi+Condensed:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body data-view-type="stats">
     <div class="overlay overlay-stats">
-      <section class="card section stats-panel stats-panel-compact">
-        <header class="stats-header">
-          <div class="stats-team-name team-home-accent" id="stats-home-name">HOME</div>
-          <h1>Team Statistics</h1>
-          <div class="stats-team-name team-away-accent" id="stats-away-name">AWAY</div>
+      <section class="stats-board">
+        <header class="stats-board-header">
+          <div class="stats-team stats-team--home team-home-accent">
+            <img class="team-logo" id="stats-home-logo" alt="" hidden />
+            <span class="stats-team-name" id="stats-home-name">HOME</span>
+          </div>
+          <div class="stats-board-title">
+            <span class="stats-board-eyebrow">Match</span>
+            <h1>Team Statistics</h1>
+          </div>
+          <div class="stats-team stats-team--away team-away-accent">
+            <span class="stats-team-name" id="stats-away-name">AWAY</span>
+            <img class="team-logo" id="stats-away-logo" alt="" hidden />
+          </div>
         </header>
-        <div id="stats-grid" class="stat-comparison-grid center-origin-stat-grid"></div>
-        <div class="advanced-block">
-          <h2>Advanced Metrics</h2>
-          <div id="advanced-grid" class="advanced-comparison-grid"></div>
+
+        <div id="stats-grid" class="stat-meter-grid"></div>
+
+        <div class="stats-board-lower">
+          <section class="leaders-block">
+            <h2 class="block-heading">Team Leaders</h2>
+            <div class="leaders-grid">
+              <div class="leaders-col team-home-accent">
+                <div class="leaders-col-head" id="leaders-home-head">HOME</div>
+                <div class="leaders-list" id="home-leaders"></div>
+              </div>
+              <div class="leaders-col team-away-accent">
+                <div class="leaders-col-head" id="leaders-away-head">AWAY</div>
+                <div class="leaders-list" id="away-leaders"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="advanced-block">
+            <h2 class="block-heading">Advanced Metrics</h2>
+            <div id="advanced-grid" class="advanced-comparison-grid"></div>
+            <div class="tempo-strip">
+              <div class="tempo-chip">
+                <span class="tempo-label">Avg Point</span>
+                <span class="tempo-value" id="tempo-avg-point">--</span>
+              </div>
+              <div class="tempo-chip">
+                <span class="tempo-label">Turnovers / Point</span>
+                <span class="tempo-value" id="tempo-to-per-point">--</span>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
     </div>

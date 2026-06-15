@@ -4297,20 +4297,21 @@ var ScoreboardAnimator = class {
       homeTeamCard: document.getElementById("home-team-card"),
       awayTeamCard: document.getElementById("away-team-card"),
       scorerRail: document.getElementById("scorer-rail"),
-      assistRail: document.getElementById("assist-rail"),
       infoRail: document.getElementById("info-rail"),
       playerRail: document.getElementById("player-rail"),
       timeoutBanner: document.getElementById("timeout-banner"),
       eventTitle: document.getElementById("event-title"),
       scorerText: document.getElementById("scorer-text"),
       assistText: document.getElementById("assist-text"),
+      scorerStat: document.getElementById("scorer-stat"),
+      goalStatWrap: document.getElementById("scorer-stat-wrap"),
+      goalSweep: document.querySelector("#scorer-rail .goal-sweep"),
       infoTitle: document.getElementById("info-title"),
       infoPrimary: document.getElementById("info-primary"),
       infoSecondary: document.getElementById("info-secondary"),
       playerTitle: document.getElementById("player-title"),
       playerName: document.getElementById("player-name"),
       playerStats: document.getElementById("player-stats"),
-      playerNote: document.getElementById("player-note"),
       homeScoreWrap: document.getElementById("home-score-wrap"),
       awayScoreWrap: document.getElementById("away-score-wrap")
     };
@@ -4396,21 +4397,28 @@ var ScoreboardAnimator = class {
     this.playInfoEvent(event);
   }
   playScoreEvent(event) {
-    const { scorerRail, assistRail, eventTitle, scorerText, assistText } = this.elements;
-    if (!scorerRail || !assistRail || !eventTitle || !scorerText || !assistText) {
+    const { scorerRail, eventTitle, scorerText, assistText, scorerStat, goalStatWrap, goalSweep } = this.elements;
+    if (!scorerRail || !eventTitle || !scorerText || !assistText) {
       return;
     }
     this.resetLowerThirdTimeline();
     eventTitle.textContent = this.formatTitle(event.title, "GOAL");
     scorerText.textContent = this.cleanText(event.primary_text, "Scorer");
-    assistText.textContent = this.cleanText(event.secondary_text, "UNASSISTED");
+    assistText.textContent = this.formatAssistText(event.secondary_text);
+    assistText.style.display = "";
+    if (scorerStat) {
+      scorerStat.textContent = this.readScoreline();
+    }
+    if (goalStatWrap) {
+      goalStatWrap.style.display = "";
+    }
     const teamCard = event.team === "h" ? this.elements.homeTeamCard : this.elements.awayTeamCard;
     const holdSeconds = this.normalizeDisplaySeconds(event.display_ms, 5);
-    gsapWithCSS.set(scorerRail, { borderLeftColor: this.resolveTeamAccent(event.team) });
+    scorerRail.style.setProperty("--event-accent", this.resolveTeamAccent(event.team));
     const timeline2 = gsapWithCSS.timeline({
       onComplete: () => {
-        gsapWithCSS.set([scorerRail, assistRail], { clearProps: "all" });
-        gsapWithCSS.set([scorerRail, assistRail], { autoAlpha: 0 });
+        gsapWithCSS.set(scorerRail, { clearProps: "all" });
+        gsapWithCSS.set(scorerRail, { autoAlpha: 0 });
       }
     });
     if (teamCard) {
@@ -4427,92 +4435,24 @@ var ScoreboardAnimator = class {
         0
       );
     }
-    this.applyScoreAnimationVariantRiseAndLock(timeline2, scorerRail, assistRail, holdSeconds);
+    this.addBarReveal(timeline2, scorerRail, goalSweep, holdSeconds);
     this.lowerThirdTimeline = timeline2;
   }
-  applyScoreAnimationVariantSlideSplit(timeline2, scorerRail, assistRail, holdSeconds) {
-    timeline2.fromTo(
-      scorerRail,
-      { x: -220, autoAlpha: 0 },
-      { x: 0, autoAlpha: 1, duration: 0.38, ease: "power3.out" },
-      0
-    );
-    timeline2.fromTo(
-      assistRail,
-      { x: 180, autoAlpha: 0 },
-      { x: 0, autoAlpha: 1, duration: 0.32, ease: "power3.out" },
-      0.12
-    );
-    timeline2.to(assistRail, { x: 180, autoAlpha: 0, duration: 0.24, ease: "power2.in" }, holdSeconds);
-    timeline2.to(scorerRail, { x: -220, autoAlpha: 0, duration: 0.28, ease: "power2.in" }, holdSeconds + 0.16);
+  formatAssistText(raw) {
+    const assist = this.cleanText(raw, "");
+    if (!assist || assist.toUpperCase() === "UNASSISTED") {
+      return "Unassisted";
+    }
+    return /^assist/i.test(assist) ? assist : `Assist: ${assist}`;
   }
-  applyScoreAnimationVariantRiseAndLock(timeline2, scorerRail, assistRail, holdSeconds) {
-    timeline2.fromTo(
-      scorerRail,
-      { y: 36, autoAlpha: 0, scaleY: 0.92, transformOrigin: "bottom center" },
-      { y: 0, autoAlpha: 1, scaleY: 1, duration: 0.36, ease: "power3.out" },
-      0
-    );
-    timeline2.fromTo(
-      assistRail,
-      { y: 24, autoAlpha: 0, scaleY: 0.9, transformOrigin: "bottom center" },
-      { y: 0, autoAlpha: 1, scaleY: 1, duration: 0.3, ease: "power2.out" },
-      0.1
-    );
-    timeline2.to(assistRail, { y: 20, autoAlpha: 0, duration: 0.22, ease: "power2.in" }, holdSeconds);
-    timeline2.to(
-      scorerRail,
-      { y: 28, autoAlpha: 0, scaleY: 0.95, duration: 0.24, ease: "power2.in" },
-      holdSeconds + 0.12
-    );
-  }
-  applyScoreAnimationVariantWipeReveal(timeline2, scorerRail, assistRail, holdSeconds) {
-    timeline2.fromTo(
-      scorerRail,
-      { autoAlpha: 0, clipPath: "inset(0 100% 0 0)" },
-      { autoAlpha: 1, clipPath: "inset(0 0% 0 0)", duration: 0.34, ease: "power2.out" },
-      0
-    );
-    timeline2.fromTo(
-      assistRail,
-      { autoAlpha: 0, clipPath: "inset(100% 0 0 0)" },
-      { autoAlpha: 1, clipPath: "inset(0 0 0 0)", duration: 0.28, ease: "power2.out" },
-      0.14
-    );
-    timeline2.to(
-      assistRail,
-      { autoAlpha: 0, clipPath: "inset(0 0 100% 0)", duration: 0.2, ease: "power2.in" },
-      holdSeconds
-    );
-    timeline2.to(
-      scorerRail,
-      { autoAlpha: 0, clipPath: "inset(0 0 0 100%)", duration: 0.22, ease: "power2.in" },
-      holdSeconds + 0.12
-    );
-  }
-  applyScoreAnimationVariantCenterPop(timeline2, scorerRail, assistRail, holdSeconds) {
-    timeline2.fromTo(
-      scorerRail,
-      { autoAlpha: 0, scale: 0.9, y: 10, transformOrigin: "center center" },
-      { autoAlpha: 1, scale: 1, y: 0, duration: 0.32, ease: "power3.out" },
-      0
-    );
-    timeline2.fromTo(
-      assistRail,
-      { autoAlpha: 0, scale: 0.94, y: 8, transformOrigin: "center center" },
-      { autoAlpha: 1, scale: 1, y: 0, duration: 0.28, ease: "power2.out" },
-      0.12
-    );
-    timeline2.to(assistRail, { autoAlpha: 0, scale: 0.95, y: 10, duration: 0.2, ease: "power2.in" }, holdSeconds);
-    timeline2.to(
-      scorerRail,
-      { autoAlpha: 0, scale: 0.9, y: 12, duration: 0.24, ease: "power2.in" },
-      holdSeconds + 0.14
-    );
+  readScoreline() {
+    const home = document.getElementById("home-score")?.textContent?.trim() || "0";
+    const away = document.getElementById("away-score")?.textContent?.trim() || "0";
+    return `${home}\u2013${away}`;
   }
   playTimeoutEvent(event) {
-    const { scorerRail, assistRail, eventTitle, scorerText, timeoutBanner } = this.elements;
-    if (!scorerRail || !assistRail || !eventTitle || !scorerText) {
+    const { scorerRail, eventTitle, scorerText, assistText, goalStatWrap, goalSweep, timeoutBanner } = this.elements;
+    if (!scorerRail || !eventTitle || !scorerText) {
       return;
     }
     this.resetLowerThirdTimeline();
@@ -4524,70 +4464,62 @@ var ScoreboardAnimator = class {
       gsapWithCSS.set(timeoutBanner, { autoAlpha: 0, clearProps: "all" });
     }
     const holdSeconds = this.normalizeDisplaySeconds(event.display_ms, 5.8);
-    eventTitle.textContent = "TIMEOUT";
+    eventTitle.textContent = "TIME";
     scorerText.textContent = this.resolveTimeoutPrimaryText(event);
-    gsapWithCSS.set(scorerRail, { borderLeftColor: this.resolveTeamAccent(event.team) });
-    gsapWithCSS.set(assistRail, { autoAlpha: 0, clearProps: "all" });
+    if (assistText) {
+      assistText.textContent = "";
+      assistText.style.display = "none";
+    }
+    if (goalStatWrap) {
+      goalStatWrap.style.display = "none";
+    }
+    scorerRail.style.setProperty("--event-accent", this.resolveTeamAccent(event.team));
     const timeline2 = gsapWithCSS.timeline({
       onComplete: () => {
         gsapWithCSS.set(scorerRail, { clearProps: "all" });
         gsapWithCSS.set(scorerRail, { autoAlpha: 0 });
       }
     });
-    timeline2.fromTo(
-      scorerRail,
-      { y: 30, autoAlpha: 0, scaleY: 0.92, transformOrigin: "bottom center" },
-      { y: 0, autoAlpha: 1, scaleY: 1, duration: 0.34, ease: "power3.out" },
-      0
-    );
-    timeline2.to(
-      scorerRail,
-      {
-        y: 26,
-        autoAlpha: 0,
-        duration: 0.24,
-        ease: "power2.in"
-      },
-      holdSeconds
-    );
+    this.addBarReveal(timeline2, scorerRail, goalSweep, holdSeconds);
     this.timeoutTimeline = timeline2;
   }
+  addBarReveal(timeline2, rail, sweep, holdSeconds) {
+    timeline2.fromTo(
+      rail,
+      { y: 92, autoAlpha: 0 },
+      { y: 0, autoAlpha: 1, duration: 0.44, ease: "power3.out" },
+      0
+    );
+    if (sweep) {
+      timeline2.fromTo(
+        sweep,
+        { xPercent: -120 },
+        { xPercent: 120, duration: 0.7, ease: "power2.inOut" },
+        0.26
+      );
+    }
+    timeline2.to(rail, { y: 72, autoAlpha: 0, duration: 0.3, ease: "power2.in" }, holdSeconds);
+  }
   playInfoEvent(event) {
-    const { infoRail, infoTitle, infoPrimary, infoSecondary, playerRail, playerTitle, playerName, playerStats, playerNote } = this.elements;
+    const { infoRail, infoTitle, infoPrimary, infoSecondary, playerRail } = this.elements;
     if (!infoRail || !infoTitle || !infoPrimary || !infoSecondary) {
       return;
     }
     this.resetLowerThirdTimeline();
     if (playerRail) {
-      playerRail.style.display = "none";
       gsapWithCSS.set(playerRail, { autoAlpha: 0 });
     }
-    if (playerTitle) playerTitle.textContent = "";
-    if (playerName) playerName.textContent = "";
-    if (playerStats) playerStats.textContent = "";
-    if (playerNote) playerNote.textContent = "";
     const titleText = this.cleanText(event.title, "");
     const primaryText = this.cleanText(event.primary_text, "");
-    const infoSecondaryText = this.cleanText(event.secondary_text, "");
-    if (titleText) {
-      infoTitle.textContent = titleText.toUpperCase();
-      infoTitle.style.display = "";
-    } else {
-      infoTitle.textContent = "";
-      infoTitle.style.display = "none";
-    }
-    if (primaryText) {
-      infoPrimary.textContent = primaryText;
-      infoPrimary.style.display = "";
-    } else {
-      infoPrimary.textContent = "";
-      infoPrimary.style.display = "none";
-    }
-    infoSecondary.textContent = infoSecondaryText;
-    infoSecondary.style.display = infoSecondaryText ? "block" : "none";
-    if (!titleText && !primaryText && !infoSecondaryText) {
+    const secondaryText = this.cleanText(event.secondary_text, "");
+    if (!titleText && !primaryText && !secondaryText) {
       return;
     }
+    infoTitle.textContent = (titleText || "INFO").toUpperCase();
+    infoPrimary.textContent = primaryText || secondaryText || titleText;
+    const subText = primaryText ? secondaryText : "";
+    infoSecondary.textContent = subText;
+    infoSecondary.style.display = subText ? "" : "none";
     const holdSeconds = this.normalizeDisplaySeconds(event.display_ms, 5);
     const timeline2 = gsapWithCSS.timeline({
       onComplete: () => {
@@ -4595,60 +4527,29 @@ var ScoreboardAnimator = class {
         gsapWithCSS.set(infoRail, { autoAlpha: 0 });
       }
     });
-    timeline2.fromTo(
-      infoRail,
-      { y: 16, autoAlpha: 0, scale: 0.985 },
-      { y: 0, autoAlpha: 1, scale: 1, duration: 0.4, ease: "power3.out" },
-      0
-    );
-    timeline2.to(
-      infoRail,
-      {
-        y: 16,
-        autoAlpha: 0,
-        duration: 0.3,
-        ease: "power2.in"
-      },
-      holdSeconds
-    );
+    this.addBarReveal(timeline2, infoRail, infoRail.querySelector(".goal-sweep"), holdSeconds);
     this.lowerThirdTimeline = timeline2;
   }
   playFeaturedPlayerEvent(event) {
-    const { playerRail, playerTitle, playerName, playerStats, playerNote } = this.elements;
-    if (!playerRail || !playerTitle || !playerName || !playerStats || !playerNote) {
+    const { playerRail, playerTitle, playerName, playerStats } = this.elements;
+    if (!playerRail || !playerTitle || !playerName || !playerStats) {
       return;
     }
     this.resetLowerThirdTimeline();
-    playerRail.style.display = "";
     const holdSeconds = this.normalizeDisplaySeconds(event.display_ms, 5.4);
     const player = this.extractPlayerDetails(event);
-    playerTitle.textContent = this.formatTitle(event.title, "PLAYER SPOTLIGHT");
+    playerTitle.textContent = this.formatTitle(event.title, "PLAYER");
     playerName.textContent = player.name;
-    playerStats.textContent = player.statsLine;
-    playerNote.textContent = player.note;
-    playerNote.style.display = player.note ? "block" : "none";
+    const subLine = player.statsLine || player.note;
+    playerStats.textContent = subLine;
+    playerStats.style.display = subLine ? "" : "none";
     const timeline2 = gsapWithCSS.timeline({
       onComplete: () => {
         gsapWithCSS.set(playerRail, { clearProps: "all" });
         gsapWithCSS.set(playerRail, { autoAlpha: 0 });
       }
     });
-    timeline2.fromTo(
-      playerRail,
-      { y: 18, autoAlpha: 0, scale: 0.985 },
-      { y: 0, autoAlpha: 1, scale: 1, duration: 0.42, ease: "power3.out" },
-      0
-    );
-    timeline2.to(
-      playerRail,
-      {
-        y: 16,
-        autoAlpha: 0,
-        duration: 0.3,
-        ease: "power2.in"
-      },
-      holdSeconds
-    );
+    this.addBarReveal(timeline2, playerRail, playerRail.querySelector(".goal-sweep"), holdSeconds);
     this.lowerThirdTimeline = timeline2;
   }
   resetLowerThirdTimeline() {
@@ -4659,8 +4560,8 @@ var ScoreboardAnimator = class {
     this.hideLowerThirdRails();
   }
   hideLowerThirdRails() {
-    const { scorerRail, assistRail, infoRail, playerRail } = this.elements;
-    const rails = [scorerRail, assistRail, infoRail, playerRail].filter(
+    const { scorerRail, infoRail, playerRail } = this.elements;
+    const rails = [scorerRail, infoRail, playerRail].filter(
       (rail) => rail instanceof HTMLElement
     );
     if (rails.length === 0) {
@@ -4835,6 +4736,22 @@ function formatClock(seconds) {
 }
 function formatTeamName(name, fallback) {
   return name?.trim() || fallback;
+}
+function applyTeamLogo(elementId, url) {
+  const el = document.getElementById(elementId);
+  if (!el) {
+    return;
+  }
+  const src = typeof url === "string" ? url.trim() : "";
+  if (src) {
+    if (el.getAttribute("src") !== src) {
+      el.src = src;
+    }
+    el.hidden = false;
+  } else {
+    el.removeAttribute("src");
+    el.hidden = true;
+  }
 }
 function getLocalClockSeconds(now = Date.now()) {
   if (localClockBaseTimestamp === 0) {
@@ -5014,15 +4931,15 @@ function ensureStatRow(target, key) {
   row.className = "stat-row";
   row.dataset.key = key;
   row.innerHTML = `
-    <div class="stat-label"></div>
-    <div class="bar-line home-line">
-      <span class="bar-value home-value"></span>
-      <div class="bar-track"><div class="bar-fill home-fill"></div></div>
+    <span class="stat-num home-value"></span>
+    <div class="stat-meter">
+      <div class="stat-label"></div>
+      <div class="bar-track">
+        <div class="bar-fill home-fill"></div>
+        <div class="bar-fill away-fill"></div>
+      </div>
     </div>
-    <div class="bar-line away-line">
-      <div class="bar-track"><div class="bar-fill away-fill"></div></div>
-      <span class="bar-value away-value"></span>
-    </div>
+    <span class="stat-num away-value"></span>
   `;
   target.appendChild(row);
   return row;
@@ -5046,11 +4963,13 @@ function renderStatBarGrid(targetId, rows) {
     if (label) label.textContent = rowData.label;
     if (homeValue) homeValue.textContent = rowData.homeValue;
     if (awayValue) awayValue.textContent = rowData.awayValue;
-    const homeWidth = `${clampPercent(rowData.homePercent)}%`;
-    const awayWidth = `${clampPercent(rowData.awayPercent)}%`;
+    const homeShare = clampPercent(rowData.homePercent);
+    const awayShare = clampPercent(rowData.awayPercent);
+    row.classList.toggle("leads-home", rowData.homePercent > rowData.awayPercent);
+    row.classList.toggle("leads-away", rowData.awayPercent > rowData.homePercent);
     requestAnimationFrame(() => {
-      if (homeFill) homeFill.style.width = homeWidth;
-      if (awayFill) awayFill.style.width = awayWidth;
+      if (homeFill) homeFill.style.width = `${homeShare}%`;
+      if (awayFill) awayFill.style.width = `${awayShare}%`;
     });
   }
 }
@@ -5094,6 +5013,33 @@ function setStatsTeamLabels(homeName, awayName) {
   const awayLabel = document.getElementById("stats-away-name");
   if (homeLabel) homeLabel.textContent = homeName;
   if (awayLabel) awayLabel.textContent = awayName;
+  const homeHead = document.getElementById("leaders-home-head");
+  const awayHead = document.getElementById("leaders-away-head");
+  if (homeHead) homeHead.textContent = homeName;
+  if (awayHead) awayHead.textContent = awayName;
+}
+function renderTeamLeaders(targetId, leaders, side) {
+  const target = document.getElementById(targetId);
+  if (!target) return;
+  const top = leaders.slice(0, 3);
+  if (top.length === 0) {
+    target.innerHTML = `<div class="leader-empty">No scoring yet</div>`;
+    return;
+  }
+  target.innerHTML = top.map((player, index) => {
+    const numberTag = player.number ? `#${player.number}` : "";
+    return `
+        <div class="leader-row${index === 0 ? " is-top" : ""}">
+          <span class="leader-name"><span class="leader-rank">${numberTag}</span>${player.name}</span>
+          <span class="leader-line">
+            <span class="leader-pill leader-pill--total">${player.total}<small>P</small></span>
+            <span class="leader-pill">${player.goals}<small>G</small></span>
+            <span class="leader-pill">${player.assists}<small>A</small></span>
+          </span>
+        </div>
+      `;
+  }).join("");
+  target.dataset.side = side;
 }
 function formatPercentValue(value) {
   if (typeof value !== "number" || Number.isFinite(value) === false) {
@@ -5101,6 +5047,15 @@ function formatPercentValue(value) {
   }
   const rounded = Math.round(value * 10) / 10;
   return `${rounded}%`;
+}
+function formatDuration(seconds) {
+  if (typeof seconds !== "number" || Number.isFinite(seconds) === false || seconds <= 0) {
+    return "--";
+  }
+  const total = Math.round(seconds);
+  const mins = Math.floor(total / 60);
+  const secs = total % 60;
+  return `${mins}:${String(secs).padStart(2, "0")}`;
 }
 function flashUpdate(target) {
   if (!target) return;
@@ -5185,6 +5140,8 @@ function render3(snapshot, animate = true) {
   const awayNameEl = document.getElementById("away-name");
   if (homeNameEl) homeNameEl.textContent = homeName;
   if (awayNameEl) awayNameEl.textContent = awayName;
+  applyTeamLogo("home-logo", snapshot.teams.h.logo_url);
+  applyTeamLogo("away-logo", snapshot.teams.a.logo_url);
   animateScoreIfChanged("home-score", snapshot.score.home ?? 0, animate);
   animateScoreIfChanged("away-score", snapshot.score.away ?? 0, animate);
   const homeTimeoutsEl = document.getElementById("home-timeouts");
@@ -5204,6 +5161,8 @@ function render3(snapshot, animate = true) {
   applyPossessionIndicator(snapshot.stats.current_possession?.team);
   if (viewType === "stats") {
     setStatsTeamLabels(homeName, awayName);
+    applyTeamLogo("stats-home-logo", snapshot.teams.h.logo_url);
+    applyTeamLogo("stats-away-logo", snapshot.teams.a.logo_url);
     const statRows = [
       {
         key: "points",
@@ -5287,6 +5246,17 @@ function render3(snapshot, animate = true) {
         awayValue: formatPercentValue(snapshot.stats.d_points.ap)
       }
     ]);
+    renderTeamLeaders("home-leaders", snapshot.stats.advanced_stats.top_contributors?.h ?? [], "home");
+    renderTeamLeaders("away-leaders", snapshot.stats.advanced_stats.top_contributors?.a ?? [], "away");
+    const avgDurationEl = document.getElementById("tempo-avg-point");
+    if (avgDurationEl) {
+      avgDurationEl.textContent = formatDuration(snapshot.stats.advanced_stats.avg_point_duration);
+    }
+    const toPerPointEl = document.getElementById("tempo-to-per-point");
+    if (toPerPointEl) {
+      const value = snapshot.stats.advanced_stats.turnovers_per_point;
+      toPerPointEl.textContent = typeof value === "number" && Number.isFinite(value) ? value.toFixed(2) : "--";
+    }
   }
   if (viewType === "roster") {
     const homeRosterTitle = document.getElementById("home-roster-title");

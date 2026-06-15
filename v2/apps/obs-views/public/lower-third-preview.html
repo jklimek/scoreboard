@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lower Third Redesign — 3 Options</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Barlow+Semi+Condensed:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --home: #ff3145;
+        --navy-1: #1a2030;
+        --navy-2: #11151f;
+        --loop: 7s;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #0a0c11;
+        color: #fff;
+        font-family: "Barlow Semi Condensed", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .page {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 40px 28px 80px;
+      }
+
+      .page-head h1 {
+        font-family: "Archivo", sans-serif;
+        font-weight: 900;
+        font-size: 26px;
+        margin: 0 0 6px;
+      }
+      .page-head p {
+        margin: 0;
+        color: #8c93a6;
+        font-size: 14px;
+        max-width: 760px;
+        line-height: 1.5;
+        font-family: "Archivo", sans-serif;
+      }
+
+      .option {
+        margin-top: 40px;
+      }
+      .option-label {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 14px;
+        font-family: "Archivo", sans-serif;
+      }
+      .option-label .tag {
+        font-weight: 900;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #0a0c11;
+        background: #fff;
+        padding: 4px 10px;
+        border-radius: 4px;
+      }
+      .option-label .title {
+        font-weight: 800;
+        font-size: 20px;
+      }
+      .option-label .desc {
+        color: #818897;
+        font-size: 13px;
+      }
+
+      .frame {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        max-height: 560px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: radial-gradient(120% 90% at 50% -10%, #2b5d34 0%, #173b1d 45%, #0c2412 100%);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+      }
+      .frame::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          105deg,
+          rgba(255, 255, 255, 0.04) 0 64px,
+          rgba(0, 0, 0, 0.05) 64px 128px
+        );
+      }
+      .frame::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(140% 120% at 50% 120%, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+      }
+
+      .panel {
+        background: linear-gradient(180deg, var(--navy-1), var(--navy-2));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55);
+      }
+      .kick {
+        font-family: "Archivo", sans-serif;
+        font-weight: 800;
+        font-size: 13px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #aeb6c8;
+      }
+      .kick b {
+        color: var(--home);
+      }
+      .name {
+        font-weight: 800;
+        text-transform: uppercase;
+        line-height: 1;
+        letter-spacing: 0.01em;
+      }
+
+      /* ===========================================================
+         OPTION 1 — TOUCHLINE STACK  (bottom-left, slide from left)
+         Real-football goal graphic: two stacked rails anchored left.
+         =========================================================== */
+      .o1 {
+        position: absolute;
+        left: 48px;
+        bottom: 56px;
+        z-index: 3;
+      }
+      .o1-scorer {
+        display: flex;
+        align-items: stretch;
+        height: 76px;
+        min-width: 460px;
+        border-radius: 6px;
+        overflow: hidden;
+        animation: o1-in var(--loop) ease both infinite;
+      }
+      .o1-cap {
+        width: 8px;
+        background: linear-gradient(180deg, #ff5566, var(--home));
+        flex: none;
+      }
+      .o1-txt {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 26px 0 20px;
+      }
+      .o1-name {
+        font-size: 38px;
+      }
+      .o1-assist {
+        margin-top: 8px;
+        margin-left: 22px;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        height: 42px;
+        padding: 0 20px;
+        border-radius: 5px;
+        animation: o1-assist-in var(--loop) ease both infinite;
+      }
+      .o1-alabel {
+        font-family: "Archivo", sans-serif;
+        font-weight: 800;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        color: #0a0c11;
+        background: #e7eaf2;
+        padding: 3px 8px;
+        border-radius: 3px;
+      }
+      .o1-aname {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      @keyframes o1-in {
+        0% { opacity: 0; transform: translateX(-60px); }
+        6% { opacity: 1; transform: translateX(0); }
+        82% { opacity: 1; transform: translateX(0); }
+        90%, 100% { opacity: 0; transform: translateX(-60px); }
+      }
+      @keyframes o1-assist-in {
+        0%, 6% { opacity: 0; transform: translateX(-50px); }
+        13% { opacity: 1; transform: translateX(0); }
+        80% { opacity: 1; transform: translateX(0); }
+        87%, 100% { opacity: 0; transform: translateX(-40px); }
+      }
+
+      /* ===========================================================
+         OPTION 2 — CENTERED CARD  (bottom-center, center wipe)
+         UEFA/FIFA style: team tab + body, reveals from the middle.
+         =========================================================== */
+      .o2 {
+        position: absolute;
+        left: 50%;
+        bottom: 64px;
+        transform: translateX(-50%);
+        z-index: 3;
+        display: flex;
+        align-items: stretch;
+        height: 84px;
+        border-radius: 8px;
+        overflow: hidden;
+        animation: o2-wipe var(--loop) cubic-bezier(0.22, 0.7, 0.2, 1) both infinite;
+      }
+      .o2-tab {
+        display: grid;
+        place-items: center;
+        width: 96px;
+        background: linear-gradient(160deg, #ff4d5d, var(--home));
+        font-family: "Archivo", sans-serif;
+        font-weight: 900;
+        font-size: 19px;
+        letter-spacing: 0.04em;
+        color: #0a0c11;
+      }
+      .o2-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 9px;
+        padding: 0 32px;
+        overflow: hidden;
+      }
+      .o2-name {
+        font-size: 38px;
+        white-space: nowrap;
+        animation: o2-rise var(--loop) ease both infinite;
+      }
+      .o2-assist {
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: #c3cad9;
+        white-space: nowrap;
+        animation: o2-rise var(--loop) ease both infinite;
+        animation-delay: -0.08s;
+      }
+      .o2-assist b {
+        color: #fff;
+        font-weight: 800;
+      }
+
+      @keyframes o2-wipe {
+        0% { clip-path: inset(0 50% 0 50%); opacity: 0; }
+        12% { clip-path: inset(0 0 0 0); opacity: 1; }
+        84% { clip-path: inset(0 0 0 0); opacity: 1; }
+        94%, 100% { clip-path: inset(0 50% 0 50%); opacity: 0; }
+      }
+      @keyframes o2-rise {
+        0%, 8% { opacity: 0; transform: translateY(14px); }
+        18% { opacity: 1; transform: translateY(0); }
+        84% { opacity: 1; transform: translateY(0); }
+        92%, 100% { opacity: 0; transform: translateY(8px); }
+      }
+
+      /* ===========================================================
+         OPTION 3 — WIDE GOAL BAR  (bottom edge, rise + accent sweep)
+         DAZN-style full bar pinned low, content staggers, sweep light.
+         =========================================================== */
+      .o3 {
+        position: absolute;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%);
+        z-index: 3;
+        display: flex;
+        align-items: stretch;
+        height: 80px;
+        width: 760px;
+        border-radius: 7px;
+        overflow: hidden;
+        animation: o3-rise var(--loop) cubic-bezier(0.2, 0.8, 0.25, 1) both infinite;
+      }
+      .o3::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.16) 50%, transparent 70%);
+        transform: translateX(-120%);
+        animation: o3-sweep var(--loop) ease both infinite;
+      }
+      .o3-badge {
+        display: grid;
+        place-items: center;
+        width: 130px;
+        flex: none;
+        background: linear-gradient(160deg, #ff4d5d, var(--home));
+        font-family: "Archivo", sans-serif;
+        font-weight: 900;
+        font-size: 22px;
+        letter-spacing: 0.04em;
+        color: #0a0c11;
+        clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+      }
+      .o3-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 28px;
+        flex: 1;
+        overflow: hidden;
+      }
+      .o3-name {
+        font-size: 34px;
+      }
+      .o3-sub {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #aab3c8;
+      }
+      .o3-min {
+        display: grid;
+        place-items: center;
+        width: 88px;
+        flex: none;
+        font-family: "Archivo", sans-serif;
+        font-weight: 900;
+        font-size: 26px;
+        background: rgba(0, 0, 0, 0.34);
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      @keyframes o3-rise {
+        0% { opacity: 0; transform: translate(-50%, 90px); }
+        9% { opacity: 1; transform: translate(-50%, 0); }
+        85% { opacity: 1; transform: translate(-50%, 0); }
+        94%, 100% { opacity: 0; transform: translate(-50%, 70px); }
+      }
+      @keyframes o3-sweep {
+        0%, 9% { transform: translateX(-120%); }
+        22% { transform: translateX(120%); }
+        100% { transform: translateX(120%); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="page-head">
+        <h1>Lower Thirds — 3 directions (animated, looping)</h1>
+        <p>
+          GOAL graphic styled to match the new Touchline scoreboard. Same data each time (scorer
+          M. Kowalski, assist A. Nowak, 67'). Each option differs in placement and motion — watch the
+          loop. Pick one and I'll apply it to the scorer/assist/info/player rails and rebuild the GSAP
+          animation to match.
+        </p>
+      </div>
+
+      <!-- OPTION 1 -->
+      <section class="option">
+        <div class="option-label">
+          <span class="tag">Option 1</span>
+          <span class="title">Touchline Stack</span>
+          <span class="desc">Bottom-left, two stacked rails, slide in from the left (classic football).</span>
+        </div>
+        <div class="frame">
+          <div class="o1">
+            <div class="o1-scorer panel">
+              <span class="o1-cap"></span>
+              <div class="o1-txt">
+                <div class="kick"><b>GOAL</b> &middot; 67'</div>
+                <div class="o1-name name">M. Kowalski</div>
+              </div>
+            </div>
+            <div class="o1-assist panel">
+              <span class="o1-alabel">Assist</span>
+              <span class="o1-aname">A. Nowak</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OPTION 2 -->
+      <section class="option">
+        <div class="option-label">
+          <span class="tag">Option 2</span>
+          <span class="title">Centered Card</span>
+          <span class="desc">Bottom-center, team tab + body, reveals from the middle, text rises up (UEFA/FIFA).</span>
+        </div>
+        <div class="frame">
+          <div class="o2 panel">
+            <div class="o2-tab">GOAL</div>
+            <div class="o2-body">
+              <div class="o2-name name">M. Kowalski</div>
+              <div class="o2-assist">Assist <b>A. Nowak</b> &middot; 67'</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OPTION 3 -->
+      <section class="option">
+        <div class="option-label">
+          <span class="tag">Option 3</span>
+          <span class="title">Wide Goal Bar</span>
+          <span class="desc">Pinned near the bottom edge, rises up with a light sweep (DAZN-style).</span>
+        </div>
+        <div class="frame">
+          <div class="o3 panel">
+            <div class="o3-badge">GOAL</div>
+            <div class="o3-main">
+              <div class="o3-name name">M. Kowalski</div>
+              <div class="o3-sub">Assist: A. Nowak</div>
+            </div>
+            <div class="o3-min">67'</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

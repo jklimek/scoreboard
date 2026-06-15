@@ -18,20 +18,21 @@ type ScoreboardAnimationElements = {
   homeTeamCard: HTMLElement | null;
   awayTeamCard: HTMLElement | null;
   scorerRail: HTMLElement | null;
-  assistRail: HTMLElement | null;
   infoRail: HTMLElement | null;
   playerRail: HTMLElement | null;
   timeoutBanner: HTMLElement | null;
   eventTitle: HTMLElement | null;
   scorerText: HTMLElement | null;
   assistText: HTMLElement | null;
+  scorerStat: HTMLElement | null;
+  goalStatWrap: HTMLElement | null;
+  goalSweep: HTMLElement | null;
   infoTitle: HTMLElement | null;
   infoPrimary: HTMLElement | null;
   infoSecondary: HTMLElement | null;
   playerTitle: HTMLElement | null;
   playerName: HTMLElement | null;
   playerStats: HTMLElement | null;
-  playerNote: HTMLElement | null;
   homeScoreWrap: HTMLElement | null;
   awayScoreWrap: HTMLElement | null;
 };
@@ -46,20 +47,21 @@ export class ScoreboardAnimator {
       homeTeamCard: document.getElementById("home-team-card"),
       awayTeamCard: document.getElementById("away-team-card"),
       scorerRail: document.getElementById("scorer-rail"),
-      assistRail: document.getElementById("assist-rail"),
       infoRail: document.getElementById("info-rail"),
       playerRail: document.getElementById("player-rail"),
       timeoutBanner: document.getElementById("timeout-banner"),
       eventTitle: document.getElementById("event-title"),
       scorerText: document.getElementById("scorer-text"),
       assistText: document.getElementById("assist-text"),
+      scorerStat: document.getElementById("scorer-stat"),
+      goalStatWrap: document.getElementById("scorer-stat-wrap"),
+      goalSweep: document.querySelector("#scorer-rail .goal-sweep"),
       infoTitle: document.getElementById("info-title"),
       infoPrimary: document.getElementById("info-primary"),
       infoSecondary: document.getElementById("info-secondary"),
       playerTitle: document.getElementById("player-title"),
       playerName: document.getElementById("player-name"),
       playerStats: document.getElementById("player-stats"),
-      playerNote: document.getElementById("player-note"),
       homeScoreWrap: document.getElementById("home-score-wrap"),
       awayScoreWrap: document.getElementById("away-score-wrap"),
     };
@@ -159,8 +161,9 @@ export class ScoreboardAnimator {
   }
 
   private playScoreEvent(event: OverlayEvent): void {
-    const { scorerRail, assistRail, eventTitle, scorerText, assistText } = this.elements;
-    if (!scorerRail || !assistRail || !eventTitle || !scorerText || !assistText) {
+    const { scorerRail, eventTitle, scorerText, assistText, scorerStat, goalStatWrap, goalSweep } =
+      this.elements;
+    if (!scorerRail || !eventTitle || !scorerText || !assistText) {
       return;
     }
 
@@ -168,16 +171,23 @@ export class ScoreboardAnimator {
 
     eventTitle.textContent = this.formatTitle(event.title, "GOAL");
     scorerText.textContent = this.cleanText(event.primary_text, "Scorer");
-    assistText.textContent = this.cleanText(event.secondary_text, "UNASSISTED");
+    assistText.textContent = this.formatAssistText(event.secondary_text);
+    assistText.style.display = "";
+    if (scorerStat) {
+      scorerStat.textContent = this.readScoreline();
+    }
+    if (goalStatWrap) {
+      goalStatWrap.style.display = "";
+    }
 
     const teamCard = event.team === "h" ? this.elements.homeTeamCard : this.elements.awayTeamCard;
     const holdSeconds = this.normalizeDisplaySeconds(event.display_ms, 5);
-    gsap.set(scorerRail, { borderLeftColor: this.resolveTeamAccent(event.team) });
+    scorerRail.style.setProperty("--event-accent", this.resolveTeamAccent(event.team));
 
     const timeline = gsap.timeline({
       onComplete: () => {
-        gsap.set([scorerRail, assistRail], { clearProps: "all" });
-        gsap.set([scorerRail, assistRail], { autoAlpha: 0 });
+        gsap.set(scorerRail, { clearProps: "all" });
+        gsap.set(scorerRail, { autoAlpha: 0 });
       },
     });
 
@@ -196,118 +206,29 @@ export class ScoreboardAnimator {
       );
     }
 
-    this.applyScoreAnimationVariantRiseAndLock(timeline, scorerRail, assistRail, holdSeconds);
+    this.addBarReveal(timeline, scorerRail, goalSweep, holdSeconds);
 
     this.lowerThirdTimeline = timeline;
   }
 
-  private applyScoreAnimationVariantSlideSplit(
-    timeline: gsap.core.Timeline,
-    scorerRail: HTMLElement,
-    assistRail: HTMLElement,
-    holdSeconds: number,
-  ): void {
-    timeline.fromTo(
-      scorerRail,
-      { x: -220, autoAlpha: 0 },
-      { x: 0, autoAlpha: 1, duration: 0.38, ease: "power3.out" },
-      0,
-    );
-    timeline.fromTo(
-      assistRail,
-      { x: 180, autoAlpha: 0 },
-      { x: 0, autoAlpha: 1, duration: 0.32, ease: "power3.out" },
-      0.12,
-    );
-    timeline.to(assistRail, { x: 180, autoAlpha: 0, duration: 0.24, ease: "power2.in" }, holdSeconds);
-    timeline.to(scorerRail, { x: -220, autoAlpha: 0, duration: 0.28, ease: "power2.in" }, holdSeconds + 0.16);
+  private formatAssistText(raw: string | undefined): string {
+    const assist = this.cleanText(raw, "");
+    if (!assist || assist.toUpperCase() === "UNASSISTED") {
+      return "Unassisted";
+    }
+    return /^assist/i.test(assist) ? assist : `Assist: ${assist}`;
   }
 
-  private applyScoreAnimationVariantRiseAndLock(
-    timeline: gsap.core.Timeline,
-    scorerRail: HTMLElement,
-    assistRail: HTMLElement,
-    holdSeconds: number,
-  ): void {
-    timeline.fromTo(
-      scorerRail,
-      { y: 36, autoAlpha: 0, scaleY: 0.92, transformOrigin: "bottom center" },
-      { y: 0, autoAlpha: 1, scaleY: 1, duration: 0.36, ease: "power3.out" },
-      0,
-    );
-    timeline.fromTo(
-      assistRail,
-      { y: 24, autoAlpha: 0, scaleY: 0.9, transformOrigin: "bottom center" },
-      { y: 0, autoAlpha: 1, scaleY: 1, duration: 0.3, ease: "power2.out" },
-      0.1,
-    );
-    timeline.to(assistRail, { y: 20, autoAlpha: 0, duration: 0.22, ease: "power2.in" }, holdSeconds);
-    timeline.to(
-      scorerRail,
-      { y: 28, autoAlpha: 0, scaleY: 0.95, duration: 0.24, ease: "power2.in" },
-      holdSeconds + 0.12,
-    );
-  }
-
-  private applyScoreAnimationVariantWipeReveal(
-    timeline: gsap.core.Timeline,
-    scorerRail: HTMLElement,
-    assistRail: HTMLElement,
-    holdSeconds: number,
-  ): void {
-    timeline.fromTo(
-      scorerRail,
-      { autoAlpha: 0, clipPath: "inset(0 100% 0 0)" },
-      { autoAlpha: 1, clipPath: "inset(0 0% 0 0)", duration: 0.34, ease: "power2.out" },
-      0,
-    );
-    timeline.fromTo(
-      assistRail,
-      { autoAlpha: 0, clipPath: "inset(100% 0 0 0)" },
-      { autoAlpha: 1, clipPath: "inset(0 0 0 0)", duration: 0.28, ease: "power2.out" },
-      0.14,
-    );
-    timeline.to(
-      assistRail,
-      { autoAlpha: 0, clipPath: "inset(0 0 100% 0)", duration: 0.2, ease: "power2.in" },
-      holdSeconds,
-    );
-    timeline.to(
-      scorerRail,
-      { autoAlpha: 0, clipPath: "inset(0 0 0 100%)", duration: 0.22, ease: "power2.in" },
-      holdSeconds + 0.12,
-    );
-  }
-
-  private applyScoreAnimationVariantCenterPop(
-    timeline: gsap.core.Timeline,
-    scorerRail: HTMLElement,
-    assistRail: HTMLElement,
-    holdSeconds: number,
-  ): void {
-    timeline.fromTo(
-      scorerRail,
-      { autoAlpha: 0, scale: 0.9, y: 10, transformOrigin: "center center" },
-      { autoAlpha: 1, scale: 1, y: 0, duration: 0.32, ease: "power3.out" },
-      0,
-    );
-    timeline.fromTo(
-      assistRail,
-      { autoAlpha: 0, scale: 0.94, y: 8, transformOrigin: "center center" },
-      { autoAlpha: 1, scale: 1, y: 0, duration: 0.28, ease: "power2.out" },
-      0.12,
-    );
-    timeline.to(assistRail, { autoAlpha: 0, scale: 0.95, y: 10, duration: 0.2, ease: "power2.in" }, holdSeconds);
-    timeline.to(
-      scorerRail,
-      { autoAlpha: 0, scale: 0.9, y: 12, duration: 0.24, ease: "power2.in" },
-      holdSeconds + 0.14,
-    );
+  private readScoreline(): string {
+    const home = document.getElementById("home-score")?.textContent?.trim() || "0";
+    const away = document.getElementById("away-score")?.textContent?.trim() || "0";
+    return `${home}\u2013${away}`;
   }
 
   private playTimeoutEvent(event: OverlayEvent): void {
-    const { scorerRail, assistRail, eventTitle, scorerText, timeoutBanner } = this.elements;
-    if (!scorerRail || !assistRail || !eventTitle || !scorerText) {
+    const { scorerRail, eventTitle, scorerText, assistText, goalStatWrap, goalSweep, timeoutBanner } =
+      this.elements;
+    if (!scorerRail || !eventTitle || !scorerText) {
       return;
     }
     this.resetLowerThirdTimeline();
@@ -320,10 +241,16 @@ export class ScoreboardAnimator {
       gsap.set(timeoutBanner, { autoAlpha: 0, clearProps: "all" });
     }
     const holdSeconds = this.normalizeDisplaySeconds(event.display_ms, 5.8);
-    eventTitle.textContent = "TIMEOUT";
+    eventTitle.textContent = "TIME";
     scorerText.textContent = this.resolveTimeoutPrimaryText(event);
-    gsap.set(scorerRail, { borderLeftColor: this.resolveTeamAccent(event.team) });
-    gsap.set(assistRail, { autoAlpha: 0, clearProps: "all" });
+    if (assistText) {
+      assistText.textContent = "";
+      assistText.style.display = "none";
+    }
+    if (goalStatWrap) {
+      goalStatWrap.style.display = "none";
+    }
+    scorerRail.style.setProperty("--event-accent", this.resolveTeamAccent(event.team));
 
     const timeline = gsap.timeline({
       onComplete: () => {
@@ -332,112 +259,85 @@ export class ScoreboardAnimator {
       },
     });
 
-    timeline.fromTo(
-      scorerRail,
-      { y: 30, autoAlpha: 0, scaleY: 0.92, transformOrigin: "bottom center" },
-      { y: 0, autoAlpha: 1, scaleY: 1, duration: 0.34, ease: "power3.out" },
-      0,
-    );
-    timeline.to(
-      scorerRail,
-      {
-        y: 26,
-        autoAlpha: 0,
-        duration: 0.24,
-        ease: "power2.in",
-      },
-      holdSeconds,
-    );
+    this.addBarReveal(timeline, scorerRail, goalSweep, holdSeconds);
 
     this.timeoutTimeline = timeline;
   }
 
+  private addBarReveal(
+    timeline: gsap.core.Timeline,
+    rail: HTMLElement,
+    sweep: Element | null,
+    holdSeconds: number,
+  ): void {
+    timeline.fromTo(
+      rail,
+      { y: 92, autoAlpha: 0 },
+      { y: 0, autoAlpha: 1, duration: 0.44, ease: "power3.out" },
+      0,
+    );
+    if (sweep) {
+      timeline.fromTo(
+        sweep,
+        { xPercent: -120 },
+        { xPercent: 120, duration: 0.7, ease: "power2.inOut" },
+        0.26,
+      );
+    }
+    timeline.to(rail, { y: 72, autoAlpha: 0, duration: 0.3, ease: "power2.in" }, holdSeconds);
+  }
+
   private playInfoEvent(event: OverlayEvent): void {
-    const { infoRail, infoTitle, infoPrimary, infoSecondary, playerRail, playerTitle, playerName, playerStats, playerNote } = this.elements;
+    const { infoRail, infoTitle, infoPrimary, infoSecondary, playerRail } = this.elements;
     if (!infoRail || !infoTitle || !infoPrimary || !infoSecondary) {
       return;
     }
 
     this.resetLowerThirdTimeline();
-
-    // Fully hide player rail so no extra line (e.g. #13) ever appears; only info rail is used
     if (playerRail) {
-      (playerRail as HTMLElement).style.display = "none";
       gsap.set(playerRail, { autoAlpha: 0 });
     }
-    if (playerTitle) playerTitle.textContent = "";
-    if (playerName) playerName.textContent = "";
-    if (playerStats) playerStats.textContent = "";
-    if (playerNote) playerNote.textContent = "";
 
     const titleText = this.cleanText(event.title, "");
     const primaryText = this.cleanText(event.primary_text, "");
-    const infoSecondaryText = this.cleanText(event.secondary_text, "");
+    const secondaryText = this.cleanText(event.secondary_text, "");
 
-    if (titleText) {
-      infoTitle.textContent = titleText.toUpperCase();
-      infoTitle.style.display = "";
-    } else {
-      infoTitle.textContent = "";
-      infoTitle.style.display = "none";
-    }
-    if (primaryText) {
-      infoPrimary.textContent = primaryText;
-      infoPrimary.style.display = "";
-    } else {
-      infoPrimary.textContent = "";
-      infoPrimary.style.display = "none";
-    }
-    infoSecondary.textContent = infoSecondaryText;
-    infoSecondary.style.display = infoSecondaryText ? "block" : "none";
-
-    if (!titleText && !primaryText && !infoSecondaryText) {
+    if (!titleText && !primaryText && !secondaryText) {
       return;
     }
 
-    const holdSeconds = this.normalizeDisplaySeconds(event.display_ms, 5);
+    infoTitle.textContent = (titleText || "INFO").toUpperCase();
+    infoPrimary.textContent = primaryText || secondaryText || titleText;
+    const subText = primaryText ? secondaryText : "";
+    infoSecondary.textContent = subText;
+    infoSecondary.style.display = subText ? "" : "none";
 
+    const holdSeconds = this.normalizeDisplaySeconds(event.display_ms, 5);
     const timeline = gsap.timeline({
       onComplete: () => {
         gsap.set(infoRail, { clearProps: "all" });
         gsap.set(infoRail, { autoAlpha: 0 });
       },
     });
-    timeline.fromTo(
-      infoRail,
-      { y: 16, autoAlpha: 0, scale: 0.985 },
-      { y: 0, autoAlpha: 1, scale: 1, duration: 0.4, ease: "power3.out" },
-      0,
-    );
-    timeline.to(
-      infoRail,
-      {
-        y: 16,
-        autoAlpha: 0,
-        duration: 0.3,
-        ease: "power2.in",
-      },
-      holdSeconds,
-    );
+    this.addBarReveal(timeline, infoRail, infoRail.querySelector(".goal-sweep"), holdSeconds);
     this.lowerThirdTimeline = timeline;
   }
 
   private playFeaturedPlayerEvent(event: OverlayEvent): void {
-    const { playerRail, playerTitle, playerName, playerStats, playerNote } = this.elements;
-    if (!playerRail || !playerTitle || !playerName || !playerStats || !playerNote) {
+    const { playerRail, playerTitle, playerName, playerStats } = this.elements;
+    if (!playerRail || !playerTitle || !playerName || !playerStats) {
       return;
     }
 
     this.resetLowerThirdTimeline();
-    (playerRail as HTMLElement).style.display = "";
 
     const holdSeconds = this.normalizeDisplaySeconds(event.display_ms, 5.4);
     const player = this.extractPlayerDetails(event);
-    playerTitle.textContent = this.formatTitle(event.title, "PLAYER SPOTLIGHT");
+    playerTitle.textContent = this.formatTitle(event.title, "PLAYER");
     playerName.textContent = player.name;
-    playerStats.textContent = player.statsLine;
-    playerNote.textContent = player.note;
-    playerNote.style.display = player.note ? "block" : "none";
+    const subLine = player.statsLine || player.note;
+    playerStats.textContent = subLine;
+    playerStats.style.display = subLine ? "" : "none";
 
     const timeline = gsap.timeline({
       onComplete: () => {
@@ -445,22 +345,7 @@ export class ScoreboardAnimator {
         gsap.set(playerRail, { autoAlpha: 0 });
       },
     });
-    timeline.fromTo(
-      playerRail,
-      { y: 18, autoAlpha: 0, scale: 0.985 },
-      { y: 0, autoAlpha: 1, scale: 1, duration: 0.42, ease: "power3.out" },
-      0,
-    );
-    timeline.to(
-      playerRail,
-      {
-        y: 16,
-        autoAlpha: 0,
-        duration: 0.3,
-        ease: "power2.in",
-      },
-      holdSeconds,
-    );
+    this.addBarReveal(timeline, playerRail, playerRail.querySelector(".goal-sweep"), holdSeconds);
     this.lowerThirdTimeline = timeline;
   }
 
@@ -473,8 +358,8 @@ export class ScoreboardAnimator {
   }
 
   private hideLowerThirdRails(): void {
-    const { scorerRail, assistRail, infoRail, playerRail } = this.elements;
-    const rails = [scorerRail, assistRail, infoRail, playerRail].filter(
+    const { scorerRail, infoRail, playerRail } = this.elements;
+    const rails = [scorerRail, infoRail, playerRail].filter(
       (rail): rail is HTMLElement => rail instanceof HTMLElement,
     );
     if (rails.length === 0) {

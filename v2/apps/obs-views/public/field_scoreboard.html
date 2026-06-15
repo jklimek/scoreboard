@@ -4,6 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>OBS Field Scoreboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body data-view-type="field_scoreboard">
@@ -13,25 +19,23 @@
       </section>
       <section class="scoreboard-shell">
         <article class="team-card team-home-accent" id="home-team-card">
-          <div class="score-wrap" id="home-score-wrap">
-            <div class="score" id="home-score">0</div>
-            <div class="timeout-dots" id="home-timeouts" aria-label="Home timeouts left"></div>
-          </div>
-          <div class="name-row">
-            <div class="name" id="home-name">HOME</div>
-          </div>
+          <img class="team-logo" id="home-logo" alt="" hidden />
+          <div class="name" id="home-name">HOME</div>
         </article>
+        <div class="score-wrap" id="home-score-wrap">
+          <div class="score" id="home-score">0</div>
+          <div class="timeout-dots" id="home-timeouts" aria-label="Home timeouts left"></div>
+        </div>
         <article class="timer-card card">
           <div class="timer-value" id="game-clock">00:00</div>
         </article>
+        <div class="score-wrap" id="away-score-wrap">
+          <div class="score" id="away-score">0</div>
+          <div class="timeout-dots" id="away-timeouts" aria-label="Away timeouts left"></div>
+        </div>
         <article class="team-card team-away-accent" id="away-team-card">
-          <div class="score-wrap" id="away-score-wrap">
-            <div class="score" id="away-score">0</div>
-            <div class="timeout-dots" id="away-timeouts" aria-label="Away timeouts left"></div>
-          </div>
-          <div class="name-row">
-            <div class="name" id="away-name">AWAY</div>
-          </div>
+          <img class="team-logo" id="away-logo" alt="" hidden />
+          <div class="name" id="away-name">AWAY</div>
         </article>
       </section>
     </div>

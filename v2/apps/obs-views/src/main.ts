@@ -13,6 +13,7 @@ type TeamState = {
   full_name: string;
   short_name: string;
   jersey_color?: string | null;
+  logo_url?: string | null;
 };
 
 type TimerState = {
@@ -57,6 +58,10 @@ type Snapshot = {
       avg_point_duration: number;
       turnovers_per_point: number;
       scoring_runs: Record<string, number>;
+      top_contributors?: {
+        h?: PlayerContributor[];
+        a?: PlayerContributor[];
+      };
     };
   };
   match_context: {
@@ -65,6 +70,14 @@ type Snapshot = {
     next_match?: MatchIdentity;
     selected_match?: MatchIdentity;
   };
+};
+
+type PlayerContributor = {
+  number?: string;
+  name: string;
+  total: number;
+  goals: number;
+  assists: number;
 };
 
 type StatBarRow = {
@@ -134,6 +147,23 @@ function formatClock(seconds: number): string {
 
 function formatTeamName(name: string, fallback: string): string {
   return name?.trim() || fallback;
+}
+
+function applyTeamLogo(elementId: string, url?: string | null): void {
+  const el = document.getElementById(elementId) as HTMLImageElement | null;
+  if (!el) {
+    return;
+  }
+  const src = typeof url === "string" ? url.trim() : "";
+  if (src) {
+    if (el.getAttribute("src") !== src) {
+      el.src = src;
+    }
+    el.hidden = false;
+  } else {
+    el.removeAttribute("src");
+    el.hidden = true;
+  }
 }
 
 function getLocalClockSeconds(now = Date.now()): number {
@@ -340,15 +370,15 @@ function ensureStatRow(target: HTMLElement, key: string): HTMLElement {
   row.className = "stat-row";
   row.dataset.key = key;
   row.innerHTML = `
-    <div class="stat-label"></div>
-    <div class="bar-line home-line">
-      <span class="bar-value home-value"></span>
-      <div class="bar-track"><div class="bar-fill home-fill"></div></div>
+    <span class="stat-num home-value"></span>
+    <div class="stat-meter">
+      <div class="stat-label"></div>
+      <div class="bar-track">
+        <div class="bar-fill home-fill"></div>
+        <div class="bar-fill away-fill"></div>
+      </div>
     </div>
-    <div class="bar-line away-line">
-      <div class="bar-track"><div class="bar-fill away-fill"></div></div>
-      <span class="bar-value away-value"></span>
-    </div>
+    <span class="stat-num away-value"></span>
   `;
   target.appendChild(row);
   return row;
@@ -377,11 +407,13 @@ function renderStatBarGrid(targetId: string, rows: StatBarRow[]): void {
     if (homeValue) homeValue.textContent = rowData.homeValue;
     if (awayValue) awayValue.textContent = rowData.awayValue;
 
-    const homeWidth = `${clampPercent(rowData.homePercent)}%`;
-    const awayWidth = `${clampPercent(rowData.awayPercent)}%`;
+    const homeShare = clampPercent(rowData.homePercent);
+    const awayShare = clampPercent(rowData.awayPercent);
+    row.classList.toggle("leads-home", rowData.homePercent > rowData.awayPercent);
+    row.classList.toggle("leads-away", rowData.awayPercent > rowData.homePercent);
     requestAnimationFrame(() => {
-      if (homeFill) homeFill.style.width = homeWidth;
-      if (awayFill) awayFill.style.width = awayWidth;
+      if (homeFill) homeFill.style.width = `${homeShare}%`;
+      if (awayFill) awayFill.style.width = `${awayShare}%`;
     });
   }
 }
@@ -430,6 +462,36 @@ function setStatsTeamLabels(homeName: string, awayName: string): void {
   const awayLabel = document.getElementById("stats-away-name");
   if (homeLabel) homeLabel.textContent = homeName;
   if (awayLabel) awayLabel.textContent = awayName;
+  const homeHead = document.getElementById("leaders-home-head");
+  const awayHead = document.getElementById("leaders-away-head");
+  if (homeHead) homeHead.textContent = homeName;
+  if (awayHead) awayHead.textContent = awayName;
+}
+
+function renderTeamLeaders(targetId: string, leaders: PlayerContributor[], side: "home" | "away"): void {
+  const target = document.getElementById(targetId);
+  if (!target) return;
+  const top = leaders.slice(0, 3);
+  if (top.length === 0) {
+    target.innerHTML = `<div class="leader-empty">No scoring yet</div>`;
+    return;
+  }
+  target.innerHTML = top
+    .map((player, index) => {
+      const numberTag = player.number ? `#${player.number}` : "";
+      return `
+        <div class="leader-row${index === 0 ? " is-top" : ""}">
+          <span class="leader-name"><span class="leader-rank">${numberTag}</span>${player.name}</span>
+          <span class="leader-line">
+            <span class="leader-pill leader-pill--total">${player.total}<small>P</small></span>
+            <span class="leader-pill">${player.goals}<small>G</small></span>
+            <span class="leader-pill">${player.assists}<small>A</small></span>
+          </span>
+        </div>
+      `;
+    })
+    .join("");
+  target.dataset.side = side;
 }
 
 function formatPercentValue(value: unknown): string {
@@ -438,6 +500,16 @@ function formatPercentValue(value: unknown): string {
   }
   const rounded = Math.round(value * 10) / 10;
   return `${rounded}%`;
+}
+
+function formatDuration(seconds: unknown): string {
+  if (typeof seconds !== "number" || Number.isFinite(seconds) === false || seconds <= 0) {
+    return "--";
+  }
+  const total = Math.round(seconds);
+  const mins = Math.floor(total / 60);
+  const secs = total % 60;
+  return `${mins}:${String(secs).padStart(2, "0")}`;
 }
 
 function flashUpdate(target: HTMLElement | null): void {
@@ -540,6 +612,9 @@ function render(snapshot: Snapshot, animate = true): void {
   if (homeNameEl) homeNameEl.textContent = homeName;
   if (awayNameEl) awayNameEl.textContent = awayName;
 
+  applyTeamLogo("home-logo", snapshot.teams.h.logo_url);
+  applyTeamLogo("away-logo", snapshot.teams.a.logo_url);
+
   animateScoreIfChanged("home-score", snapshot.score.home ?? 0, animate);
   animateScoreIfChanged("away-score", snapshot.score.away ?? 0, animate);
 
@@ -563,6 +638,8 @@ function render(snapshot: Snapshot, animate = true): void {
 
   if (viewType === "stats") {
     setStatsTeamLabels(homeName, awayName);
+    applyTeamLogo("stats-home-logo", snapshot.teams.h.logo_url);
+    applyTeamLogo("stats-away-logo", snapshot.teams.a.logo_url);
 
     const statRows: StatBarRow[] = [
       {
@@ -649,6 +726,20 @@ function render(snapshot: Snapshot, animate = true): void {
         awayValue: formatPercentValue(snapshot.stats.d_points.ap),
       },
     ]);
+
+    renderTeamLeaders("home-leaders", snapshot.stats.advanced_stats.top_contributors?.h ?? [], "home");
+    renderTeamLeaders("away-leaders", snapshot.stats.advanced_stats.top_contributors?.a ?? [], "away");
+
+    const avgDurationEl = document.getElementById("tempo-avg-point");
+    if (avgDurationEl) {
+      avgDurationEl.textContent = formatDuration(snapshot.stats.advanced_stats.avg_point_duration);
+    }
+    const toPerPointEl = document.getElementById("tempo-to-per-point");
+    if (toPerPointEl) {
+      const value = snapshot.stats.advanced_stats.turnovers_per_point;
+      toPerPointEl.textContent =
+        typeof value === "number" && Number.isFinite(value) ? value.toFixed(2) : "--";
+    }
   }
 
   if (viewType === "roster") {

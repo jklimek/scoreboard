@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OBS Stats — Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Barlow+Semi+Condensed:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      /* Preview-only: fixed key background + sample team colors */
+      body {
+        background: #20283a;
+        --team-h-color: #52e0a6;
+        --team-a-color: #8ca7ff;
+      }
+    </style>
+  </head>
+  <body data-view-type="stats">
+    <div class="overlay overlay-stats">
+      <section class="stats-board">
+        <header class="stats-board-header">
+          <div class="stats-team stats-team--home team-home-accent">
+            <span class="stats-team-name">Flaming</span>
+          </div>
+          <div class="stats-board-title">
+            <span class="stats-board-eyebrow">Match</span>
+            <h1>Team Statistics</h1>
+          </div>
+          <div class="stats-team stats-team--away team-away-accent">
+            <span class="stats-team-name">Guziec</span>
+          </div>
+        </header>
+
+        <div class="stat-meter-grid">
+          <article class="stat-row leads-home">
+            <span class="stat-num home-value">4</span>
+            <div class="stat-meter">
+              <div class="stat-label">Points</div>
+              <div class="bar-track">
+                <div class="bar-fill home-fill" style="width: 67%"></div>
+                <div class="bar-fill away-fill" style="width: 33%"></div>
+              </div>
+            </div>
+            <span class="stat-num away-value">2</span>
+          </article>
+
+          <article class="stat-row">
+            <span class="stat-num home-value">2</span>
+            <div class="stat-meter">
+              <div class="stat-label">O Points</div>
+              <div class="bar-track">
+                <div class="bar-fill home-fill" style="width: 50%"></div>
+                <div class="bar-fill away-fill" style="width: 50%"></div>
+              </div>
+            </div>
+            <span class="stat-num away-value">2</span>
+          </article>
+
+          <article class="stat-row leads-home">
+            <span class="stat-num home-value">2</span>
+            <div class="stat-meter">
+              <div class="stat-label">D Points</div>
+              <div class="bar-track">
+                <div class="bar-fill home-fill" style="width: 100%"></div>
+                <div class="bar-fill away-fill" style="width: 0%"></div>
+              </div>
+            </div>
+            <span class="stat-num away-value">0</span>
+          </article>
+
+          <article class="stat-row leads-home">
+            <span class="stat-num home-value">50.4%</span>
+            <div class="stat-meter">
+              <div class="stat-label">Disc Possession</div>
+              <div class="bar-track">
+                <div class="bar-fill home-fill" style="width: 50%"></div>
+                <div class="bar-fill away-fill" style="width: 50%"></div>
+              </div>
+            </div>
+            <span class="stat-num away-value">49.6%</span>
+          </article>
+
+          <article class="stat-row leads-away">
+            <span class="stat-num home-value">4</span>
+            <div class="stat-meter">
+              <div class="stat-label">Turnovers</div>
+              <div class="bar-track">
+                <div class="bar-fill home-fill" style="width: 44%"></div>
+                <div class="bar-fill away-fill" style="width: 56%"></div>
+              </div>
+            </div>
+            <span class="stat-num away-value">5</span>
+          </article>
+
+          <article class="stat-row leads-home">
+            <span class="stat-num home-value">1</span>
+            <div class="stat-meter">
+              <div class="stat-label">Timeouts</div>
+              <div class="bar-track">
+                <div class="bar-fill home-fill" style="width: 100%"></div>
+                <div class="bar-fill away-fill" style="width: 0%"></div>
+              </div>
+            </div>
+            <span class="stat-num away-value">0</span>
+          </article>
+        </div>
+
+        <div class="stats-board-lower">
+          <section class="leaders-block">
+            <h2 class="block-heading">Team Leaders</h2>
+            <div class="leaders-grid">
+              <div class="leaders-col team-home-accent">
+                <div class="leaders-col-head">Flaming</div>
+                <div class="leaders-list">
+                  <div class="leader-row is-top">
+                    <span class="leader-name"><span class="leader-rank">#7</span>J. Smith</span>
+                    <span class="leader-line">
+                      <span class="leader-pill leader-pill--total">4<small>P</small></span>
+                      <span class="leader-pill">3<small>G</small></span>
+                      <span class="leader-pill">1<small>A</small></span>
+                    </span>
+                  </div>
+                  <div class="leader-row">
+                    <span class="leader-name"><span class="leader-rank">#11</span>A. Lee</span>
+                    <span class="leader-line">
+                      <span class="leader-pill leader-pill--total">2<small>P</small></span>
+                      <span class="leader-pill">1<small>G</small></span>
+                      <span class="leader-pill">1<small>A</small></span>
+                    </span>
+                  </div>
+                  <div class="leader-row">
+                    <span class="leader-name"><span class="leader-rank">#4</span>M. Diaz</span>
+                    <span class="leader-line">
+                      <span class="leader-pill leader-pill--total">1<small>P</small></span>
+                      <span class="leader-pill">0<small>G</small></span>
+                      <span class="leader-pill">1<small>A</small></span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="leaders-col team-away-accent">
+                <div class="leaders-col-head">Guziec</div>
+                <div class="leaders-list">
+                  <div class="leader-row is-top">
+                    <span class="leader-name"><span class="leader-rank">#9</span>K. Novak</span>
+                    <span class="leader-line">
+                      <span class="leader-pill leader-pill--total">2<small>P</small></span>
+                      <span class="leader-pill">2<small>G</small></span>
+                      <span class="leader-pill">0<small>A</small></span>
+                    </span>
+                  </div>
+                  <div class="leader-row">
+                    <span class="leader-name"><span class="leader-rank">#5</span>P. Kowal</span>
+                    <span class="leader-line">
+                      <span class="leader-pill leader-pill--total">1<small>P</small></span>
+                      <span class="leader-pill">1<small>G</small></span>
+                      <span class="leader-pill">0<small>A</small></span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="advanced-block">
+            <h2 class="block-heading">Advanced Metrics</h2>
+            <div class="advanced-comparison-grid">
+              <div class="advanced-row">
+                <div class="advanced-label">Hold Rate</div>
+                <div class="advanced-home">50%</div>
+                <div class="advanced-away">100%</div>
+              </div>
+              <div class="advanced-row">
+                <div class="advanced-label">Break Rate</div>
+                <div class="advanced-home">33.3%</div>
+                <div class="advanced-away">0%</div>
+              </div>
+              <div class="advanced-row">
+                <div class="advanced-label">Scoring Runs</div>
+                <div class="advanced-home">2</div>
+                <div class="advanced-away">1</div>
+              </div>
+              <div class="advanced-row">
+                <div class="advanced-label">O Point Share</div>
+                <div class="advanced-home">50%</div>
+                <div class="advanced-away">50%</div>
+              </div>
+              <div class="advanced-row">
+                <div class="advanced-label">D Point Share</div>
+                <div class="advanced-home">100%</div>
+                <div class="advanced-away">0%</div>
+              </div>
+            </div>
+            <div class="tempo-strip">
+              <div class="tempo-chip">
+                <span class="tempo-label">Avg Point</span>
+                <span class="tempo-value">2:14</span>
+              </div>
+              <div class="tempo-chip">
+                <span class="tempo-label">Turnovers / Point</span>
+                <span class="tempo-value">1.50</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

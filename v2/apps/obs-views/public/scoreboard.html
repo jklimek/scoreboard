@@ -4,51 +4,65 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>OBS Scoreboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Barlow+Semi+Condensed:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body data-view-type="scoreboard">
     <div class="overlay overlay-scoreboard">
       <section class="scoreboard-shell">
         <article class="team-card team-home-accent" id="home-team-card">
-          <div class="score-wrap" id="home-score-wrap">
-            <div class="score" id="home-score">0</div>
-            <div class="timeout-dots" id="home-timeouts" aria-label="Home timeouts left"></div>
-          </div>
-          <div class="name-row">
-            <div class="name" id="home-name">HOME</div>
-          </div>
+          <img class="team-logo" id="home-logo" alt="" hidden />
+          <div class="name" id="home-name">HOME</div>
         </article>
+        <div class="score-wrap" id="home-score-wrap">
+          <div class="score" id="home-score">0</div>
+          <div class="timeout-dots" id="home-timeouts" aria-label="Home timeouts left"></div>
+        </div>
         <article class="timer-card card">
           <div class="timer-value" id="game-clock">00:00</div>
         </article>
+        <div class="score-wrap" id="away-score-wrap">
+          <div class="score" id="away-score">0</div>
+          <div class="timeout-dots" id="away-timeouts" aria-label="Away timeouts left"></div>
+        </div>
         <article class="team-card team-away-accent" id="away-team-card">
-          <div class="score-wrap" id="away-score-wrap">
-            <div class="score" id="away-score">0</div>
-            <div class="timeout-dots" id="away-timeouts" aria-label="Away timeouts left"></div>
-          </div>
-          <div class="name-row">
-            <div class="name" id="away-name">AWAY</div>
-          </div>
+          <img class="team-logo" id="away-logo" alt="" hidden />
+          <div class="name" id="away-name">AWAY</div>
         </article>
       </section>
       <section class="event-stack">
-        <article id="scorer-rail" class="event-banner scorer-rail">
-          <div class="event-title" id="event-title">GOAL</div>
-          <div class="event-primary" id="scorer-text">SCORER</div>
+        <article id="scorer-rail" class="event-banner goal-bar">
+          <div class="goal-badge" id="event-title">GOAL</div>
+          <div class="goal-main">
+            <div class="goal-name" id="scorer-text">SCORER</div>
+            <div class="goal-sub" id="assist-text">ASSIST</div>
+          </div>
+          <div class="goal-stat" id="scorer-stat-wrap">
+            <span class="goal-stat-label">Score</span>
+            <span class="goal-stat-value" id="scorer-stat">0&ndash;0</span>
+          </div>
+          <span class="goal-sweep" aria-hidden="true"></span>
         </article>
-        <article id="assist-rail" class="event-banner assist-rail">
-          <div class="event-secondary" id="assist-text">ASSIST</div>
+        <article id="info-rail" class="event-banner goal-bar goal-bar--info">
+          <div class="goal-badge is-tab" id="info-title">INFO</div>
+          <div class="goal-main">
+            <div class="goal-name" id="info-primary">UPDATE</div>
+            <div class="goal-sub" id="info-secondary"></div>
+          </div>
+          <span class="goal-sweep" aria-hidden="true"></span>
         </article>
-        <article id="info-rail" class="event-banner info-rail">
-          <div class="event-title" id="info-title">INFO</div>
-          <div class="event-primary" id="info-primary">UPDATE</div>
-          <div class="event-secondary" id="info-secondary"></div>
-        </article>
-        <article id="player-rail" class="event-banner player-rail">
-          <div class="event-title" id="player-title">PLAYER SPOTLIGHT</div>
-          <div class="event-primary" id="player-name">PLAYER NAME</div>
-          <div class="event-stats" id="player-stats">PTS 0 · G 0 · A 0</div>
-          <div class="event-secondary" id="player-note"></div>
+        <article id="player-rail" class="event-banner goal-bar goal-bar--player">
+          <div class="goal-badge is-tab" id="player-title">PLAYER</div>
+          <div class="goal-main">
+            <div class="goal-name" id="player-name">PLAYER NAME</div>
+            <div class="goal-sub" id="player-stats">PTS 0 · G 0 · A 0</div>
+          </div>
+          <span class="goal-sweep" aria-hidden="true"></span>
         </article>
       </section>
     </div>
