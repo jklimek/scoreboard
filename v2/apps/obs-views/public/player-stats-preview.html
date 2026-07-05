@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Barlow+Semi+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>body{background:#20283a;--team-h-color:#52e0a6;--team-a-color:#8ca7ff;}</style>
+  </head>
+  <body data-view-type="player_stats">
+    <div class="overlay overlay-board">
+      <section class="stats-board">
+        <header class="stats-board-header">
+          <div class="stats-team stats-team--home team-home-accent"><span class="stats-team-name">Flaming</span></div>
+          <div class="stats-board-title"><span class="stats-board-eyebrow">Match</span><h1>Player Stats</h1></div>
+          <div class="stats-team stats-team--away team-away-accent"><span class="stats-team-name">Guziec</span></div>
+        </header>
+        <div class="board-columns">
+          <div class="board-col team-home-accent">
+            <div class="board-col-legend"><span>Player</span><span class="board-col-legend-keys">Pts · G · A</span></div>
+            <div class="board-list" id="h"></div>
+          </div>
+          <div class="board-col team-away-accent">
+            <div class="board-col-legend"><span>Player</span><span class="board-col-legend-keys">Pts · G · A</span></div>
+            <div class="board-list" id="a"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script>
+      const home = {7:{name:"J. Smith",total:4,goals:3,assists:1},11:{name:"A. Lee",total:2,goals:1,assists:1},4:{name:"M. Diaz",total:1,goals:0,assists:1},23:{name:"S. Kim",total:1,goals:1,assists:0}};
+      const away = {9:{name:"K. Novak",total:2,goals:2,assists:0},5:{name:"P. Kowal",total:1,goals:1,assists:0},12:{name:"B. Wolf",total:1,goals:0,assists:1}};
+      const row = (n,l,top)=>`<div class="player-row${top?" is-top":""}"><span class="player-id">#${n}</span><span class="player-name">${l.name}</span><span class="leader-line"><span class="leader-pill leader-pill--total">${l.total}<small>P</small></span><span class="leader-pill">${l.goals}<small>G</small></span><span class="leader-pill">${l.assists}<small>A</small></span></span></div>`;
+      document.getElementById("h").innerHTML = Object.entries(home).map(([n,l],i)=>row(n,l,i===0)).join("");
+      document.getElementById("a").innerHTML = Object.entries(away).map(([n,l],i)=>row(n,l,i===0)).join("");
+    </script>
+  </body>
+</html>

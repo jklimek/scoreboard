@@ -5018,6 +5018,12 @@ function setStatsTeamLabels(homeName, awayName) {
   if (homeHead) homeHead.textContent = homeName;
   if (awayHead) awayHead.textContent = awayName;
 }
+function setBoardTeamLabels(prefix, homeName, awayName) {
+  const homeEl = document.getElementById(`${prefix}-home-name`);
+  const awayEl = document.getElementById(`${prefix}-away-name`);
+  if (homeEl) homeEl.textContent = homeName;
+  if (awayEl) awayEl.textContent = awayName;
+}
 function renderTeamLeaders(targetId, leaders, side) {
   const target = document.getElementById(targetId);
   if (!target) return;
@@ -5063,31 +5069,48 @@ function flashUpdate(target) {
   void target.offsetWidth;
   target.classList.add("flash-update");
 }
-function renderRoster(tableId, roster) {
-  const table = document.getElementById(tableId);
-  if (!table) return;
+function renderRoster(listId, roster) {
+  const list = document.getElementById(listId);
+  if (!list) return;
   const rows = Object.entries(roster).sort((a, b) => Number(a[0]) - Number(b[0]));
-  table.innerHTML = `
-    <thead><tr><th>#</th><th>Name</th></tr></thead>
-    <tbody>
-      ${rows.map(([number, name]) => `<tr><td>${number}</td><td>${name}</td></tr>`).join("")}
-    </tbody>
-  `;
-  flashUpdate(table);
+  if (rows.length === 0) {
+    list.innerHTML = `<div class="leader-empty">No roster</div>`;
+    return;
+  }
+  list.innerHTML = rows.map(
+    ([number, name]) => `
+        <div class="player-row">
+          <span class="player-id">#${number}</span>
+          <span class="player-name">${name}</span>
+        </div>
+      `
+  ).join("");
+  flashUpdate(list);
 }
-function renderPlayerStats(tableId, stats) {
-  const table = document.getElementById(tableId);
-  if (!table) return;
-  const rows = Object.entries(stats);
-  table.innerHTML = `
-    <thead><tr><th>Player</th><th>G</th><th>A</th><th>P</th></tr></thead>
-    <tbody>
-      ${rows.map(
-    ([number, line]) => `<tr><td>#${number} ${line.name}</td><td>${line.goals}</td><td>${line.assists}</td><td>${line.total}</td></tr>`
-  ).join("")}
-    </tbody>
-  `;
-  flashUpdate(table);
+function renderPlayerStats(listId, stats) {
+  const list = document.getElementById(listId);
+  if (!list) return;
+  const rows = Object.entries(stats).sort(
+    ([, a], [, b]) => b.total - a.total || b.goals - a.goals || b.assists - a.assists
+  ).slice(0, 5);
+  if (rows.length === 0) {
+    list.innerHTML = `<div class="leader-empty">No scoring yet</div>`;
+    return;
+  }
+  list.innerHTML = rows.map(
+    ([number, line], index) => `
+        <div class="player-row${index === 0 ? " is-top" : ""}">
+          <span class="player-id">#${number}</span>
+          <span class="player-name">${line.name}</span>
+          <span class="leader-line">
+            <span class="leader-pill leader-pill--total">${line.total}<small>P</small></span>
+            <span class="leader-pill">${line.goals}<small>G</small></span>
+            <span class="leader-pill">${line.assists}<small>A</small></span>
+          </span>
+        </div>
+      `
+  ).join("");
+  flashUpdate(list);
 }
 function renderMatches(snapshot) {
   const table = document.getElementById("matches-table");
@@ -5259,20 +5282,18 @@ function render3(snapshot, animate = true) {
     }
   }
   if (viewType === "roster") {
-    const homeRosterTitle = document.getElementById("home-roster-title");
-    const awayRosterTitle = document.getElementById("away-roster-title");
-    if (homeRosterTitle) homeRosterTitle.textContent = `${homeName} Roster`;
-    if (awayRosterTitle) awayRosterTitle.textContent = `${awayName} Roster`;
-    renderRoster("home-roster-table", snapshot.players.h ?? {});
-    renderRoster("away-roster-table", snapshot.players.a ?? {});
+    setBoardTeamLabels("roster", homeName, awayName);
+    applyTeamLogo("roster-home-logo", snapshot.teams.h.logo_url);
+    applyTeamLogo("roster-away-logo", snapshot.teams.a.logo_url);
+    renderRoster("home-roster-list", snapshot.players.h ?? {});
+    renderRoster("away-roster-list", snapshot.players.a ?? {});
   }
   if (viewType === "player_stats") {
-    const homePlayerTitle = document.getElementById("home-player-title");
-    const awayPlayerTitle = document.getElementById("away-player-title");
-    if (homePlayerTitle) homePlayerTitle.textContent = `${homeName} Players`;
-    if (awayPlayerTitle) awayPlayerTitle.textContent = `${awayName} Players`;
-    renderPlayerStats("home-player-table", snapshot.stats.player_stats.h ?? {});
-    renderPlayerStats("away-player-table", snapshot.stats.player_stats.a ?? {});
+    setBoardTeamLabels("player", homeName, awayName);
+    applyTeamLogo("player-home-logo", snapshot.teams.h.logo_url);
+    applyTeamLogo("player-away-logo", snapshot.teams.a.logo_url);
+    renderPlayerStats("home-player-list", snapshot.stats.player_stats.h ?? {});
+    renderPlayerStats("away-player-list", snapshot.stats.player_stats.a ?? {});
   }
   if (viewType === "matches") {
     renderMatches(snapshot);

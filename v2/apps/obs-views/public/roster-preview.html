@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Barlow+Semi+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>body{background:#20283a;--team-h-color:#52e0a6;--team-a-color:#8ca7ff;}</style>
+  </head>
+  <body data-view-type="roster">
+    <div class="overlay overlay-board">
+      <section class="stats-board">
+        <header class="stats-board-header">
+          <div class="stats-team stats-team--home team-home-accent"><span class="stats-team-name">Flaming</span></div>
+          <div class="stats-board-title"><span class="stats-board-eyebrow">Match</span><h1>Rosters</h1></div>
+          <div class="stats-team stats-team--away team-away-accent"><span class="stats-team-name">Guziec</span></div>
+        </header>
+        <div class="board-columns">
+          <div class="board-col team-home-accent">
+            <div class="board-list roster-list" id="h"></div>
+          </div>
+          <div class="board-col team-away-accent">
+            <div class="board-list roster-list" id="a"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script>
+      const home = {4:"M. Diaz",7:"J. Smith",9:"T. Brown",11:"A. Lee",14:"R. Park",18:"C. Vega",21:"D. Holt",23:"S. Kim",27:"L. Funk",33:"W. Ono"};
+      const away = {2:"P. Kowal",5:"P. Nowak",8:"K. Mazur",9:"K. Novak",12:"B. Wolf",15:"G. Adams",19:"N. Cruz",22:"E. Ford"};
+      const row = (n,name)=>`<div class="player-row"><span class="player-id">#${n}</span><span class="player-name">${name}</span></div>`;
+      document.getElementById("h").innerHTML = Object.entries(home).map(([n,nm])=>row(n,nm)).join("");
+      document.getElementById("a").innerHTML = Object.entries(away).map(([n,nm])=>row(n,nm)).join("");
+    </script>
+  </body>
+</html>

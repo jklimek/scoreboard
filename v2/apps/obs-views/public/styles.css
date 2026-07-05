@@ -160,6 +160,7 @@ th {
 }
 
 .score-wrap {
+  position: relative;
   width: 68px;
   flex: none;
   display: flex;
@@ -213,6 +214,25 @@ th {
 
 .team-card.is-possession-team .name {
   color: #ffffff;
+}
+
+#home-team-card.is-possession-team + #home-score-wrap::after,
+#away-score-wrap:has(+ #away-team-card.is-possession-team)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #ffffff;
+  z-index: 2;
+}
+
+#home-team-card.is-possession-team + #home-score-wrap::after {
+  right: 0;
+}
+
+#away-score-wrap:has(+ #away-team-card.is-possession-team)::after {
+  left: 0;
 }
 
 #away-team-card {
@@ -516,6 +536,19 @@ th {
 .stats-team--away .stats-team-name::after {
   left: auto;
   right: 0;
+}
+
+/* Jersey-color accent wins over the neutral default in stats/board contexts */
+.stats-team.team-home-accent,
+.leaders-col.team-home-accent,
+.board-col.team-home-accent {
+  --team-accent: var(--team-h-color);
+}
+
+.stats-team.team-away-accent,
+.leaders-col.team-away-accent,
+.board-col.team-away-accent {
+  --team-accent: var(--team-a-color);
 }
 
 .stats-board-title {
@@ -862,6 +895,101 @@ th {
   font-weight: 800;
   color: #ffffff;
   font-variant-numeric: tabular-nums;
+}
+
+/* Roster / Player Stats boards (share the stats-board shell) */
+.overlay-board {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem 1.2rem;
+  font-family: "Barlow Semi Condensed", "Segoe UI", sans-serif;
+}
+
+.overlay-board .stats-board {
+  margin: 0;
+}
+
+.board-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.board-col {
+  --team-accent: var(--accent-neutral);
+  padding: 16px 22px 20px;
+  min-width: 0;
+}
+
+.board-col + .board-col {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.board-col-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 0 4px 9px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: "Archivo", sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.board-list {
+  display: grid;
+  gap: 6px;
+}
+
+.roster-list {
+  grid-template-columns: 1fr 1fr;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.035);
+  border-left: 3px solid transparent;
+  min-width: 0;
+}
+
+.player-row.is-top {
+  background: rgba(255, 255, 255, 0.07);
+  border-left-color: var(--team-accent);
+}
+
+.player-id {
+  flex: none;
+  font-family: "Archivo", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  min-width: 34px;
+}
+
+.player-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f1f4ff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-row .leader-line {
+  margin-left: auto;
 }
 
 /* Shared secondary layouts */
