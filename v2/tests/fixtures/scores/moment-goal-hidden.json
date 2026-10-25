@@ -1,0 +1,37 @@
+{
+  "v": 1,
+  "channel": "stream:w31-fixture:game",
+  "type": "moment",
+  "version": 222,
+  "serverNow": "2026-10-25T14:00:00.000Z",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000307",
+    "elapsedMs": 420000,
+    "kind": "goal",
+    "side": "home",
+    "pointNumber": 3,
+    "scorer": {
+      "personId": "00000000-0000-4000-8000-000000000402",
+      "number": "12",
+      "displayName": null,
+      "firstName": null,
+      "lastName": null,
+      "shortName": null
+    },
+    "assist": {
+      "personId": "00000000-0000-4000-8000-000000000403",
+      "number": null,
+      "displayName": null,
+      "firstName": null,
+      "lastName": null,
+      "shortName": null
+    },
+    "callahan": false,
+    "scoreAfter": {
+      "home": 2,
+      "away": 1
+    },
+    "outcome": "hold",
+    "durationMs": 50000
+  }
+}

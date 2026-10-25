@@ -170,10 +170,13 @@ test("animations: never on the first render, a game switch, or the first snapsho
     ["live", true],
   ]);
   // Whether a snapshot is the resync answer or news is not visible to the source: the first one
-  // after a reconnect never animates (conservative); a live moment or snapshot ends the resync.
-  scores.snapshot("game-live-goal");
+  // after a reconnect never animates (conservative), and only a snapshot ends the resync. S2: a
+  // live moment before it no longer does (it may still enter a banner, see banners.test.ts).
   scores.moment("moment-goal");
   await flush();
+  scores.snapshot("game-live-goal");
+  await flush();
+  assert.equal(updates.at(-1)!.liveSnapshot, false);
   assert.deepEqual(scoreBumps(updates.at(-1)!), { home: false, away: false });
   scores.snapshot("game-official");
   await flush();

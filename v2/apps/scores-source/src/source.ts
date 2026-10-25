@@ -1,12 +1,15 @@
 // One Scores live client per document for a stream profile, reduced to typed presentation state.
 // Q77 policy: a lost connection or a transient refusal keeps the last game (degraded, clock keeps
 // running locally), a removal or refusal clears it at once (unavailable); the two are never
-// confused. The status follows the client's `open` callback (W31-D13).
+// confused. The status follows the client's `open` callback (W31-D13). Live moments are passed on
+// only when they belong to the shown game (W31-D7); replayed moments never are.
 import { createClockTicker, createLiveClient } from "../../../vendor/scores-live-client/live-client.js";
 import type { LiveClient, LiveClientOptions } from "../../../vendor/scores-live-client/live-client.js";
 import type { ConfigResult, SetupProblem } from "./config.ts";
 import { readGameSnapshot } from "./game.ts";
 import type { GameSnapshot } from "./game.ts";
+import { readMoment } from "./moments.ts";
+import type { Moment } from "./moments.ts";
 
 export type SourceStatus = "setup-error" | "connecting" | "live" | "degraded" | "unavailable" | "error";
 /** Why the status is `error` or `degraded` (`limit`, `rate-limited`, `not-ready`: transient). */
@@ -26,8 +29,17 @@ export interface SourceUpdate {
   readonly liveSnapshot: boolean;
 }
 
+/** A live moment of the shown game (W31-D7), with that game's snapshot. */
+export interface SourceMoment {
+  readonly moment: Moment;
+  readonly game: GameSnapshot;
+  readonly version: number;
+}
+
 export interface ScoresSourceOptions {
   onUpdate?(update: SourceUpdate): void;
+  /** Live moments whose game is established; never replays, never while not `live`. */
+  onMoment?(event: SourceMoment): void;
   /** Passed through to `createLiveClient` (tests, other runtimes). */
   WebSocket?: LiveClientOptions["WebSocket"];
   fetch?: LiveClientOptions["fetch"];
@@ -65,8 +77,10 @@ export function createScoresSource(config: ConfigResult, options: ScoresSourceOp
   const channel = gameChannel(config.config.profile);
   /** A socket has opened at least once: later connection loss is degraded, not connecting. */
   let opened = false;
-  /** Reconnected: the next snapshot (or live moment) resynchronizes; it must not animate. */
+  /** Reconnected: the next snapshot resynchronizes (or cannot be told apart from it); it must not animate. */
   let resyncing = false;
+  /** Envelope version of the shown game's snapshot. */
+  let gameVersion = 0;
   let closed = false;
 
   const set = (next: SourceState, liveSnapshot = false) => {
@@ -106,17 +120,25 @@ export function createScoresSource(config: ConfigResult, options: ScoresSourceOp
         }
       } else if (status.state === "reconnecting" && opened) degrade(null);
     },
-    onSnapshot(name, data) {
+    onSnapshot(name, data, message) {
       if (closed || name !== channel) return;
       const game = readGameSnapshot(data);
       if (!game) return clear("error", "invalid-snapshot");
       const liveSnapshot = state.status === "live" && state.game !== null && !resyncing;
       resyncing = false;
+      gameVersion = message.version;
       set({ status: "live", game, problem: null }, liveSnapshot);
     },
-    onMoment(name) {
-      // S1 plays no moment animations; a live moment proves the resume has caught up.
-      if (name === channel) resyncing = false;
+    onMoment(name, data, message) {
+      // W31-D7: moments carry no game id. The hub publishes a channel in version order, a switched
+      // game's earlier moments are part of its first snapshot, and the client drops live moments
+      // not newer than its latest snapshot, so a live moment newer than the shown snapshot, while
+      // that snapshot is still the client's latest, belongs to the shown game. Anything else is
+      // dropped. It never ends the post-reconnect bump suppression (only a snapshot does).
+      if (closed || name !== channel || state.status !== "live" || !state.game) return;
+      if (!(message.version > gameVersion) || client.get(channel)?.version !== gameVersion) return;
+      const moment = readMoment(data);
+      if (moment) options.onMoment?.({ moment, game: state.game, version: message.version });
     },
     onRemoved(name) {
       if (!closed && name === channel) clear("unavailable");

@@ -5,6 +5,9 @@
 // `subscribed`; envelopes `{v:1,channel,type,version,serverNow,data}` share one version sequence;
 // `pong` carries `serverNow`. A refused key answers `error NOT_FOUND` and closes 1008, at auth or
 // while connected (B06-UP); a connection overdue for verification closes 1008 without a frame.
+// The replay ring keeps only moments the current projection still carries (`hub.ts` rebuilds it on
+// every snapshot): a switched game's moments leave it, a voided play moment leaves it (modelled as
+// "the moment's game is the snapshot's and its id is in the timeline, or it is a correction").
 // Test-only; transport adapters below.
 import { readFileSync } from "node:fs";
 
@@ -45,8 +48,12 @@ interface Connection {
 /** A hub channel: the retained snapshot (or `removed`) and the moment replay ring. */
 interface HubChannel {
   latest: Envelope;
-  moments: Envelope[];
+  moments: { envelope: Envelope; gameId: string | undefined }[];
 }
+
+type GameData = { game?: { id?: string }; timeline?: { id?: string }[] } | null;
+const gameOf = (envelope: Envelope) => (envelope.type === "snapshot" ? (envelope.data as GameData)?.game?.id : undefined);
+const corrections = new Set(["event.voided", "event.amended", "result.official"]);
 
 export interface FakeScoresOptions {
   /** Valid key → profile slug. */
@@ -139,7 +146,8 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
       if (!(from !== undefined && channel.latest.version <= from))
         control(connection, { ...channel.latest, serverNow: serverNow() });
       if (from !== undefined)
-        for (const moment of channel.moments) if (moment.version > from) control(connection, { ...moment, replay: true });
+        for (const { envelope } of channel.moments)
+          if (envelope.version > from) control(connection, { ...envelope, replay: true });
     }
     control(connection, { op: "subscribed", channels: names.filter((name) => connection.subscribed.has(name)) });
   }
@@ -157,10 +165,17 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
     const name = `stream:${slug}:game`;
     const channel = hubChannel(name);
     const stamped = stamp(envelope, name);
-    if (stamped.type === "moment") channel.moments = [...channel.moments, stamped].slice(-50);
+    if (stamped.type === "moment")
+      channel.moments = [...channel.moments, { envelope: stamped, gameId: gameOf(channel.latest) }].slice(-50);
     else {
       channel.latest = stamped;
-      if (stamped.type === "removed") channel.moments = [];
+      const data = stamped.data as GameData;
+      const ids = new Set((data?.timeline ?? []).map((entry) => entry.id));
+      const kept = ({ envelope: moment, gameId }: HubChannel["moments"][number]) => {
+        const { id, kind } = moment.data as { id: string; kind: string };
+        return gameId === gameOf(stamped) && (corrections.has(kind) || ids.has(id));
+      };
+      channel.moments = stamped.type === "removed" ? [] : channel.moments.filter(kept);
     }
     for (const connection of connections) if (connection.subscribed.has(name)) control(connection, stamped);
     return stamped;
@@ -203,6 +218,24 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
       publish(slug, { ...fixture("game-live"), type: "snapshot", data }),
     /** A moment: sent to subscribers and kept in the replay ring. */
     moment: (name: string, slug = fixtureProfile) => publish(slug, { ...fixture(name), type: "moment" }),
+    /** Arbitrary moment data, versioned like `moment`. */
+    momentData: (data: unknown, slug = fixtureProfile) => publish(slug, { ...fixture("moment-goal"), type: "moment", data }),
+    /** The ring's moments for a profile (version and id), oldest first. */
+    ring: (slug = fixtureProfile) =>
+      (channels.get(`stream:${slug}:game`)?.moments ?? []).map(({ envelope }) => ({
+        version: envelope.version,
+        id: (envelope.data as { id: string }).id,
+      })),
+    /**
+     * Adverse ordering the real hub never produces: sends an envelope as given (its own version,
+     * e.g. one older than the latest snapshot) to every subscriber, without retaining it.
+     */
+    deliver(envelope: Envelope, slug = fixtureProfile) {
+      const name = `stream:${slug}:game`;
+      const message = { ...envelope, channel: name, serverNow: serverNow() };
+      for (const connection of connections) if (connection.subscribed.has(name)) control(connection, message);
+      return message;
+    },
     /** The profile has nothing to show any more: a `removed` envelope (also served to new subscribers). */
     remove: (slug = fixtureProfile) => publish(slug, { ...fixture("removed"), type: "removed", data: null }),
     /** Revokes a key: its sockets get `error NOT_FOUND` then a 1008 close; later auths are refused. */
