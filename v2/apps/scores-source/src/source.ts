@@ -25,7 +25,10 @@ export interface SourceState {
 export interface SourceUpdate {
   readonly previous: SourceState;
   readonly state: SourceState;
-  /** A snapshot that arrived while live (not the first one, not the first after a reconnect). */
+  /**
+   * A snapshot that arrived while live (not the first one, not the first after a reconnect): it may
+   * bump the score and admit banners; the others are baselines.
+   */
   readonly liveSnapshot: boolean;
 }
 

@@ -4321,12 +4321,10 @@ function bannerFor(entry, game) {
 var sameBanner = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 function createBannerController(view, options = {}) {
   const holdMs = options.holdMs ?? { goal: 6e3, timeout: 5e3 };
-  const settleMs = options.settleMs ?? 300;
   const gapMs = options.gapMs ?? 400;
-  const maxQueued = options.maxQueued ?? 2;
+  const maxQueued = options.maxQueued ?? 3;
   let game = null;
-  let known = /* @__PURE__ */ new Set();
-  let recent = /* @__PURE__ */ new Set();
+  let quiet = /* @__PURE__ */ new Set();
   let current = null;
   let queue = [];
   let timer;
@@ -4350,12 +4348,11 @@ function createBannerController(view, options = {}) {
     timer = setTimeout(next, gapMs);
   }
   function cancel() {
+    const visible = current !== null || timer !== void 0;
     stopTimer();
     queue = [];
-    if (current) {
-      current = null;
-      view.hide("cut");
-    }
+    current = null;
+    if (visible) view.hide("cut");
   }
   function retract(id) {
     queue = queue.filter((banner) => banner.id !== id);
@@ -4368,16 +4365,14 @@ function createBannerController(view, options = {}) {
     queue = queue.map((item) => item.id === id ? banner : item);
     if (current?.id === id && !sameBanner(current, banner)) view.refresh(current = banner);
   }
-  function enter(id) {
-    if (!game || known.has(id)) return;
-    known.add(id);
-    const entry = game.timeline.find((item) => item.id === id);
-    const newest = game.timeline.filter((item) => item.kind === entry?.kind).pop();
-    if (!entry || newest !== entry) return;
-    recent.add(id);
+  function admit(kind, id) {
+    if (!game || quiet.has(id)) return;
+    const entry = game.timeline.find((item) => item.id === id && item.kind === kind);
+    if (!entry) return;
+    quiet.add(id);
     queue.push(bannerFor(entry, game));
     if (queue.length > maxQueued) queue.shift();
-    if (!current && timer === void 0) timer = setTimeout(next, settleMs);
+    if (!current && timer === void 0) next();
   }
   return {
     get current() {
@@ -4386,7 +4381,7 @@ function createBannerController(view, options = {}) {
     get queued() {
       return queue;
     },
-    update({ state }) {
+    update({ state, liveSnapshot }) {
       const shown = state.game;
       if (!shown || state.status !== "live" && state.status !== "degraded") {
         cancel();
@@ -4395,16 +4390,13 @@ function createBannerController(view, options = {}) {
       }
       if (!game || shown.gameId !== game.gameId) {
         cancel();
-        known = /* @__PURE__ */ new Set();
-        recent = /* @__PURE__ */ new Set();
-        game = shown;
-        return;
+        quiet = /* @__PURE__ */ new Set();
       }
       if (state.status === "degraded") cancel();
       if (shown === game) return;
-      for (const entry of game.timeline) known.add(entry.id);
+      const baseline = !game || shown.gameId !== game.gameId || !liveSnapshot;
       game = shown;
-      recent = /* @__PURE__ */ new Set();
+      if (baseline) for (const entry of shown.timeline) quiet.add(entry.id);
       for (const banner of [...current ? [current] : [], ...queue]) rederive(banner.id);
     },
     moment({ moment, game: of }) {
@@ -4412,10 +4404,9 @@ function createBannerController(view, options = {}) {
       switch (moment.kind) {
         case "goal":
         case "timeout":
-          return enter(moment.id);
+          return admit(moment.kind, moment.id);
         case "event.voided":
-          retract(moment.targetId);
-          if (moment.targetKind === "event.voided") for (const id of recent) retract(id);
+          if (moment.targetKind !== "event.voided") retract(moment.targetId);
           return;
         case "event.amended":
           if (current?.id === moment.targetId || queue.some((banner) => banner.id === moment.targetId))

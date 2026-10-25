@@ -68,44 +68,39 @@ export interface BannerView {
 
 export interface BannerOptions {
   holdMs?: { goal: number; timeout: number };
-  /**
-   * Wait before an idle rail shows a new banner: a correction published in the same hub load (a
-   * mistaken goal and its void, a restore and its undo) arrives within it and cancels the banner.
-   */
-  settleMs?: number;
   /** Pause after a banner leaves (covers its exit). */
   gapMs?: number;
-  /** Waiting banners kept; the oldest is dropped beyond it. */
+  /** Banners waiting behind the one on air; beyond it the oldest waiting one is dropped. */
   maxQueued?: number;
 }
 
 const sameBanner = (a: Banner, b: Banner) => JSON.stringify(a) === JSON.stringify(b);
 
 /**
- * Feed it every source update and moment. Rules:
- * - a banner enters (after `settleMs`, one at a time) only on a live `goal`/`timeout` moment of the shown game (the source checks
- *   W31-D7) whose timeline entry is in the latest snapshot and is the newest of its kind there,
- *   and whose id was not in an earlier snapshot of this game (an administrative restore, a backlog
- *   or a duplicate never announces);
+ * Feed it every source update and moment. Rules (no timing decides correctness):
+ * - a banner is admitted on a live `goal`/`timeout` moment of the shown game (the source checks
+ *   W31-D7) whose entry of that kind is in the latest snapshot's timeline, unless its id was in a
+ *   baseline snapshot of this game (the first one, the first after a switch or a reconnect: it is
+ *   history) or was admitted before; every admitted banner plays in order, one at a time;
  * - every snapshot re-derives the waiting and shown banners; one whose entry is gone is retracted;
- * - `event.voided` retracts its target; a void of a void (a restore) also retracts what entered
- *   after the latest snapshot; `event.amended` re-derives its target from the snapshot;
- * - a game switch, `degraded` and every state without a game cancel everything at once.
+ * - `event.voided` retracts only its own target (an undo, `targetKind` `event.voided`, retracts and
+ *   starts nothing); `event.amended` re-derives its target from the snapshot;
+ * - a game switch, `degraded`, every state without a game and `close` cut everything at once,
+ *   including a banner still leaving.
  */
 export function createBannerController(view: BannerView, options: BannerOptions = {}) {
   const holdMs = options.holdMs ?? { goal: 6000, timeout: 5000 };
-  const settleMs = options.settleMs ?? 300;
   const gapMs = options.gapMs ?? 400;
-  const maxQueued = options.maxQueued ?? 2;
+  const maxQueued = options.maxQueued ?? 3;
   /** The latest snapshot of the current game. */
   let game: GameSnapshot | null = null;
-  /** Ids in an earlier snapshot of this game, or already announced. */
-  let known = new Set<string>();
-  /** Ids that entered after the latest snapshot. */
-  let recent = new Set<string>();
+  /** Ids never to admit: in a baseline snapshot of this game, or admitted already. */
+  let quiet = new Set<string>();
+  /** The banner on air (not while it leaves). */
   let current: Banner | null = null;
+  /** Admitted banners waiting, oldest first. */
   let queue: Banner[] = [];
-  /** The hold of the shown banner, else the wait (settle or gap) before the next one. */
+  /** The hold of `current`; without `current`, the gap while the previous banner leaves. */
   let timer: ReturnType<typeof setTimeout> | undefined;
 
   const stopTimer = () => {
@@ -128,12 +123,12 @@ export function createBannerController(view: BannerView, options: BannerOptions 
     timer = setTimeout(next, gapMs);
   }
   function cancel() {
+    // A banner on air or still leaving (the gap timer) is cut at once.
+    const visible = current !== null || timer !== undefined;
     stopTimer();
     queue = [];
-    if (current) {
-      current = null;
-      view.hide("cut");
-    }
+    current = null;
+    if (visible) view.hide("cut");
   }
   function retract(id: string) {
     queue = queue.filter((banner) => banner.id !== id);
@@ -147,16 +142,14 @@ export function createBannerController(view: BannerView, options: BannerOptions 
     queue = queue.map((item) => (item.id === id ? banner : item));
     if (current?.id === id && !sameBanner(current, banner)) view.refresh((current = banner));
   }
-  function enter(id: string) {
-    if (!game || known.has(id)) return;
-    known.add(id);
-    const entry = game.timeline.find((item) => item.id === id);
-    const newest = game.timeline.filter((item) => item.kind === entry?.kind).pop();
-    if (!entry || newest !== entry) return;
-    recent.add(id);
+  function admit(kind: "goal" | "timeout", id: string) {
+    if (!game || quiet.has(id)) return;
+    const entry = game.timeline.find((item) => item.id === id && item.kind === kind);
+    if (!entry) return;
+    quiet.add(id);
     queue.push(bannerFor(entry, game));
     if (queue.length > maxQueued) queue.shift();
-    if (!current && timer === undefined) timer = setTimeout(next, settleMs);
+    if (!current && timer === undefined) next();
   }
 
   return {
@@ -166,7 +159,7 @@ export function createBannerController(view: BannerView, options: BannerOptions 
     get queued(): readonly Banner[] {
       return queue;
     },
-    update({ state }: SourceUpdate) {
+    update({ state, liveSnapshot }: SourceUpdate) {
       const shown = state.game;
       if (!shown || (state.status !== "live" && state.status !== "degraded")) {
         cancel();
@@ -174,19 +167,16 @@ export function createBannerController(view: BannerView, options: BannerOptions 
         return;
       }
       if (!game || shown.gameId !== game.gameId) {
-        // A switch: nothing of the previous game survives.
+        // A switch (or the first game): nothing of the previous game survives.
         cancel();
-        known = new Set();
-        recent = new Set();
-        game = shown;
-        return;
+        quiet = new Set();
       }
       // Q77: no animations while degraded; what was waiting or shown may be corrected unseen.
       if (state.status === "degraded") cancel();
       if (shown === game) return;
-      for (const entry of game.timeline) known.add(entry.id);
+      const baseline = !game || shown.gameId !== game.gameId || !liveSnapshot;
       game = shown;
-      recent = new Set();
+      if (baseline) for (const entry of shown.timeline) quiet.add(entry.id);
       for (const banner of [...(current ? [current] : []), ...queue]) rederive(banner.id);
     },
     moment({ moment, game: of }: SourceMoment) {
@@ -194,10 +184,10 @@ export function createBannerController(view: BannerView, options: BannerOptions 
       switch (moment.kind) {
         case "goal":
         case "timeout":
-          return enter(moment.id);
+          return admit(moment.kind, moment.id);
         case "event.voided":
-          retract(moment.targetId);
-          if (moment.targetKind === "event.voided") for (const id of recent) retract(id);
+          // An undo restores its event in the snapshot; it never retracts or starts anything.
+          if (moment.targetKind !== "event.voided") retract(moment.targetId);
           return;
         case "event.amended":
           if (current?.id === moment.targetId || queue.some((banner) => banner.id === moment.targetId))

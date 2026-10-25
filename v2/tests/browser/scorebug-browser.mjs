@@ -363,7 +363,9 @@ try {
     hub.deliver({ ...fixture("moment-goal-hidden"), version: switched.version - 1 });
     await settle(1200);
     assert.deepEqual((await bannerLog(main.page)).slice(seen), [shortId(303)]);
-    // A timeout banner on the new game.
+    // A timeout banner on the next game (its first snapshot is the baseline).
+    hub.snapshotData(live("game-standard"));
+    await main.page.waitForFunction(() => document.getElementById("home-score").textContent === "5");
     hub.snapshotData(live("game-standard-timeout"));
     hub.moment("moment-timeout");
     await waitBanner(main.page, shortId(304));
@@ -381,6 +383,36 @@ try {
     assert.deepEqual(await rail(main.page), { id: undefined, visibility: "hidden" });
     hub.snapshotData(live("game-live"));
     await waitStatus(main.page, "live");
+  });
+
+  await check("reload race: a goal whose snapshot a new page gets first never shows there", async () => {
+    // The page subscribes between the hub's snapshot and its moment (both of one load).
+    hub.snapshotData(live("game-live-goal"));
+    const reloaded = await openPage(profile);
+    await waitStatus(reloaded.page, "live");
+    await reloaded.page.waitForFunction(() => document.getElementById("home-score").textContent === "4");
+    hub.moment("moment-goal");
+    await waitBanner(main.page, shortId(301));
+    await settle(1200);
+    assert.deepEqual(await bannerLog(reloaded.page), [], "its id was in the page's first snapshot");
+    await reloaded.page.close();
+  });
+
+  await check("a game switch cuts a banner still leaving at once", async () => {
+    // The goal banner's exit (after its 6 s hold) is a 0.3 s slide down to y 72; a cut is y 0.
+    await main.page.waitForFunction(
+      () => {
+        const element = document.getElementById("scorer-rail");
+        return element.dataset.bannerId === undefined && getComputedStyle(element).visibility === "visible";
+      },
+      null,
+      { timeout: 10_000, polling: 10 },
+    );
+    hub.snapshotData(live("game-standard"));
+    await main.page.waitForFunction(() => getComputedStyle(document.getElementById("scorer-rail")).visibility === "hidden", null, { timeout: 1000 });
+    const offset = await main.page.evaluate(() => new DOMMatrix(getComputedStyle(document.getElementById("scorer-rail")).transform).f);
+    assert.equal(offset, 0, "cut, not the end of the exit");
+    await main.page.waitForFunction(() => document.getElementById("home-score").textContent === "5");
   });
 
   await check("unavailable: a key revoked while connected clears the scorebug before any reconnect", async () => {

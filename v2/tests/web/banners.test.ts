@@ -5,8 +5,9 @@ import { afterEach, beforeEach, mock, test } from "node:test";
 import { createBannerController } from "../../apps/scores-source/src/banners.ts";
 import type { Banner } from "../../apps/scores-source/src/banners.ts";
 import { parseScoresFragment } from "../../apps/scores-source/src/config.ts";
+import { readGameSnapshot } from "../../apps/scores-source/src/game.ts";
 import { createScoresSource } from "../../apps/scores-source/src/source.ts";
-import type { SourceMoment } from "../../apps/scores-source/src/source.ts";
+import type { SourceMoment, SourceState } from "../../apps/scores-source/src/source.ts";
 import { scoreBumps } from "../../apps/scores-source/src/scorebug.ts";
 import { createLiveClient } from "../../vendor/scores-live-client/live-client.js";
 import { createFakeScores, fakeWebSocket, fixture, fixtureKey, fixtureProfile } from "../support/fake-scores.ts";
@@ -29,25 +30,39 @@ async function advance(ms: number, step = 100) {
   }
 }
 
-/** One overlay document: source + banner controller with a recording view. */
-function setup(scores = createFakeScores()) {
-  const { WebSocket, control } = fakeWebSocket(scores);
+/** `game-standard` data whose timeline also has the last entry of each named variant, in order. */
+function standardWith(...variants: string[]) {
+  const data = structuredClone(fixture("game-standard").data) as { timeline: unknown[] };
+  for (const name of variants) data.timeline.push((fixture(name).data as { timeline: unknown[] }).timeline.at(-1));
+  return data;
+}
+
+/** A recording view. */
+function recorder() {
   const log: string[] = [];
   const shown: Banner[] = [];
-  const moments: SourceMoment[] = [];
-  const bumps: { home: boolean; away: boolean }[] = [];
-  const banners = createBannerController({
-    show(banner) {
+  const view = {
+    show(banner: Banner) {
       shown.push(banner);
       log.push(`show ${banner.id.slice(-3)}`);
     },
-    refresh(banner) {
+    refresh(banner: Banner) {
       log.push(`refresh ${banner.id.slice(-3)} ${banner.secondary}`);
     },
-    hide(mode) {
+    hide(mode: "exit" | "cut") {
       log.push(`hide ${mode}`);
     },
-  });
+  };
+  return { log, shown, view };
+}
+
+/** One overlay document: source + banner controller with a recording view. */
+function setup(scores = createFakeScores()) {
+  const { WebSocket, control } = fakeWebSocket(scores);
+  const { log, shown, view } = recorder();
+  const moments: SourceMoment[] = [];
+  const bumps: { home: boolean; away: boolean }[] = [];
+  const banners = createBannerController(view);
   const params = new URLSearchParams({ scores: origin, profile: fixtureProfile, key: fixtureKey });
   const source = createScoresSource(parseScoresFragment(`#${params}`), {
     WebSocket,
@@ -79,9 +94,7 @@ test("a live goal enters once per id with the snapshot's content; the initial sn
   board.scores.snapshot("game-standard-callahan");
   board.scores.moment("moment-goal-callahan");
   await flush();
-  assert.deepEqual(board.log, [], "the banner waits for the settle window");
-  await advance(300);
-  assert.deepEqual(board.log, ["show 303"]);
+  assert.deepEqual(board.log, ["show 303"], "no settle window: it enters at once");
   assert.deepEqual(board.shown[0], {
     id: id(303), kind: "goal", side: "away", title: "GOAL", primary: "W31 Fixture Defender", secondary: "Callahan", scoreline: "5–5",
   });
@@ -111,6 +124,45 @@ test("reload: a new document with the same hub state shows nothing", async () =>
   reloaded.close();
 });
 
+test("reload race: a moment arriving live right after a new document's first snapshot is history", async () => {
+  // The hub delivers a load's snapshot, then allocates and sends its moments: a document that
+  // subscribes in between gets the retained snapshot (already with the goal), then the goal live.
+  const scores = createFakeScores();
+  scores.snapshot("game-standard");
+  scores.snapshot("game-standard-goal");
+  const board = setup(scores);
+  await flush();
+  assert.equal(board.source.state.game?.timeline.at(-1)?.id, id(302));
+  scores.moment("moment-goal-named");
+  await advance(10_000);
+  assert.deepEqual(board.moments.map((event) => event.moment.id), [id(302)], "a live moment, not a replay");
+  assert.deepEqual(board.log, [], "its id was in the baseline snapshot");
+  scores.snapshot("game-standard-callahan");
+  scores.moment("moment-goal-callahan");
+  await flush();
+  assert.deepEqual(board.log, ["show 303"], "a later goal enters");
+  board.close();
+});
+
+test("reconnect race: a moment arriving live right after the resync snapshot is history", async () => {
+  const board = setup();
+  board.scores.snapshot("game-standard");
+  await flush();
+  board.control.down = true;
+  board.scores.dropAll();
+  await flush();
+  // The goal's snapshot was published while the board was away, its moment not yet.
+  board.scores.snapshot("game-standard-goal");
+  board.control.down = false;
+  await advance(3000);
+  assert.equal(board.source.state.status, "live");
+  board.scores.moment("moment-goal-named");
+  await advance(10_000);
+  assert.equal(board.moments.length, 1);
+  assert.deepEqual(board.log, [], "its id was in the resync snapshot");
+  board.close();
+});
+
 test("a reconnect never animates replayed or resynced goals; a fresh goal after it may", async () => {
   const board = setup();
   board.scores.snapshot("game-standard");
@@ -136,18 +188,23 @@ test("a reconnect never animates replayed or resynced goals; a fresh goal after 
   board.close();
 });
 
-test("after an unchanged reconnect a fresh live goal enters, but its first snapshot does not bump", async () => {
+test("after an unchanged reconnect the first snapshot is a baseline: no bump, no banner; later goals enter", async () => {
   const board = setup();
   board.scores.snapshot("game-standard");
   await flush();
   board.scores.dropAll();
   await advance(2000);
   assert.equal(board.source.state.status, "live");
+  // No resync snapshot came (nothing changed), so this one cannot be told apart from it.
   board.scores.snapshot("game-standard-goal");
   board.scores.moment("moment-goal-named");
   await advance(500);
   assert.deepEqual(board.bumps.at(-1), { home: false, away: false }, "first snapshot after a reconnect");
-  assert.deepEqual(board.log, ["show 302"], "a fresh live moment is not a replay");
+  assert.deepEqual(board.log, [], "its goal may be history");
+  board.scores.snapshotData(standardWith("game-standard-goal", "game-standard-callahan"));
+  board.scores.moment("moment-goal-callahan");
+  await flush();
+  assert.deepEqual(board.log, ["show 303"]);
   board.close();
 });
 
@@ -222,39 +279,31 @@ test("a timeout banner names the team and its timeouts left", async () => {
   board.close();
 });
 
-test("an administrative restore never announces the goal again", async () => {
-  // The board joined after the goal (it is only history), then saw it voided and restored. The
-  // hub announces a restored id again, and this client never saw it as a moment.
+test("restore (Scores bb5ce05e): only the undo arrives and nothing enters; voiding the undo adds nothing", async () => {
   const board = setup();
+  board.scores.snapshot("game-standard");
+  await flush();
   board.scores.snapshot("game-standard-goal");
+  board.scores.moment("moment-goal-named");
   await flush();
   board.scores.snapshot("game-standard");
   board.scores.moment("moment-voided");
   await flush();
+  assert.deepEqual(board.log, ["show 302", "hide cut"]);
+  // The undo restores the goal in the snapshot; the goal is never a moment again.
   board.scores.snapshot("game-standard-goal");
-  board.scores.moment("moment-goal-named");
   board.scores.moment("moment-restore");
   await advance(10_000);
-  assert.deepEqual(board.moments.map((event) => event.moment.kind), ["event.voided", "goal", "event.voided"]);
-  assert.deepEqual(board.log, [], "known from an earlier snapshot of this game");
-
-  // Without its undo in the same burst (an allocation failure defers it to the next load), the
-  // restored goal is still known from an earlier snapshot of this game.
-  const late = setup();
-  late.scores.snapshot("game-standard-goal");
-  await flush();
-  late.scores.snapshot("game-standard");
-  late.scores.moment("moment-voided");
-  await flush();
-  late.scores.snapshot("game-standard-goal");
-  late.scores.moment("moment-goal-named");
+  assert.deepEqual(board.scores.ring().map((entry) => entry.id), [id(323)], "the void and the restored goal left the ring");
+  // Voiding the undo: the original retraction again (deduplicated by id) and the undo's void.
+  board.scores.snapshot("game-standard");
+  board.scores.moment("moment-voided");
+  board.scores.moment("moment-revoid");
   await advance(10_000);
-  assert.deepEqual(late.moments.map((event) => event.moment.kind), ["event.voided", "goal"]);
-  assert.deepEqual(late.log, []);
-  late.close();
+  assert.deepEqual(board.moments.map((event) => event.moment.id.slice(-3)), ["302", "322", "323", "324"]);
+  assert.deepEqual(board.log, ["show 302", "hide cut"]);
 
-  // Reloaded during the void: the goal is unknown, but its undo arrives in the same burst and
-  // cancels it inside the settle window.
+  // Reloaded during the void: the restore brings the goal back without any banner.
   const scores = createFakeScores();
   scores.snapshot("game-standard-goal");
   scores.snapshot("game-standard");
@@ -262,29 +311,74 @@ test("an administrative restore never announces the goal again", async () => {
   const reloaded = setup(scores);
   await flush();
   scores.snapshot("game-standard-goal");
-  scores.moment("moment-goal-named");
   scores.moment("moment-restore");
   await advance(10_000);
-  assert.deepEqual(reloaded.moments.map((event) => event.moment.kind), ["goal", "event.voided"]);
+  assert.equal(reloaded.source.state.game?.timeline.at(-1)?.id, id(302));
+  assert.deepEqual(reloaded.moments.map((event) => event.moment.kind), ["event.voided"]);
   assert.deepEqual(reloaded.log, []);
   board.close();
   reloaded.close();
 });
 
-test("an older goal or a backlog never celebrates: only the newest entry of its kind enters", async () => {
+test("an unrelated restore never retracts the goal on air", async () => {
+  const board = setup();
+  board.scores.snapshot("game-standard-goal");
+  await flush();
+  board.scores.snapshot("game-standard");
+  board.scores.moment("moment-voided");
+  await flush();
+  board.scores.snapshotData(standardWith("game-standard-callahan"));
+  board.scores.moment("moment-goal-callahan");
+  await flush();
+  assert.deepEqual(board.log, ["show 303"]);
+  // The older goal …302 is restored while …303 is on air.
+  board.scores.snapshotData(standardWith("game-standard-goal", "game-standard-callahan"));
+  board.scores.moment("moment-restore");
+  await advance(1000);
+  assert.equal(board.banners.current?.id, id(303), "an undo retracts nothing");
+  await advance(10_000);
+  assert.deepEqual(board.log, ["show 303", "hide exit"]);
+  board.close();
+});
+
+test("two goals in one coalesced snapshot both celebrate, in order", async () => {
   const board = setup();
   board.scores.snapshot("game-standard");
   await flush();
-  // Two goals in one load (an offline scorer syncing): both moments arrive, only the newest enters.
-  const data = structuredClone(fixture("game-standard-no-assist").data) as { timeline: { id: string }[] };
-  const named = (fixture("game-standard-goal").data as { timeline: unknown[] }).timeline.at(-1) as { id: string };
-  data.timeline.splice(-1, 0, named);
-  board.scores.snapshotData(data);
+  // An offline scorer syncing: one load, both goals in the snapshot, then both moments.
+  board.scores.snapshotData(standardWith("game-standard-goal", "game-standard-no-assist"));
   board.scores.moment("moment-goal-named");
   board.scores.moment("moment-goal-no-assist");
-  await advance(500);
-  assert.deepEqual(board.log, ["show 306"]);
+  await flush();
+  assert.deepEqual(board.log, ["show 302"]);
+  assert.deepEqual(board.banners.queued.map((banner) => banner.id), [id(306)]);
+  await advance(6000 + 400);
+  assert.deepEqual(board.log, ["show 302", "hide exit", "show 306"]);
+  await advance(10_000);
+  assert.deepEqual(board.log, ["show 302", "hide exit", "show 306", "hide exit"]);
   board.close();
+});
+
+test("the queue keeps at most three waiting banners, dropping the oldest waiting, never the one on air", () => {
+  const before = standardWith("game-standard-goal") as { timeline: { id: string }[] };
+  const ids = [401, 402, 403, 404, 405].map(id);
+  const after = structuredClone(before);
+  after.timeline.push(...ids.map((value) => ({ ...before.timeline.at(-1)!, id: value })));
+  const live = readGameSnapshot(after)!;
+  const previous: SourceState = { status: "connecting", game: null, problem: null };
+  const state = (game: SourceState["game"]): SourceState => ({ status: "live", game, problem: null });
+  const { log, view } = recorder();
+  const banners = createBannerController(view);
+  banners.update({ previous, state: state(readGameSnapshot(before)), liveSnapshot: false });
+  banners.update({ previous, state: state(live), liveSnapshot: true });
+  // A baseline id is refused even though it is in the latest snapshot.
+  banners.moment({ moment: { kind: "goal", id: id(302) }, game: live, version: 1 });
+  for (const value of ids) banners.moment({ moment: { kind: "goal", id: value }, game: live, version: 1 });
+  assert.equal(banners.current?.id, ids[0], "the first one stays on air");
+  assert.deepEqual(banners.queued.map((banner) => banner.id), ids.slice(2), "…402, the oldest waiting, is dropped");
+  assert.deepEqual(log, ["show 401"]);
+  banners.close();
+  assert.deepEqual(log, ["show 401", "hide cut"]);
 });
 
 test("W31-D7 (client): a live moment not newer than the latest snapshot never reaches onMoment", async () => {
@@ -350,7 +444,7 @@ test("game switch: everything is cancelled and no old-game moment animates on th
   board.close();
 });
 
-test("game switch: an old-game moment published just before the switch never shows on either game", async () => {
+test("game switch: an old-game moment published just before the switch is cut by it, never shown on the new game", async () => {
   const board = setup();
   board.scores.snapshot("game-standard");
   await flush();
@@ -361,7 +455,7 @@ test("game switch: an old-game moment published just before the switch never sho
   await flush();
   assert.equal(board.moments.length, 1, "attributed to the old game while it was shown");
   await advance(10_000);
-  assert.deepEqual(board.log, [], "cancelled inside the settle window by the switch");
+  assert.deepEqual(board.log, ["show 302", "hide cut"], "cut at the switch");
   board.close();
 });
 
@@ -403,6 +497,8 @@ test("degraded and unavailable cancel banners at once; no animation while degrad
   await advance(3000);
   assert.equal(board.source.state.status, "live");
   assert.deepEqual(board.log, ["show 302", "hide cut"], "nothing comes back after the resume");
+  board.scores.snapshot("game-standard");
+  await flush();
 
   board.scores.snapshot("game-standard-timeout");
   board.scores.moment("moment-timeout");
@@ -441,4 +537,28 @@ test("the source passes on nothing while not live (error, connecting) and nothin
   await advance(1000);
   assert.deepEqual(board.moments, []);
   assert.deepEqual(board.log, []);
+});
+
+test("a cancellation cuts a banner that is still leaving (switch, degraded, unavailable, close)", async () => {
+  const cancellations: [string, (board: ReturnType<typeof setup>) => void][] = [
+    ["switch", (board) => board.scores.snapshot("game-hidden-stats")],
+    ["degraded", (board) => board.scores.dropAll()],
+    ["unavailable", (board) => board.scores.remove()],
+    ["close", (board) => board.banners.close()],
+  ];
+  for (const [name, cancel] of cancellations) {
+    const board = setup();
+    board.scores.snapshot("game-standard");
+    await flush();
+    board.scores.snapshot("game-standard-timeout");
+    board.scores.moment("moment-timeout");
+    await advance(5200);
+    assert.deepEqual(board.log, ["show 304", "hide exit"], name);
+    cancel(board);
+    await flush();
+    assert.deepEqual(board.log, ["show 304", "hide exit", "hide cut"], `${name}: the exit is cut at once`);
+    await advance(10_000);
+    assert.deepEqual(board.log, ["show 304", "hide exit", "hide cut"], name);
+    board.close();
+  }
 });

@@ -6,8 +6,12 @@
 // `pong` carries `serverNow`. A refused key answers `error NOT_FOUND` and closes 1008, at auth or
 // while connected (B06-UP); a connection overdue for verification closes 1008 without a frame.
 // The replay ring keeps only moments the current projection still carries (`hub.ts` rebuilds it on
-// every snapshot): a switched game's moments leave it, a voided play moment leaves it (modelled as
-// "the moment's game is the snapshot's and its id is in the timeline, or it is a correction").
+// every snapshot): a switched game's moments leave it, a voided play moment leaves it, and, as
+// Scores `bb5ce05e` (B06-UP), so do a voided correction and a restored play moment (one whose void
+// was undone is never a moment again). Modelled as "the moment's game is the snapshot's, and a play
+// moment's id is in the timeline and not restored, or a correction is not voided". Tests publish
+// what that Scores sends: a restore is the snapshot and the undo (`event.voided` targeting the void)
+// only; voiding the undo is the snapshot, the original `event.voided` again and the undo's void.
 // Test-only; transport adapters below.
 import { readFileSync } from "node:fs";
 
@@ -74,6 +78,11 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
   /** Test switches: refuse auth transiently, or reject every channel name (protocol mismatch). */
   const faults: { auth?: "LIMIT" | "NOT_READY"; invalidChannels?: boolean } = {};
   let version = 0;
+  /** Published `event.voided` moments: void id → target id. */
+  const voids = new Map<string, string>();
+  /** Voided by a void that is not itself voided (an undo restores the target). */
+  const isVoided = (id: string): boolean => [...voids].some(([by, target]) => target === id && !isVoided(by));
+  const isRestored = (id: string) => [...voids].some(([by, target]) => target === id && isVoided(by));
 
   const serverNow = () => new Date(now()).toISOString();
   const stamp = (envelope: Envelope, channel: string): Envelope => ({
@@ -160,22 +169,32 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
     subscribe(connection, message.channels as string[], (message.resume ?? {}) as Record<string, number>);
   }
 
+  /** Whether a ring moment is still carried by the projection of `snapshot`. */
+  const retained = (snapshot: Envelope) => {
+    const ids = new Set(((snapshot.data as GameData)?.timeline ?? []).map((entry) => entry.id));
+    return ({ envelope: moment, gameId }: HubChannel["moments"][number]) => {
+      const { id, kind } = moment.data as { id: string; kind: string };
+      return gameId === gameOf(snapshot) && (corrections.has(kind) ? !isVoided(id) : ids.has(id) && !isRestored(id));
+    };
+  };
+
   /** Versions and retains an envelope (moments in the replay ring, last 50), then sends it. */
   function publish(slug: string, envelope: Envelope) {
     const name = `stream:${slug}:game`;
     const channel = hubChannel(name);
     const stamped = stamp(envelope, name);
-    if (stamped.type === "moment")
+    if (stamped.type === "moment") {
       channel.moments = [...channel.moments, { envelope: stamped, gameId: gameOf(channel.latest) }].slice(-50);
-    else {
+      const moment = stamped.data as { id: string; kind: string; targetId?: string };
+      // A void belongs to the latest snapshot's projection: what it voids or restores was not
+      // in that projection's ring either.
+      if (moment.kind === "event.voided" && moment.targetId) {
+        voids.set(moment.id, moment.targetId);
+        channel.moments = channel.moments.filter(retained(channel.latest));
+      }
+    } else {
       channel.latest = stamped;
-      const data = stamped.data as GameData;
-      const ids = new Set((data?.timeline ?? []).map((entry) => entry.id));
-      const kept = ({ envelope: moment, gameId }: HubChannel["moments"][number]) => {
-        const { id, kind } = moment.data as { id: string; kind: string };
-        return gameId === gameOf(stamped) && (corrections.has(kind) || ids.has(id));
-      };
-      channel.moments = stamped.type === "removed" ? [] : channel.moments.filter(kept);
+      channel.moments = stamped.type === "removed" ? [] : channel.moments.filter(retained(stamped));
     }
     for (const connection of connections) if (connection.subscribed.has(name)) control(connection, stamped);
     return stamped;

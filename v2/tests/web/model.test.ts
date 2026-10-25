@@ -28,7 +28,7 @@ test("every snapshot fixture reads, every moment fixture is a moment", () => {
   const snapshots = names.filter((name) => name.startsWith("game-"));
   const moments = names.filter((name) => name.startsWith("moment-"));
   assert.equal(snapshots.length, 16);
-  assert.equal(moments.length, 10);
+  assert.equal(moments.length, 11);
   for (const name of snapshots) assert.ok(readGameSnapshot(fixture(name).data), name);
   assert.deepEqual(
     Object.fromEntries(moments.map((name) => [name, readMoment(fixture(name).data)?.kind])),
@@ -41,12 +41,14 @@ test("every snapshot fixture reads, every moment fixture is a moment", () => {
       "moment-goal-no-assist": "goal",
       "moment-restore": "event.voided",
       "moment-result-official": "other",
+      "moment-revoid": "event.voided",
       "moment-timeout": "timeout",
       "moment-voided": "event.voided",
     },
   );
   assert.deepEqual(readMoment(fixture("moment-amended").data), { kind: "event.amended", id: id(321), targetId: id(302), targetKind: "goal" });
   assert.deepEqual(readMoment(fixture("moment-restore").data), { kind: "event.voided", id: id(323), targetId: id(322), targetKind: "event.voided" });
+  assert.deepEqual(readMoment(fixture("moment-revoid").data), { kind: "event.voided", id: id(324), targetId: id(323), targetKind: "event.voided" });
   for (const data of [null, {}, { id: "x" }, { id: "x", kind: "event.voided" }]) assert.equal(readMoment(data), null);
 });
 
