@@ -4287,6 +4287,145 @@ gsap.registerPlugin(CSSPlugin);
 var gsapWithCSS = gsap.registerPlugin(CSSPlugin) || gsap;
 var TweenMaxWithCSS = gsapWithCSS.core.Tween;
 
+// apps/scores-source/src/banners.ts
+var clean = (value) => value?.trim() || null;
+function playerLabel(ref) {
+  if (!ref) return null;
+  const full = [clean(ref.firstName), clean(ref.lastName)].filter(Boolean).join(" ");
+  const number = clean(ref.number);
+  return clean(ref.displayName) ?? (full || null) ?? clean(ref.shortName) ?? (number ? `#${number}` : null);
+}
+var teamLabel = (game, side) => game.teams[side]?.displayName.trim() || (side === "home" ? "Home" : "Away");
+function bannerFor(entry, game) {
+  const base = { id: entry.id, kind: entry.kind, side: entry.side };
+  if (entry.kind === "timeout") {
+    const { left, limit } = game.timeouts[entry.side];
+    const per = game.timeouts.per === "half" ? " this half" : "";
+    return {
+      ...base,
+      title: "TIMEOUT",
+      primary: teamLabel(game, entry.side),
+      secondary: left === null ? null : `${left} of ${limit} left${per}`,
+      scoreline: null
+    };
+  }
+  const assist = playerLabel(entry.assist);
+  return {
+    ...base,
+    title: "GOAL",
+    primary: playerLabel(entry.scorer) ?? teamLabel(game, entry.side),
+    secondary: entry.callahan ? "Callahan" : assist ? `Assist: ${assist}` : null,
+    scoreline: entry.scoreAfter ? `${entry.scoreAfter.home}\u2013${entry.scoreAfter.away}` : null
+  };
+}
+var sameBanner = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+function createBannerController(view, options = {}) {
+  const holdMs = options.holdMs ?? { goal: 6e3, timeout: 5e3 };
+  const settleMs = options.settleMs ?? 300;
+  const gapMs = options.gapMs ?? 400;
+  const maxQueued = options.maxQueued ?? 2;
+  let game = null;
+  let known = /* @__PURE__ */ new Set();
+  let recent = /* @__PURE__ */ new Set();
+  let current = null;
+  let queue = [];
+  let timer;
+  const stopTimer = () => {
+    clearTimeout(timer);
+    timer = void 0;
+  };
+  function next() {
+    stopTimer();
+    const banner = queue.shift();
+    if (!banner) return;
+    current = banner;
+    view.show(banner);
+    timer = setTimeout(() => leave("exit"), holdMs[banner.kind]);
+  }
+  function leave(mode) {
+    stopTimer();
+    if (!current) return;
+    current = null;
+    view.hide(mode);
+    timer = setTimeout(next, gapMs);
+  }
+  function cancel() {
+    stopTimer();
+    queue = [];
+    if (current) {
+      current = null;
+      view.hide("cut");
+    }
+  }
+  function retract(id) {
+    queue = queue.filter((banner) => banner.id !== id);
+    if (current?.id === id) leave("cut");
+  }
+  function rederive(id) {
+    const entry = game?.timeline.find((item) => item.id === id);
+    if (!game || !entry) return retract(id);
+    const banner = bannerFor(entry, game);
+    queue = queue.map((item) => item.id === id ? banner : item);
+    if (current?.id === id && !sameBanner(current, banner)) view.refresh(current = banner);
+  }
+  function enter(id) {
+    if (!game || known.has(id)) return;
+    known.add(id);
+    const entry = game.timeline.find((item) => item.id === id);
+    const newest = game.timeline.filter((item) => item.kind === entry?.kind).pop();
+    if (!entry || newest !== entry) return;
+    recent.add(id);
+    queue.push(bannerFor(entry, game));
+    if (queue.length > maxQueued) queue.shift();
+    if (!current && timer === void 0) timer = setTimeout(next, settleMs);
+  }
+  return {
+    get current() {
+      return current;
+    },
+    get queued() {
+      return queue;
+    },
+    update({ state }) {
+      const shown = state.game;
+      if (!shown || state.status !== "live" && state.status !== "degraded") {
+        cancel();
+        game = null;
+        return;
+      }
+      if (!game || shown.gameId !== game.gameId) {
+        cancel();
+        known = /* @__PURE__ */ new Set();
+        recent = /* @__PURE__ */ new Set();
+        game = shown;
+        return;
+      }
+      if (state.status === "degraded") cancel();
+      if (shown === game) return;
+      for (const entry of game.timeline) known.add(entry.id);
+      game = shown;
+      recent = /* @__PURE__ */ new Set();
+      for (const banner of [...current ? [current] : [], ...queue]) rederive(banner.id);
+    },
+    moment({ moment, game: of }) {
+      if (!game || of !== game) return;
+      switch (moment.kind) {
+        case "goal":
+        case "timeout":
+          return enter(moment.id);
+        case "event.voided":
+          retract(moment.targetId);
+          if (moment.targetKind === "event.voided") for (const id of recent) retract(id);
+          return;
+        case "event.amended":
+          if (current?.id === moment.targetId || queue.some((banner) => banner.id === moment.targetId))
+            rederive(moment.targetId);
+      }
+    },
+    close: cancel
+  };
+}
+
 // apps/scores-source/src/config.ts
 var profileSlugPattern = /^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/;
 var streamKeyPattern = /^[A-Za-z0-9_-]{43}$/;
@@ -4736,7 +4875,9 @@ var isObject = (value) => typeof value === "object" && value !== null && !Array.
 var isCount = (value) => Number.isSafeInteger(value) && value >= 0;
 var isCountOrNull = (value) => value === null || isCount(value);
 var isString = (value) => typeof value === "string";
+var isStringOrNull = (value) => value === null || isString(value);
 var isHexOrNull = (value) => value === null || isString(value) && /^#[0-9a-f]{6}$/.test(value);
+var isSide = (value) => value === "home" || value === "away";
 function readTeam(value) {
   if (value === null) return null;
   if (!isObject(value) || !isString(value.displayName)) return void 0;
@@ -4753,30 +4894,80 @@ function readTimeouts(value) {
   if (!isObject(value) || !isCountOrNull(value.left) || !isCount(value.limit)) return void 0;
   return { left: value.left, limit: value.limit };
 }
+function readPlayerRef(value) {
+  if (value === null) return null;
+  if (!isObject(value)) return void 0;
+  const fields = ["number", "displayName", "firstName", "lastName", "shortName"];
+  if (!fields.every((field) => isStringOrNull(value[field]))) return void 0;
+  return Object.fromEntries(fields.map((field) => [field, value[field]]));
+}
+function readScore(value) {
+  if (value === null) return null;
+  return isObject(value) && isCount(value.home) && isCount(value.away) ? { home: value.home, away: value.away } : void 0;
+}
+function readTimeline(value) {
+  if (!Array.isArray(value)) return void 0;
+  const entries = [];
+  for (const item of value) {
+    if (!isObject(item) || !isString(item.id) || !isString(item.kind)) return void 0;
+    if (item.kind !== "goal" && item.kind !== "timeout") continue;
+    if (!isSide(item.side)) return void 0;
+    const scoreAfter = readScore(item.scoreAfter);
+    const scorer = readPlayerRef(item.scorer);
+    const assist = readPlayerRef(item.assist);
+    if (scoreAfter === void 0 || scorer === void 0 || assist === void 0) return void 0;
+    if (item.callahan !== null && typeof item.callahan !== "boolean") return void 0;
+    entries.push({ id: item.id, kind: item.kind, side: item.side, scoreAfter, scorer, assist, callahan: item.callahan === true });
+  }
+  return entries;
+}
 function readGameSnapshot(data) {
   if (!isObject(data)) return null;
-  const { game, teams, score, timeouts, clock: clock2 } = data;
+  const { game, teams, score, timeouts, clock: clock2, possession, freshness } = data;
   if (!isObject(game) || !isString(game.id)) return null;
-  if (!isObject(teams) || !isObject(score) || !isObject(timeouts) || !isObject(clock2)) return null;
+  if (!isObject(teams) || !isObject(score) || !isObject(timeouts) || !isObject(clock2) || !isObject(freshness))
+    return null;
   const home = readTeam(teams.home);
   const away = readTeam(teams.away);
   if (home === void 0 || away === void 0) return null;
   if (!isCountOrNull(score.home) || !isCountOrNull(score.away)) return null;
   if (score.source !== "none" && score.source !== "observed" && score.source !== "official") return null;
+  if (possession !== null && !isSide(possession)) return null;
   const homeTimeouts = readTimeouts(timeouts.home);
   const awayTimeouts = readTimeouts(timeouts.away);
-  if (!homeTimeouts || !awayTimeouts) return null;
-  const { running, elapsedMs, anchorServerTs } = clock2;
+  if (!homeTimeouts || !awayTimeouts || timeouts.per !== "game" && timeouts.per !== "half") return null;
+  const { running, elapsedMs, anchorServerTs, confidence } = clock2;
   if (typeof running !== "boolean" || typeof elapsedMs !== "number" || !Number.isFinite(elapsedMs) || elapsedMs < 0)
     return null;
   if (!isString(anchorServerTs) || !Number.isFinite(Date.parse(anchorServerTs))) return null;
+  if (confidence !== "good" && confidence !== "uncertain" && confidence !== "unknown") return null;
+  if (typeof freshness.ageWarning !== "boolean") return null;
+  const timeline2 = readTimeline(data.timeline);
+  if (!timeline2) return null;
   return {
     gameId: game.id,
     teams: { home, away },
     score: { home: score.home, away: score.away, source: score.source },
-    timeouts: { home: homeTimeouts, away: awayTimeouts },
-    clock: { running, elapsedMs, anchorServerTs }
+    possession,
+    timeouts: { per: timeouts.per, home: homeTimeouts, away: awayTimeouts },
+    clock: { running, elapsedMs, anchorServerTs, confidence },
+    ageWarning: freshness.ageWarning,
+    timeline: timeline2
   };
+}
+
+// apps/scores-source/src/moments.ts
+var isObject2 = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
+function readMoment(data) {
+  if (!isObject2(data) || typeof data.id !== "string" || typeof data.kind !== "string") return null;
+  const { id, kind } = data;
+  if (kind === "goal" || kind === "timeout") return { kind, id };
+  if (kind === "event.voided" || kind === "event.amended") {
+    if (typeof data.targetId !== "string") return null;
+    const target = kind === "event.voided" ? data.targetKind : isObject2(data.target) ? data.target.kind : null;
+    return { kind, id, targetId: data.targetId, targetKind: typeof target === "string" ? target : null };
+  }
+  return { kind: "other", id };
 }
 
 // apps/scores-source/src/source.ts
@@ -4798,6 +4989,7 @@ function createScoresSource(config4, options = {}) {
   const channel = gameChannel(config4.config.profile);
   let opened = false;
   let resyncing = false;
+  let gameVersion = 0;
   let closed = false;
   const set = (next, liveSnapshot = false) => {
     const previous = state;
@@ -4834,16 +5026,20 @@ function createScoresSource(config4, options = {}) {
         }
       } else if (status.state === "reconnecting" && opened) degrade(null);
     },
-    onSnapshot(name, data) {
+    onSnapshot(name, data, message) {
       if (closed || name !== channel) return;
       const game = readGameSnapshot(data);
       if (!game) return clear2("error", "invalid-snapshot");
       const liveSnapshot = state.status === "live" && state.game !== null && !resyncing;
       resyncing = false;
+      gameVersion = message.version;
       set({ status: "live", game, problem: null }, liveSnapshot);
     },
-    onMoment(name) {
-      if (name === channel) resyncing = false;
+    onMoment(name, data, message) {
+      if (closed || name !== channel || state.status !== "live" || !state.game) return;
+      if (!(message.version > gameVersion) || client.get(channel)?.version !== gameVersion) return;
+      const moment = readMoment(data);
+      if (moment) options.onMoment?.({ moment, game: state.game, version: message.version });
     },
     onRemoved(name) {
       if (!closed && name === channel) clear2("unavailable");
@@ -4884,6 +5080,12 @@ function createScoresSource(config4, options = {}) {
 }
 
 // apps/scores-source/src/scorebug.ts
+var maxTimeoutDots = 5;
+function timeoutView({ left, limit }) {
+  if (left === null || limit === 0) return { kind: "none" };
+  if (limit > maxTimeoutDots) return { kind: "count", text: `${left}/${limit}` };
+  return { kind: "dots", active: Math.min(left, limit), total: limit };
+}
 var missingScore = "-";
 function resolveLogoUrl(url, origin2) {
   try {
@@ -4902,7 +5104,9 @@ function team(side, value, game, origin2) {
     colour: value?.primary ?? null,
     logoUrl: value?.logo ? resolveLogoUrl(value.logo, origin2) : null,
     timeoutsLeft: timeouts.left,
-    timeoutLimit: timeouts.limit
+    timeoutLimit: timeouts.limit,
+    timeouts: timeoutView(timeouts),
+    possession: game.possession === side
   };
 }
 function scorebugModel(game, origin2) {
@@ -4911,7 +5115,9 @@ function scorebugModel(game, origin2) {
     home: team("home", game.teams.home, game, origin2),
     away: team("away", game.teams.away, game, origin2),
     score: { ...game.score },
-    clock: game.clock
+    clock: game.clock,
+    timeoutsPer: game.timeouts.per,
+    operator: { stale: game.ageWarning, clock: game.clock.confidence }
   };
 }
 var scoreText = (score) => score === null ? missingScore : String(score);
@@ -4935,6 +5141,7 @@ var clock = byId("game-clock");
 var scores = { home: byId("home-score"), away: byId("away-score") };
 var scoreElements = [scores.home, scores.away].filter((element) => element !== null);
 var chip = diag ? createChip() : null;
+var rail = byId("scorer-rail");
 var source;
 async function applyObsBgColor() {
   if (!/^https?:$/.test(location.protocol)) return;
@@ -4952,11 +5159,12 @@ function createChip() {
   document.body.append(element);
   return element;
 }
-function renderTeam(team2) {
+function renderTeam(team2, per) {
   const prefix = team2.side;
   const card = byId(`${prefix}-team-card`);
   const name = byId(`${prefix}-name`);
   card?.classList.toggle("is-placeholder", team2.name === null);
+  card?.classList.toggle("is-possession-team", team2.possession);
   if (name) name.textContent = team2.name ?? (team2.side === "home" ? "Home" : "Away");
   document.documentElement.style.setProperty(
     team2.side === "home" ? "--team-h-color" : "--team-a-color",
@@ -4976,16 +5184,75 @@ function renderTeam(team2) {
   const dots = byId(`${prefix}-timeouts`);
   if (dots) {
     dots.replaceChildren();
-    if (team2.timeoutsLeft !== null)
-      for (let index = 0; index < team2.timeoutLimit; index++) {
+    const view = team2.timeouts;
+    dots.dataset.timeouts = view.kind;
+    if (view.kind === "dots")
+      for (let index = 0; index < view.total; index++) {
         const dot = document.createElement("span");
         dot.className = "timeout-dot";
         dot.setAttribute("aria-hidden", "true");
-        dot.classList.toggle("is-active", index < team2.timeoutsLeft);
+        dot.classList.toggle("is-active", index < view.active);
         dots.append(dot);
       }
+    else if (view.kind === "count") {
+      const count = document.createElement("span");
+      count.className = "timeout-count";
+      count.textContent = view.text;
+      dots.append(count);
+    }
+    const side = team2.side === "home" ? "Home" : "Away";
+    dots.setAttribute(
+      "aria-label",
+      view.kind === "none" ? `${side} timeouts not known` : `${side} timeouts left this ${per}`
+    );
   }
 }
+var railTimeline = null;
+function writeBanner(banner) {
+  const set = (id, value) => {
+    const element = byId(id);
+    if (!element) return;
+    element.textContent = value ?? "";
+    element.style.display = value === null ? "none" : "";
+  };
+  set("event-title", banner.title);
+  set("scorer-text", banner.primary);
+  set("assist-text", banner.secondary);
+  set("scorer-stat", banner.scoreline);
+  const wrap3 = byId("scorer-stat-wrap");
+  if (wrap3) wrap3.style.display = banner.scoreline === null ? "none" : "";
+  rail?.style.setProperty("--event-accent", `var(--team-${banner.side === "home" ? "h" : "a"}-color)`);
+}
+var banners = createBannerController({
+  show(banner) {
+    if (!rail) return;
+    railTimeline?.kill();
+    writeBanner(banner);
+    rail.dataset.bannerId = banner.id;
+    rail.dataset.bannerKind = banner.kind;
+    const timeline2 = gsapWithCSS.timeline();
+    const card = byId(`${banner.side}-team-card`);
+    if (card && banner.kind === "goal")
+      timeline2.fromTo(card, { filter: "brightness(1)" }, { filter: "brightness(1.24)", duration: 0.14, yoyo: true, repeat: 1, ease: "power2.out" }, 0);
+    timeline2.fromTo(rail, { y: 92, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.44, ease: "power3.out" }, 0);
+    const sweep = rail.querySelector(".goal-sweep");
+    if (sweep) timeline2.fromTo(sweep, { xPercent: -120 }, { xPercent: 120, duration: 0.7, ease: "power2.inOut" }, 0.26);
+    railTimeline = timeline2;
+  },
+  refresh: writeBanner,
+  hide(mode) {
+    if (!rail) return;
+    railTimeline?.kill();
+    delete rail.dataset.bannerId;
+    delete rail.dataset.bannerKind;
+    if (mode === "exit") railTimeline = gsapWithCSS.timeline().to(rail, { y: 72, autoAlpha: 0, duration: 0.3, ease: "power2.in" });
+    else {
+      railTimeline = null;
+      gsapWithCSS.set(rail, { autoAlpha: 0, y: 0 });
+      for (const card of [byId("home-team-card"), byId("away-team-card")]) if (card) gsapWithCSS.set(card, { clearProps: "filter" });
+    }
+  }
+});
 function bump(element) {
   gsapWithCSS.to(element, {
     keyframes: [
@@ -5001,6 +5268,8 @@ function stopScoreAnimations() {
 }
 function clear() {
   stopScoreAnimations();
+  delete document.body.dataset.sourceFreshness;
+  delete document.body.dataset.sourceClock;
   overlay?.classList.add("is-empty");
   for (const id of ["home-name", "away-name", "home-score", "away-score", "game-clock", "home-timeouts", "away-timeouts"])
     byId(id)?.replaceChildren();
@@ -5008,20 +5277,24 @@ function clear() {
     const logo = byId(`${side}-logo`);
     logo?.removeAttribute("src");
     if (logo) logo.hidden = true;
+    byId(`${side}-team-card`)?.classList.remove("is-possession-team");
   }
 }
 function render3(state, changed = { home: false, away: false }) {
   document.body.dataset.sourceStatus = state.status;
+  const model = state.game ? scorebugModel(state.game, origin) : null;
   if (chip) {
+    const signals = model ? [model.operator.stale ? "stale" : null, model.operator.clock === "good" ? null : `clock ${model.operator.clock}`] : [];
     chip.dataset.status = state.status;
-    chip.textContent = [`Scores: ${state.status}`, state.problem, config3.ok ? config3.config.profile : null].filter(Boolean).join(" \xB7 ");
+    chip.textContent = [`Scores: ${state.status}`, state.problem, ...signals, config3.ok ? config3.config.profile : null].filter(Boolean).join(" \xB7 ");
   }
-  if (!state.game) return clear();
-  const model = scorebugModel(state.game, origin);
+  if (!model) return clear();
+  document.body.dataset.sourceFreshness = model.operator.stale ? "stale" : "fresh";
+  document.body.dataset.sourceClock = model.operator.clock;
   overlay?.classList.remove("is-empty");
   overlay?.setAttribute("data-score-source", model.score.source);
-  renderTeam(model.home);
-  renderTeam(model.away);
+  renderTeam(model.home, model.timeoutsPer);
+  renderTeam(model.away, model.timeoutsPer);
   if (clock) clock.textContent = clockText(model.clock, source?.serverNow() ?? Date.now());
   stopScoreAnimations();
   for (const side of ["home", "away"]) {
@@ -5036,7 +5309,11 @@ function render3(state, changed = { home: false, away: false }) {
 if (!config3.ok) console.warn(`scorebug: Scores setup error (${config3.problem})`);
 void applyObsBgColor();
 source = createScoresSource(config3, {
-  onUpdate: (update) => render3(update.state, scoreBumps(update))
+  onUpdate: (update) => {
+    render3(update.state, scoreBumps(update));
+    banners.update(update);
+  },
+  onMoment: (event) => banners.moment(event)
 });
 render3(source.state);
 source.tickClock((elapsedMs) => {

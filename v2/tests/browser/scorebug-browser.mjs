@@ -1,4 +1,4 @@
-// OBS-like acceptance check (S1-A5): headless Chromium loads the built scoreboard.html against a
+// OBS-like acceptance check (S1-A5, S2-A3): headless Chromium loads the built scoreboard.html against a
 // local deterministic fake Scores (real WebSocket protocol, synthetic fixtures). Dev only.
 // Usage: npm run test:browser   (ports: SCOREBOARD_PORT=8131, FAKE_SCORES_PORT=8141)
 import assert from "node:assert/strict";
@@ -108,6 +108,8 @@ async function openPage(params, { skewMs = 0 } = {}) {
       Date.now = () => realNow() + skew;
     }
     window.__bumps = 0;
+    // Every banner entrance (the rail's `data-banner-id` is set on show, removed on hide).
+    window.__banners = [];
     // Status transitions with the number of sockets opened so far and whether the bug was empty.
     window.__sockets = 0;
     window.__statuses = [];
@@ -126,8 +128,11 @@ async function openPage(params, { skewMs = 0 } = {}) {
             sockets: window.__sockets,
             empty: document.querySelector(".overlay-scoreboard").classList.contains("is-empty"),
           });
-        else if (/scale\(1\.[1-9]/.test(record.target.getAttribute("style") ?? "")) window.__bumps++;
-    }).observe(document, { subtree: true, attributes: true, attributeFilter: ["style", "data-source-status"] });
+        else if (record.attributeName === "data-banner-id") {
+          const id = record.target.getAttribute("data-banner-id");
+          if (id) window.__banners.push(id);
+        } else if (/scale\(1\.[1-9]/.test(record.target.getAttribute("style") ?? "")) window.__bumps++;
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ["style", "data-source-status", "data-banner-id"] });
   }, skewMs);
   const fragment = new URLSearchParams(params).toString();
   await page.goto(`http://127.0.0.1:${scoreboardPort}/ui/obs/scoreboard.html#${fragment}`);
@@ -147,6 +152,23 @@ const settle = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const statuses = (page) => page.evaluate(() => window.__statuses);
 const socketCount = (page) => page.evaluate(() => window.__sockets);
 const profile = { scores: scoresOrigin, profile: fixtureProfile, key: fixtureKey, diag: "1" };
+const bannerLog = (page) => page.evaluate(() => window.__banners);
+const shortId = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
+/** The rail's banner id (undefined when none is on air) and its computed visibility. */
+const rail = (page) =>
+  page.evaluate(() => {
+    const element = document.getElementById("scorer-rail");
+    return { id: element.dataset.bannerId, visibility: getComputedStyle(element).visibility };
+  });
+const waitBanner = (page, id) =>
+  page.waitForFunction((expected) => document.getElementById("scorer-rail").dataset.bannerId === expected, id, { timeout: 5000 });
+const timeoutDots = (page, side) =>
+  page.evaluate((prefix) => {
+    const element = document.getElementById(`${prefix}-timeouts`);
+    return { kind: element.dataset.timeouts, dots: [...element.querySelectorAll(".timeout-dot")].map((dot) => dot.classList.contains("is-active")), text: element.textContent };
+  }, side);
+const possession = (page) =>
+  page.evaluate(() => ["home", "away"].map((side) => document.getElementById(`${side}-team-card`).classList.contains("is-possession-team")));
 
 let main;
 try {
@@ -170,11 +192,12 @@ try {
     const after = await clockSeconds(main.page);
     assert.ok(after >= before + 2, `the clock runs locally (${before} -> ${after})`);
     assert.equal(await bumps(main.page), 0, "no animation on the first render");
-    // Slice 2 banners stay in the markup but never show in S1.
+    // The snapshot's goal history is quiet: no banner on the first render.
     const banners = await main.page.evaluate(() =>
       ["scorer-rail", "info-rail", "player-rail"].map((id) => getComputedStyle(document.getElementById(id)).visibility),
     );
     assert.deepEqual(banners, ["hidden", "hidden", "hidden"]);
+    assert.deepEqual(await bannerLog(main.page), []);
   });
 
   await check("degraded: a dropped server keeps the score and the clock advancing", async () => {
@@ -264,6 +287,100 @@ try {
     assert.ok(Math.abs(previous - expected()) <= 1, `${previous} s vs ${expected()} s`);
     assert.equal(await socketCount(page), 2);
     await page.close();
+  });
+
+  await check("possession and per-side timeouts render from the snapshot", async () => {
+    hub.snapshotData(live("game-standard"));
+    await main.page.waitForFunction(() => document.getElementById("away-team-card").classList.contains("is-possession-team"));
+    assert.deepEqual(await possession(main.page), [false, true], "possession, never guessed from offence (home)");
+    assert.deepEqual(await timeoutDots(main.page, "home"), { kind: "dots", dots: [true, true], text: "" });
+    assert.deepEqual(await timeoutDots(main.page, "away"), { kind: "dots", dots: [true, false], text: "" });
+    hub.snapshotData(live("game-asymmetric-timeouts"));
+    await main.page.waitForFunction(() => document.querySelectorAll("#home-timeouts .timeout-dot").length === 3);
+    assert.deepEqual(await timeoutDots(main.page, "home"), { kind: "dots", dots: [true, true, false], text: "" });
+    assert.deepEqual(await timeoutDots(main.page, "away"), { kind: "dots", dots: [false], text: "" });
+    assert.deepEqual(await possession(main.page), [false, false], "BASIC: no possession");
+  });
+
+  await check("operator-only freshness and clock confidence: attributes and chip, nothing on air", async () => {
+    const onAir = () => main.page.evaluate(() => document.querySelector(".overlay-scoreboard").outerHTML.replace(/<img[^>]*>/g, ""));
+    hub.snapshotData(live("game-standard"));
+    await main.page.waitForFunction(() => document.body.dataset.sourceFreshness === "fresh");
+    const before = await onAir();
+    hub.snapshotData(live("game-partial"));
+    await main.page.waitForFunction(() => document.body.dataset.sourceFreshness === "stale");
+    assert.equal(await main.page.evaluate(() => document.body.dataset.sourceClock), "uncertain");
+    assert.equal(await main.page.evaluate(() => document.querySelector(".source-status-chip").textContent), `Scores: live · stale · clock uncertain · ${fixtureProfile}`);
+    assert.deepEqual(await timeoutDots(main.page, "home"), { kind: "none", dots: [], text: "" }, "not covered: no fake dots");
+    const after = await onAir();
+    for (const marker of ["stale", "uncertain", "warning"]) assert.ok(!after.includes(marker), `no on-air ${marker} marker`);
+    assert.ok(before.includes("scoreboard-shell") && after.includes("scoreboard-shell"));
+  });
+
+  await check("a live goal shows its banner once; a reload does not; a void retracts it at once", async () => {
+    hub.snapshotData(live("game-standard"));
+    await main.page.waitForFunction(() => document.body.dataset.sourceFreshness === "fresh");
+    const seen = (await bannerLog(main.page)).length;
+    hub.snapshotData(live("game-standard-goal"));
+    hub.moment("moment-goal-named");
+    await waitBanner(main.page, shortId(302));
+    await settle(700);
+    assert.deepEqual(await rail(main.page), { id: shortId(302), visibility: "visible" });
+    assert.deepEqual(
+      await Promise.all(["event-title", "scorer-text", "assist-text", "scorer-stat"].map((id) => text(main.page, id))),
+      ["GOAL", "W31 Fixture Scorer", "Assist: W31 Fixture Thrower", "6\u20134"],
+    );
+    assert.deepEqual([await text(main.page, "home-score"), await text(main.page, "away-score")], ["6", "4"], "the score is the snapshot's");
+    // At-least-once delivery: a duplicate id never enters again.
+    hub.moment("moment-goal-named");
+    // A reload while the goal is current: its history is quiet.
+    const reloaded = await openPage(profile);
+    await waitStatus(reloaded.page, "live");
+    await settle(1200);
+    assert.deepEqual(await bannerLog(reloaded.page), []);
+    assert.equal((await rail(reloaded.page)).visibility, "hidden");
+    await reloaded.page.close();
+    assert.deepEqual((await bannerLog(main.page)).slice(seen), [shortId(302)], "exactly once");
+    // The void: the snapshot without the goal, then the void moment. Gone at once (no exit).
+    hub.snapshotData(live("game-standard"));
+    hub.moment("moment-voided");
+    await main.page.waitForFunction(() => getComputedStyle(document.getElementById("scorer-rail")).visibility === "hidden", null, { timeout: 1000 });
+    assert.deepEqual(await rail(main.page), { id: undefined, visibility: "hidden" });
+    assert.deepEqual([await text(main.page, "home-score"), await text(main.page, "away-score")], ["5", "4"]);
+  });
+
+  await check("a game switch clears the banner at once; a stale old-game moment never animates", async () => {
+    const seen = (await bannerLog(main.page)).length;
+    hub.snapshotData(live("game-standard-callahan"));
+    hub.moment("moment-goal-callahan");
+    await waitBanner(main.page, shortId(303));
+    assert.equal(await text(main.page, "assist-text"), "Callahan");
+    const switched = hub.snapshotData(live("game-hidden-stats"));
+    await main.page.waitForFunction(() => document.getElementById("scorer-rail").dataset.bannerId === undefined, null, { timeout: 1000 });
+    await main.page.waitForFunction(() => getComputedStyle(document.getElementById("scorer-rail")).visibility === "hidden", null, { timeout: 1000 });
+    assert.deepEqual([await text(main.page, "home-score"), await text(main.page, "away-score")], ["2", "1"]);
+    assert.deepEqual(await possession(main.page), [true, false]);
+    hub.deliver({ ...fixture("moment-goal-hidden"), version: switched.version - 1 });
+    await settle(1200);
+    assert.deepEqual((await bannerLog(main.page)).slice(seen), [shortId(303)]);
+    // A timeout banner on the new game.
+    hub.snapshotData(live("game-standard-timeout"));
+    hub.moment("moment-timeout");
+    await waitBanner(main.page, shortId(304));
+    assert.deepEqual(
+      await Promise.all(["event-title", "scorer-text", "assist-text"].map((id) => text(main.page, id))),
+      ["TIMEOUT", "W31 Fixture Home", "1 of 2 left this half"],
+    );
+    assert.equal(await main.page.evaluate(() => document.getElementById("scorer-stat-wrap").style.display), "none");
+  });
+
+  await check("unavailable clears a banner on air at once", async () => {
+    await waitBanner(main.page, shortId(304));
+    hub.remove();
+    await waitStatus(main.page, "unavailable");
+    assert.deepEqual(await rail(main.page), { id: undefined, visibility: "hidden" });
+    hub.snapshotData(live("game-live"));
+    await waitStatus(main.page, "live");
   });
 
   await check("unavailable: a key revoked while connected clears the scorebug before any reconnect", async () => {
