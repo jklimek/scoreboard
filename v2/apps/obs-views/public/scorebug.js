@@ -4377,6 +4377,7 @@ function createLiveClient(options) {
     names.map((name) => [name, { version: 0, dataVersion: 0, data: void 0, seen: /* @__PURE__ */ new Set() }])
   );
   let offset = null;
+  let stale = false;
   let closed = false;
   let failedOpens = 0;
   let socketWorked = false;
@@ -4384,7 +4385,10 @@ function createLiveClient(options) {
   const report = (connection, value, extra) => options.onStatus?.({ state: value, transport, channels: connection.names, ...extra });
   function sample(serverNow) {
     const value = Date.parse(serverNow) - Date.now();
-    if (Number.isFinite(value) && (offset === null || value > offset)) offset = value;
+    if (Number.isFinite(value) && (offset === null || stale || value > offset)) {
+      offset = value;
+      stale = false;
+    }
   }
   function apply(message) {
     const channel = state.get(message?.channel);
@@ -4580,7 +4584,7 @@ function createLiveClient(options) {
     socket.onopen = () => {
       opened = socketWorked = true;
       failedOpens = 0;
-      offset = null;
+      stale = true;
       if (key) socket.send(JSON.stringify({ op: "auth", key }));
       connection.subscribe = subscribe;
       subscribe(connection.names);
@@ -4640,7 +4644,7 @@ function createLiveClient(options) {
       const response = await fetchImpl(url, { headers, signal: abort.signal, cache: "no-store" });
       if (response.status === 404) return isolate(connection);
       if (response.status !== 200 || !response.body) throw new Error(`HTTP ${response.status}`);
-      offset = null;
+      stale = true;
       unwatch = watch(connection, stop);
       report(connection, "open");
       const reader = response.body.getReader();

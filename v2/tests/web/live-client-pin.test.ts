@@ -9,7 +9,7 @@ const rows = [...provenance.matchAll(/^\| `([^`]+)` \| `([^`]+)` \| `([0-9a-f]{4
 
 test("the provenance names the release commit and both pinned files", () => {
   assert.match(provenance, /^- Repository: `ultimatepolska\/scores`$/m);
-  assert.match(provenance, /^- Release commit: `[0-9a-f]{40}`/m);
+  assert.match(provenance, /^- (Release|Candidate) commit: `[0-9a-f]{40}`/m);
   assert.deepEqual(rows.map((row) => row[1]).sort(), ["live-client.d.ts", "live-client.js"]);
   const files = readdirSync(vendor).filter((name) => !name.startsWith(".") && name !== "PROVENANCE.md").sort();
   assert.deepEqual(files, ["live-client.d.ts", "live-client.js"]);

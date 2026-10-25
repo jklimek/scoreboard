@@ -67,8 +67,9 @@ export function createLiveClient(options) {
   const state = new Map(
     names.map((name) => [name, { version: 0, dataVersion: 0, data: undefined, seen: new Set() }]),
   );
-  /** Server clock minus local clock: the largest sample of the current connection. */
+  /** Server minus local clock, largest sample; a reopen keeps it until a new sample. */
   let offset = null;
+  let stale = false;
   let closed = false;
   /** Sockets closed unopened in a row: `auto` moves to SSE after 1 (none ever opened) or 5. */
   let failedOpens = 0;
@@ -80,7 +81,10 @@ export function createLiveClient(options) {
 
   function sample(serverNow) {
     const value = Date.parse(serverNow) - Date.now();
-    if (Number.isFinite(value) && (offset === null || value > offset)) offset = value;
+    if (Number.isFinite(value) && (offset === null || stale || value > offset)) {
+      offset = value;
+      stale = false;
+    }
   }
 
   /** Applies one envelope; true when it was valid for a followed channel. */
@@ -301,7 +305,7 @@ export function createLiveClient(options) {
     socket.onopen = () => {
       opened = socketWorked = true;
       failedOpens = 0;
-      offset = null;
+      stale = true;
       if (key) socket.send(JSON.stringify({ op: 'auth', key }));
       connection.subscribe = subscribe;
       subscribe(connection.names);
@@ -363,7 +367,7 @@ export function createLiveClient(options) {
       const response = await fetchImpl(url, { headers, signal: abort.signal, cache: 'no-store' });
       if (response.status === 404) return isolate(connection);
       if (response.status !== 200 || !response.body) throw new Error(`HTTP ${response.status}`);
-      offset = null;
+      stale = true;
       unwatch = watch(connection, stop);
       report(connection, 'open');
       const reader = response.body.getReader();

@@ -5,7 +5,8 @@ Never edit these files: `tests/web/live-client-pin.test.ts` fails when a file's 
 the table below.
 
 - Repository: `ultimatepolska/scores`
-- Release commit: `78d4ecc277ea8f2fb71c1ca08ba5ed51274a1733` (committed 2026-10-25T01:57:57+02:00)
+- Candidate commit: `e06f964b477474068eb22e381d4e03daf386215a` (committed 2026-10-25T15:57:09Z)
+- Status: B06-UP candidate on Scores branch `wave31/b06-upstream` (PR ultimatepolska/scores#219), not yet on Scores main. After #219 merges, rerun step 2 without `--candidate` on the merge commit (same bytes expected).
 - Pinned: 2026-10-25
 - The same `live-client.js` bytes are served publicly by every Scores deployment at
   `/broadcast/live-client.js`; the scoreboard bundles this copy with esbuild and never loads code
@@ -13,7 +14,7 @@ the table below.
 
 | File | Scores path | Last change | SHA-256 |
 | ---- | ----------- | ----------- | ------- |
-| `live-client.js` | `packages/live-client/src/live-client.js` | `b4517c582d0a23d811282f02745090f0755ed67f` | `425b249985b9b5a98fefcbb5742b81d2550f77bc65cd7044edfa807bae89cc79` |
+| `live-client.js` | `packages/live-client/src/live-client.js` | `e06f964b477474068eb22e381d4e03daf386215a` | `aa3cfeb2043ef13c9a344befb63ac9d968a12f3264f67753eee7accadbd2bfa0` |
 | `live-client.d.ts` | `packages/live-client/src/live-client.d.ts` | `b4517c582d0a23d811282f02745090f0755ed67f` | `72b5a540d8142d7860bfc2e07a8b55818a1bdee5b69792e87aab7b568d9495f3` |
 
 ## Update procedure

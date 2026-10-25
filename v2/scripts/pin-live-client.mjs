@@ -1,5 +1,7 @@
 // Pins the official Scores live client into vendor/scores-live-client (the only update path).
-// Usage: node scripts/pin-live-client.mjs --scores <scores checkout> --ref <commit>
+// Usage: node scripts/pin-live-client.mjs --scores <scores checkout> --ref <commit> [--candidate <note>]
+// `--candidate` records a commit that is not yet on Scores main (e.g. an open upstream PR); rerun
+// without it on the merge commit to record the release.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -11,11 +13,14 @@ const sourceDir = "packages/live-client/src";
 const files = ["live-client.js", "live-client.d.ts"];
 const target = join(dirname(fileURLToPath(import.meta.url)), "..", "vendor", "scores-live-client");
 
-function argument(name) {
+function argument(name, optional = false) {
   const index = process.argv.indexOf(name);
+  if (index < 0 && optional) return undefined;
   const value = index > 0 ? process.argv[index + 1] : undefined;
   if (!value || value.startsWith("--")) {
-    console.error("Usage: node scripts/pin-live-client.mjs --scores <scores checkout> --ref <commit>");
+    console.error(
+      "Usage: node scripts/pin-live-client.mjs --scores <scores checkout> --ref <commit> [--candidate <note>]",
+    );
     process.exit(2);
   }
   return value;
@@ -23,6 +28,7 @@ function argument(name) {
 
 const checkout = argument("--scores");
 const ref = argument("--ref");
+const candidate = argument("--candidate", true);
 const git = (...args) => execFileSync("git", ["-C", checkout, ...args], { maxBuffer: 1 << 24 });
 const text = (...args) => git(...args).toString("utf8").trim();
 
@@ -55,8 +61,8 @@ Never edit these files: \`tests/web/live-client-pin.test.ts\` fails when a file'
 the table below.
 
 - Repository: \`${repository}\`
-- Release commit: \`${commit}\` (committed ${committedAt})
-- Pinned: ${new Date().toISOString().slice(0, 10)}
+- ${candidate ? "Candidate" : "Release"} commit: \`${commit}\` (committed ${committedAt})
+${candidate ? `- Status: ${candidate}\n` : ""}- Pinned: ${new Date().toISOString().slice(0, 10)}
 - The same \`live-client.js\` bytes are served publicly by every Scores deployment at
   \`/broadcast/live-client.js\`; the scoreboard bundles this copy with esbuild and never loads code
   from a Scores origin at runtime.
@@ -69,7 +75,8 @@ ${rows.join("\n")}
 
 1. In a Scores checkout, fetch the release commit to pin.
 2. From \`v2/\`: \`node scripts/pin-live-client.mjs --scores <scores checkout> --ref <commit>\`
-   (reads the files with \`git show <commit>:${sourceDir}/…\` and rewrites this file).
+   (reads the files with \`git show <commit>:${sourceDir}/…\` and rewrites this file). A commit not
+   yet on Scores main takes \`--candidate <note>\`; rerun without it once the commit is released.
 3. \`npm test && npm run build:web && npm run test:browser\`, then commit the vendored files, this
    file and the rebuilt bundles together.
 `,
