@@ -1,0 +1,418 @@
+{
+  "v": 1,
+  "channel": "stream:w31-fixture:game",
+  "type": "snapshot",
+  "version": 251,
+  "serverNow": "2026-10-25T17:00:00.000Z",
+  "data": {
+    "game": {
+      "id": "00000000-0000-4000-8000-000000000017",
+      "name": "W31 Fixture Game",
+      "round": 1,
+      "competition": {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "name": "W31 Fixture Cup",
+        "slug": "w31-fixture-cup"
+      },
+      "division": {
+        "id": "00000000-0000-4000-8000-000000000002",
+        "name": "Open",
+        "colour": null
+      },
+      "pool": {
+        "id": "00000000-0000-4000-8000-000000000003",
+        "name": "Pool A"
+      },
+      "court": {
+        "id": "00000000-0000-4000-8000-000000000004",
+        "name": "Field 1"
+      },
+      "venue": null,
+      "scheduledAt": "2026-10-25T10:00:00.000Z",
+      "timezone": "Europe/Warsaw",
+      "status": "live",
+      "statsLevel": "STANDARD",
+      "version": 7
+    },
+    "teams": {
+      "home": {
+        "entryId": "00000000-0000-4000-8000-000000000101",
+        "displayName": "W31 Fixture Home",
+        "abbreviation": "W3H",
+        "abbreviationSource": "entry",
+        "clubShortName": null,
+        "colours": {
+          "primary": "#1b6f7d",
+          "secondary": "#ffffff",
+          "text": "#ffffff"
+        },
+        "colourSource": "entry",
+        "contrastWarning": false,
+        "logo": {
+          "small": "/api/public/v1/broadcast/logos/00000000-0000-4000-8000-000000000201/128?v=1",
+          "large": "/api/public/v1/broadcast/logos/00000000-0000-4000-8000-000000000201/512?v=1",
+          "version": "1"
+        },
+        "logoSource": "entry"
+      },
+      "away": {
+        "entryId": "00000000-0000-4000-8000-000000000102",
+        "displayName": "W31 Fixture Away",
+        "abbreviation": "W3A",
+        "abbreviationSource": "entry",
+        "clubShortName": null,
+        "colours": {
+          "primary": "#f5b301",
+          "secondary": null,
+          "text": "#111111"
+        },
+        "colourSource": "entry",
+        "contrastWarning": false,
+        "logo": null,
+        "logoSource": null
+      }
+    },
+    "score": {
+      "home": 3,
+      "away": 2,
+      "source": "observed",
+      "observed": {
+        "home": 3,
+        "away": 2
+      },
+      "official": null
+    },
+    "target": {
+      "gameTo": 15,
+      "initial": 15,
+      "winBy": 1,
+      "halftimeAt": 8,
+      "softCapAtMs": null,
+      "hardCapAtMs": null,
+      "capApplied": "none"
+    },
+    "offence": null,
+    "possession": null,
+    "point": {
+      "number": null,
+      "half": null,
+      "ratio": null
+    },
+    "timeouts": {
+      "per": "game",
+      "home": {
+        "used": 1,
+        "left": 1,
+        "limit": 2
+      },
+      "away": {
+        "used": 0,
+        "left": 2,
+        "limit": 2
+      }
+    },
+    "clock": {
+      "confidence": "good",
+      "capMs": null,
+      "halftimeAtMs": null,
+      "softCapAtMs": null,
+      "hardCapAtMs": null,
+      "running": true,
+      "elapsedMs": 600000,
+      "anchorServerTs": "2026-10-25T17:00:00.000Z"
+    },
+    "lastPoint": null,
+    "points": [],
+    "timeline": [
+      {
+        "id": "00000000-0000-4000-8000-000000000351",
+        "kind": "goal",
+        "side": "home",
+        "elapsedMs": 21060000,
+        "scoreAfter": {
+          "home": 1,
+          "away": 0
+        },
+        "scorer": {
+          "personId": "00000000-0000-4000-8000-000000000406",
+          "number": "0",
+          "displayName": null,
+          "firstName": null,
+          "lastName": null,
+          "shortName": null
+        },
+        "assist": {
+          "personId": "00000000-0000-4000-8000-000000000407",
+          "number": null,
+          "displayName": null,
+          "firstName": null,
+          "lastName": null,
+          "shortName": null
+        },
+        "defender": null,
+        "callahan": false
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000352",
+        "kind": "goal",
+        "side": "away",
+        "elapsedMs": 21120000,
+        "scoreAfter": {
+          "home": 1,
+          "away": 1
+        },
+        "scorer": {
+          "personId": "00000000-0000-4000-8000-000000000408",
+          "number": "7",
+          "displayName": null,
+          "firstName": null,
+          "lastName": null,
+          "shortName": null
+        },
+        "assist": {
+          "personId": "00000000-0000-4000-8000-000000000409",
+          "number": "7",
+          "displayName": null,
+          "firstName": null,
+          "lastName": null,
+          "shortName": "W31 Short"
+        },
+        "defender": null,
+        "callahan": false
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000353",
+        "kind": "goal",
+        "side": "home",
+        "elapsedMs": 21180000,
+        "scoreAfter": {
+          "home": 2,
+          "away": 1
+        },
+        "scorer": {
+          "personId": "00000000-0000-4000-8000-000000000409",
+          "number": "7",
+          "displayName": null,
+          "firstName": null,
+          "lastName": null,
+          "shortName": "W31 Short"
+        },
+        "assist": {
+          "personId": "00000000-0000-4000-8000-000000000408",
+          "number": "7",
+          "displayName": null,
+          "firstName": null,
+          "lastName": null,
+          "shortName": null
+        },
+        "defender": null,
+        "callahan": false
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000354",
+        "kind": "goal",
+        "side": "away",
+        "elapsedMs": 21240000,
+        "scoreAfter": {
+          "home": 2,
+          "away": 2
+        },
+        "scorer": {
+          "personId": "00000000-0000-4000-8000-000000000410",
+          "number": "",
+          "displayName": null,
+          "firstName": "W31",
+          "lastName": null,
+          "shortName": null
+        },
+        "assist": {
+          "personId": "00000000-0000-4000-8000-000000000411",
+          "number": " ",
+          "displayName": " ",
+          "firstName": " ",
+          "lastName": null,
+          "shortName": null
+        },
+        "defender": null,
+        "callahan": false
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000355",
+        "kind": "goal",
+        "side": "home",
+        "elapsedMs": 21300000,
+        "scoreAfter": {
+          "home": 3,
+          "away": 2
+        },
+        "scorer": {
+          "personId": "00000000-0000-4000-8000-000000000411",
+          "number": " ",
+          "displayName": " ",
+          "firstName": " ",
+          "lastName": null,
+          "shortName": null
+        },
+        "assist": {
+          "personId": "00000000-0000-4000-8000-000000000406",
+          "number": "0",
+          "displayName": null,
+          "firstName": null,
+          "lastName": null,
+          "shortName": null
+        },
+        "defender": null,
+        "callahan": false
+      }
+    ],
+    "run": {
+      "side": null,
+      "length": null,
+      "longest": {
+        "home": null,
+        "away": null
+      }
+    },
+    "teamStats": {
+      "home": {
+        "oPoints": null,
+        "dPoints": null,
+        "holds": null,
+        "breaks": null,
+        "holdRate": null,
+        "breakRate": null,
+        "turnovers": null,
+        "timeoutsUsed": null,
+        "possessionShare": null
+      },
+      "away": {
+        "oPoints": null,
+        "dPoints": null,
+        "holds": null,
+        "breaks": null,
+        "holdRate": null,
+        "breakRate": null,
+        "turnovers": null,
+        "timeoutsUsed": null,
+        "possessionShare": null
+      },
+      "avgPointDurationMs": null,
+      "turnoversPerPoint": null
+    },
+    "players": {
+      "home": [
+        {
+          "player": {
+            "personId": "00000000-0000-4000-8000-000000000406",
+            "number": "0",
+            "displayName": null,
+            "firstName": null,
+            "lastName": null,
+            "shortName": null
+          },
+          "goals": 1,
+          "assists": 1,
+          "total": 2,
+          "callahans": 0,
+          "blocks": null
+        },
+        {
+          "player": {
+            "personId": "00000000-0000-4000-8000-000000000409",
+            "number": "7",
+            "displayName": null,
+            "firstName": null,
+            "lastName": null,
+            "shortName": "W31 Short"
+          },
+          "goals": 1,
+          "assists": 1,
+          "total": 2,
+          "callahans": 0,
+          "blocks": null
+        },
+        {
+          "player": {
+            "personId": "00000000-0000-4000-8000-000000000411",
+            "number": " ",
+            "displayName": " ",
+            "firstName": " ",
+            "lastName": null,
+            "shortName": null
+          },
+          "goals": 1,
+          "assists": 0,
+          "total": 1,
+          "callahans": 0,
+          "blocks": null
+        }
+      ],
+      "away": [
+        {
+          "player": {
+            "personId": "00000000-0000-4000-8000-000000000408",
+            "number": "7",
+            "displayName": null,
+            "firstName": null,
+            "lastName": null,
+            "shortName": null
+          },
+          "goals": 1,
+          "assists": 1,
+          "total": 2,
+          "callahans": 0,
+          "blocks": null
+        },
+        {
+          "player": {
+            "personId": "00000000-0000-4000-8000-000000000410",
+            "number": "",
+            "displayName": null,
+            "firstName": "W31",
+            "lastName": null,
+            "shortName": null
+          },
+          "goals": 1,
+          "assists": 0,
+          "total": 1,
+          "callahans": 0,
+          "blocks": null
+        },
+        {
+          "player": {
+            "personId": "00000000-0000-4000-8000-000000000407",
+            "number": null,
+            "displayName": null,
+            "firstName": null,
+            "lastName": null,
+            "shortName": null
+          },
+          "goals": null,
+          "assists": null,
+          "total": null,
+          "callahans": 0,
+          "blocks": null
+        }
+      ]
+    },
+    "leaders": {
+      "goals": [],
+      "assists": [],
+      "blocks": []
+    },
+    "completeness": {
+      "sequence": "complete",
+      "goals": "complete",
+      "assists": "complete",
+      "turnovers": "complete",
+      "timeouts": "complete",
+      "blocks": "partial",
+      "possession": "complete",
+      "clock": "complete"
+    },
+    "freshness": {
+      "lastChangeAt": "2026-10-25T17:00:00.000Z",
+      "ageWarning": false
+    }
+  }
+}

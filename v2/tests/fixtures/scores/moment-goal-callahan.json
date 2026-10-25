@@ -1,0 +1,30 @@
+{
+  "v": 1,
+  "channel": "stream:w31-fixture:game",
+  "type": "moment",
+  "version": 209,
+  "serverNow": "2026-10-25T13:02:00.000Z",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000303",
+    "elapsedMs": 1860000,
+    "kind": "goal",
+    "side": "away",
+    "pointNumber": 10,
+    "scorer": {
+      "personId": "00000000-0000-4000-8000-000000000405",
+      "number": "88",
+      "displayName": "W31 Fixture Defender",
+      "firstName": null,
+      "lastName": null,
+      "shortName": null
+    },
+    "assist": null,
+    "callahan": true,
+    "scoreAfter": {
+      "home": 5,
+      "away": 5
+    },
+    "outcome": "break",
+    "durationMs": 50000
+  }
+}

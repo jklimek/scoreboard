@@ -10,11 +10,83 @@ DOM-free TypeScript module shared by scoreboard views that follow a Scores strea
   needs (`stream:{slug}:game` for the scorebug). The key goes only to the client's first-frame
   `auth`; it is never logged, rendered, stored or put in a URL.
 - `game.ts`: the typed part of the Scores `BroadcastGame` snapshot the scorebug renders (game id,
-  team display name, primary colour and small logo, score and its source, timeouts left/limit,
-  clock), with a structural check (an unsupported payload is an explicit `error`).
-- `scorebug.ts`: pure scorebug view model, score/clock text and the score-bump rule. A logo loads
-  only when its resolved origin is the configured Scores origin (relative paths resolve against
-  it); another origin, a protocol-relative URL, credentials or a non-http(s) scheme mean no logo.
+  team display name, primary colour and small logo, score and its source, possession, timeouts
+  left/limit and their period, clock and its confidence, `freshness.ageWarning`, and the `goal`/
+  `timeout` entries of the public timeline), with a structural check (an unsupported payload is an
+  explicit `error`).
+- `moments.ts`: the part of a B01 moment the scorebug acts on (`goal`, `timeout`, `event.voided`,
+  `event.amended`; every other kind is ignored).
+- `scorebug.ts`: pure scorebug view model, score/clock text, timeouts view and the score-bump rule.
+  A logo loads only when its resolved origin is the configured Scores origin (relative paths
+  resolve against it); another origin, a protocol-relative URL, credentials or a non-http(s) scheme
+  mean no logo.
+- `banners.ts`: goal and timeout banners: which live moment may enter, the content (always from
+  the latest snapshot) and the one-at-a-time queue; the view only plays `show`/`refresh`/`hide`.
+
+## What the scorebug shows
+
+- Team names, colours and same-origin logos; the score (`-` when missing, never `0`); the clock.
+- **Possession** from `game.possession` only (a marker on that team's card). It is null at BASIC
+  and outside play, so nothing shows then; it is never guessed from `offence`.
+- **Timeouts** left of each side's own `limit` (asymmetric limits, per game or per half): one dot
+  per timeout up to five, a `left/limit` count above that, nothing when `left` is null (the log
+  does not cover them) or the limit is 0. No fixed number of dots.
+- Nothing is computed locally: no score arithmetic, no stats, no invented names or values.
+
+## Banners (goal, timeout)
+
+- A banner is admitted only on a **live** `goal` or `timeout` moment of the shown game (W31-D7
+  below) whose entry of that kind is in the latest snapshot's timeline. Every admitted banner plays,
+  in order, one at a time (goal 6 s, timeout 5 s, 0.4 s gap); at most three wait behind the one on
+  air, and beyond that the oldest waiting one is dropped (never the one on air). Two goals synced
+  in one snapshot both play. No timing window decides what is correct.
+- Its content is the moment's entry in the latest snapshot's timeline: a goal shows the scorer
+  (display name, else first and last name, else short name, else `#number`; `#0` is a number),
+  `Assist: …` or `Callahan`, and the score after the goal; a missing or hidden scorer shows the
+  team, and a null assist (none, unknown or not public) shows nothing. A timeout shows the team
+  and `n of limit left` when covered. Colours are the side's.
+- **Baseline**: every goal and timeout id in a baseline snapshot is history and never admitted.
+  Baselines are the document's first snapshot, the first snapshot of a switched game and the first
+  snapshot after a reconnect (the resync, or one that cannot be told apart from it). This covers
+  the hub delivering a new subscriber's retained snapshot (already holding the goal) and then that
+  goal's moment live, not as a replay. An id is also admitted at most once (at-least-once delivery).
+- Corrections are targeted: every snapshot re-derives the waiting and shown banners (an amended
+  assist updates the banner on air without a new entrance) and one whose entry is gone (a voided
+  goal) is retracted at once; `event.voided` retracts only its own target, shown or waiting;
+  an undo (`event.voided` whose `targetKind` is `event.voided`) retracts and starts nothing.
+- Restores (Scores `bb5ce05e`, B06-UP): undoing a void restores the goal in the snapshot and
+  announces only the undo, never the goal again, so nothing enters; voiding the undo announces the
+  original retraction again and the undo's void, and the snapshot retracts the goal.
+- Cancellation (a game switch, `degraded`, every state without a game, `close`) cuts at once the
+  banner on air, one still leaving (its exit is cut) and the queue.
+- Never animated: baseline history, replayed moments (`onReplay` is not used), anything while
+  `degraded`.
+- Residuals: a goal or timeout scored in the first snapshot after any reconnect is never
+  celebrated, even after an unchanged reconnect (no resync came, so the next live snapshot is the
+  baseline; its score does not bump either). Against a Scores API older than `bb5ce05e` (staging
+  until it is deployed) a restored goal is announced again as a new `goal` moment: a board that has
+  not seen that goal before (loaded or resynced while it was voided) shows its banner. There is no
+  client workaround.
+
+### W31-D7: moment identity
+
+Moments carry no game id. Within one channel the hub publishes in version order (a load sends its
+snapshot, then that projection's moments); a switched game's earlier moments are part of its
+first snapshot (`quietMoments`, never sent as moments) and leave the replay ring; the client drops
+a live moment whose version is not newer than its latest snapshot. So a live moment newer than the
+shown snapshot, while that snapshot is still the client's latest, belongs to the shown game. The
+source checks exactly that (`status` live, `version >` the snapshot's, `client.get` still at the
+snapshot) and drops anything else; the banner then also needs the id in that snapshot's timeline.
+`tests/web/banners.test.ts` proves it with the pinned client: a stale-version moment after a
+switch snapshot (also one whose id is in the new game), a moment published just before the switch,
+and a reconnect across a switch with the old game's moment buffered.
+
+## Operator-only signals
+
+`freshness.ageWarning` (the scorer has gone silent) and `clock.confidence` (`uncertain`,
+`unknown`) never change what is on air (Q77 spirit). They appear as `<body data-source-freshness>`
+(`fresh`/`stale`), `<body data-source-clock>` (`good`/`uncertain`/`unknown`) and in the diag chip
+(`stale`, `clock uncertain`); both attributes are removed when no game is shown.
 
 ## Status (Q77)
 
@@ -50,8 +122,9 @@ data it is `error`.
 - Clock: the client keeps its server-time estimate across a reconnect until the new connection's
   first `serverNow` sample, so an OBS host clock that is off never moves the running clock after
   an unchanged resume (no snapshot).
-- Animations: the first snapshot after any reconnect is the resync (or cannot be told apart from
-  it) and never animates; later live snapshots of the same game bump the changed digits. Replayed
-  moments never animate. Connection loss is never treated as a refusal.
+- Score bumps: the first snapshot after any reconnect is the resync (or cannot be told apart from
+  it) and never bumps, and only a snapshot ends that suppression (a live moment before it does
+  not); later live snapshots of the same game bump the changed digits. Replayed moments never
+  animate. Connection loss is never treated as a refusal.
 - After a refusal the board shows again with the next snapshot the profile publishes; reloading
   the browser source shows the current one at once.

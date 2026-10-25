@@ -1,0 +1,43 @@
+{
+  "v": 1,
+  "channel": "stream:w31-fixture:game",
+  "type": "moment",
+  "version": 207,
+  "serverNow": "2026-10-25T13:01:30.000Z",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000321",
+    "elapsedMs": 1855000,
+    "kind": "event.amended",
+    "targetId": "00000000-0000-4000-8000-000000000302",
+    "target": {
+      "id": "00000000-0000-4000-8000-000000000302",
+      "elapsedMs": 1850000,
+      "kind": "goal",
+      "side": "home",
+      "pointNumber": 10,
+      "scorer": {
+        "personId": "00000000-0000-4000-8000-000000000401",
+        "number": "7",
+        "displayName": "W31 Fixture Scorer",
+        "firstName": "W31",
+        "lastName": "Scorer",
+        "shortName": "W. Scorer"
+      },
+      "assist": {
+        "personId": "00000000-0000-4000-8000-000000000403",
+        "number": "21",
+        "displayName": null,
+        "firstName": "W31",
+        "lastName": "Handler",
+        "shortName": null
+      },
+      "callahan": false,
+      "scoreAfter": {
+        "home": 6,
+        "away": 4
+      },
+      "outcome": "hold",
+      "durationMs": 50000
+    }
+  }
+}

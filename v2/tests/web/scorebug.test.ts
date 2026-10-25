@@ -46,7 +46,7 @@ test("an external logo in a snapshot is no logo (the neutral fallback)", () => {
   assert.equal(scorebugModel(readGameSnapshot(data)!, origin).home.logoUrl, null);
 });
 
-test("the projection keeps only what the scorebug renders", () => {
+test("the projection keeps only what the scorebug and its banners render", () => {
   assert.deepEqual(game("game-live"), {
     gameId: "00000000-0000-4000-8000-000000000011",
     teams: {
@@ -58,8 +58,24 @@ test("the projection keeps only what the scorebug renders", () => {
       away: { displayName: "W31 Fixture Away", primary: "#f5b301", logo: null },
     },
     score: { home: 3, away: 2, source: "observed" },
-    timeouts: { home: { left: 1, limit: 2 }, away: { left: 2, limit: 2 } },
-    clock: { running: true, elapsedMs: 600000, anchorServerTs: "2026-10-25T10:20:00.000Z" },
+    // S2: possession, the timeout period, clock confidence, freshness and the goal/timeout timeline.
+    possession: null,
+    timeouts: { per: "game", home: { left: 1, limit: 2 }, away: { left: 2, limit: 2 } },
+    clock: { running: true, elapsedMs: 600000, anchorServerTs: "2026-10-25T10:20:00.000Z", confidence: "good" },
+    ageWarning: false,
+    timeline: ["291", "292", "293", "296", "294", "295"].map((n) => {
+      const id = `00000000-0000-4000-8000-000000000${n}`;
+      const timeout = n === "296";
+      return {
+        id,
+        kind: timeout ? "timeout" : "goal",
+        side: ["291", "293", "295", "296"].includes(n) ? "home" : "away",
+        scoreAfter: timeout ? null : { "291": { home: 1, away: 0 }, "292": { home: 1, away: 1 }, "293": { home: 2, away: 1 }, "294": { home: 2, away: 2 }, "295": { home: 3, away: 2 } }[n]!,
+        scorer: null,
+        assist: null,
+        callahan: false,
+      };
+    }),
   });
 });
 

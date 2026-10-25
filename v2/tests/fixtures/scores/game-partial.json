@@ -1,0 +1,221 @@
+{
+  "v": 1,
+  "channel": "stream:w31-fixture:game",
+  "type": "snapshot",
+  "version": 241,
+  "serverNow": "2026-10-25T16:00:00.000Z",
+  "data": {
+    "game": {
+      "id": "00000000-0000-4000-8000-000000000016",
+      "name": "W31 Fixture Game",
+      "round": 1,
+      "competition": {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "name": "W31 Fixture Cup",
+        "slug": "w31-fixture-cup"
+      },
+      "division": {
+        "id": "00000000-0000-4000-8000-000000000002",
+        "name": "Open",
+        "colour": null
+      },
+      "pool": {
+        "id": "00000000-0000-4000-8000-000000000003",
+        "name": "Pool A"
+      },
+      "court": {
+        "id": "00000000-0000-4000-8000-000000000004",
+        "name": "Field 1"
+      },
+      "venue": null,
+      "scheduledAt": "2026-10-25T10:00:00.000Z",
+      "timezone": "Europe/Warsaw",
+      "status": "live",
+      "statsLevel": "STANDARD",
+      "version": 7
+    },
+    "teams": {
+      "home": {
+        "entryId": "00000000-0000-4000-8000-000000000101",
+        "displayName": "W31 Fixture Home",
+        "abbreviation": "W3H",
+        "abbreviationSource": "entry",
+        "clubShortName": null,
+        "colours": {
+          "primary": "#1b6f7d",
+          "secondary": "#ffffff",
+          "text": "#ffffff"
+        },
+        "colourSource": "entry",
+        "contrastWarning": false,
+        "logo": {
+          "small": "/api/public/v1/broadcast/logos/00000000-0000-4000-8000-000000000201/128?v=1",
+          "large": "/api/public/v1/broadcast/logos/00000000-0000-4000-8000-000000000201/512?v=1",
+          "version": "1"
+        },
+        "logoSource": "entry"
+      },
+      "away": {
+        "entryId": "00000000-0000-4000-8000-000000000102",
+        "displayName": "W31 Fixture Away",
+        "abbreviation": "W3A",
+        "abbreviationSource": "entry",
+        "clubShortName": null,
+        "colours": {
+          "primary": "#f5b301",
+          "secondary": null,
+          "text": "#111111"
+        },
+        "colourSource": "entry",
+        "contrastWarning": false,
+        "logo": null,
+        "logoSource": null
+      }
+    },
+    "score": {
+      "home": 7,
+      "away": 6,
+      "source": "observed",
+      "observed": {
+        "home": 7,
+        "away": 6
+      },
+      "official": null
+    },
+    "target": {
+      "gameTo": 15,
+      "initial": 15,
+      "winBy": 1,
+      "halftimeAt": 8,
+      "softCapAtMs": null,
+      "hardCapAtMs": null,
+      "capApplied": "none"
+    },
+    "offence": null,
+    "possession": null,
+    "point": {
+      "number": null,
+      "half": null,
+      "ratio": null
+    },
+    "timeouts": {
+      "per": "game",
+      "home": {
+        "used": null,
+        "left": null,
+        "limit": 2
+      },
+      "away": {
+        "used": 1,
+        "left": 1,
+        "limit": 2
+      }
+    },
+    "clock": {
+      "confidence": "uncertain",
+      "capMs": null,
+      "halftimeAtMs": null,
+      "softCapAtMs": null,
+      "hardCapAtMs": null,
+      "running": true,
+      "elapsedMs": 600000,
+      "anchorServerTs": "2026-10-25T16:00:00.000Z"
+    },
+    "lastPoint": null,
+    "points": [],
+    "timeline": [
+      {
+        "id": "00000000-0000-4000-8000-000000000341",
+        "kind": "goal",
+        "side": "away",
+        "elapsedMs": 20460000,
+        "scoreAfter": {
+          "home": 6,
+          "away": 6
+        },
+        "scorer": null,
+        "assist": null,
+        "defender": null,
+        "callahan": false
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000342",
+        "kind": "goal",
+        "side": "home",
+        "elapsedMs": 20520000,
+        "scoreAfter": {
+          "home": 7,
+          "away": 6
+        },
+        "scorer": {
+          "personId": "00000000-0000-4000-8000-000000000401",
+          "number": "7",
+          "displayName": "W31 Fixture Scorer",
+          "firstName": "W31",
+          "lastName": "Scorer",
+          "shortName": "W. Scorer"
+        },
+        "assist": null,
+        "defender": null,
+        "callahan": false
+      }
+    ],
+    "run": {
+      "side": null,
+      "length": null,
+      "longest": {
+        "home": null,
+        "away": null
+      }
+    },
+    "teamStats": {
+      "home": {
+        "oPoints": null,
+        "dPoints": null,
+        "holds": null,
+        "breaks": null,
+        "holdRate": null,
+        "breakRate": null,
+        "turnovers": null,
+        "timeoutsUsed": null,
+        "possessionShare": null
+      },
+      "away": {
+        "oPoints": null,
+        "dPoints": null,
+        "holds": null,
+        "breaks": null,
+        "holdRate": null,
+        "breakRate": null,
+        "turnovers": null,
+        "timeoutsUsed": null,
+        "possessionShare": null
+      },
+      "avgPointDurationMs": null,
+      "turnoversPerPoint": null
+    },
+    "players": {
+      "home": [],
+      "away": []
+    },
+    "leaders": {
+      "goals": [],
+      "assists": [],
+      "blocks": []
+    },
+    "completeness": {
+      "sequence": "partial",
+      "goals": "partial",
+      "assists": "partial",
+      "turnovers": "partial",
+      "timeouts": "partial",
+      "blocks": "unavailable",
+      "possession": "unavailable",
+      "clock": "partial"
+    },
+    "freshness": {
+      "lastChangeAt": "2026-10-25T16:00:00.000Z",
+      "ageWarning": true
+    }
+  }
+}

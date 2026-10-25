@@ -5,6 +5,13 @@
 // `subscribed`; envelopes `{v:1,channel,type,version,serverNow,data}` share one version sequence;
 // `pong` carries `serverNow`. A refused key answers `error NOT_FOUND` and closes 1008, at auth or
 // while connected (B06-UP); a connection overdue for verification closes 1008 without a frame.
+// The replay ring keeps only moments the current projection still carries (`hub.ts` rebuilds it on
+// every snapshot): a switched game's moments leave it, a voided play moment leaves it, and, as
+// Scores `bb5ce05e` (B06-UP), so do a voided correction and a restored play moment (one whose void
+// was undone is never a moment again). Modelled as "the moment's game is the snapshot's, and a play
+// moment's id is in the timeline and not restored, or a correction is not voided". Tests publish
+// what that Scores sends: a restore is the snapshot and the undo (`event.voided` targeting the void)
+// only; voiding the undo is the snapshot, the original `event.voided` again and the undo's void.
 // Test-only; transport adapters below.
 import { readFileSync } from "node:fs";
 
@@ -45,8 +52,14 @@ interface Connection {
 /** A hub channel: the retained snapshot (or `removed`) and the moment replay ring. */
 interface HubChannel {
   latest: Envelope;
-  moments: Envelope[];
+  moments: { envelope: Envelope; gameId: string | undefined; load: number }[];
+  /** Snapshots published so far: the moments after a snapshot belong to its load. */
+  load: number;
 }
+
+type GameData = { game?: { id?: string }; timeline?: { id?: string }[] } | null;
+const gameOf = (envelope: Envelope) => (envelope.type === "snapshot" ? (envelope.data as GameData)?.game?.id : undefined);
+const corrections = new Set(["event.voided", "event.amended", "result.official"]);
 
 export interface FakeScoresOptions {
   /** Valid key → profile slug. */
@@ -67,6 +80,11 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
   /** Test switches: refuse auth transiently, or reject every channel name (protocol mismatch). */
   const faults: { auth?: "LIMIT" | "NOT_READY"; invalidChannels?: boolean } = {};
   let version = 0;
+  /** Published `event.voided` moments: void id → target id. */
+  const voids = new Map<string, string>();
+  /** Voided by a void that is not itself voided (an undo restores the target). */
+  const isVoided = (id: string): boolean => [...voids].some(([by, target]) => target === id && !isVoided(by));
+  const isRestored = (id: string) => [...voids].some(([by, target]) => target === id && isVoided(by));
 
   const serverNow = () => new Date(now()).toISOString();
   const stamp = (envelope: Envelope, channel: string): Envelope => ({
@@ -80,7 +98,7 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
   const hubChannel = (name: string) => {
     // A profile with nothing to show streams `removed` (the hub reads stream keys with removed).
     let channel = channels.get(name);
-    if (!channel) channels.set(name, (channel = { latest: stamp({ ...fixture("removed"), data: null }, name), moments: [] }));
+    if (!channel) channels.set(name, (channel = { latest: stamp({ ...fixture("removed"), data: null }, name), moments: [], load: 0 }));
     return channel;
   };
 
@@ -139,7 +157,8 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
       if (!(from !== undefined && channel.latest.version <= from))
         control(connection, { ...channel.latest, serverNow: serverNow() });
       if (from !== undefined)
-        for (const moment of channel.moments) if (moment.version > from) control(connection, { ...moment, replay: true });
+        for (const { envelope } of channel.moments)
+          if (envelope.version > from) control(connection, { ...envelope, replay: true });
     }
     control(connection, { op: "subscribed", channels: names.filter((name) => connection.subscribed.has(name)) });
   }
@@ -152,15 +171,39 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
     subscribe(connection, message.channels as string[], (message.resume ?? {}) as Record<string, number>);
   }
 
+  /** Whether a ring moment is still carried by the projection of `snapshot`. */
+  const retained = (snapshot: Envelope) => {
+    const ids = new Set(((snapshot.data as GameData)?.timeline ?? []).map((entry) => entry.id));
+    return ({ envelope: moment, gameId }: HubChannel["moments"][number]) => {
+      const { id, kind } = moment.data as { id: string; kind: string };
+      return gameId === gameOf(snapshot) && (corrections.has(kind) ? !isVoided(id) : ids.has(id) && !isRestored(id));
+    };
+  };
+
   /** Versions and retains an envelope (moments in the replay ring, last 50), then sends it. */
   function publish(slug: string, envelope: Envelope) {
     const name = `stream:${slug}:game`;
     const channel = hubChannel(name);
     const stamped = stamp(envelope, name);
-    if (stamped.type === "moment") channel.moments = [...channel.moments, stamped].slice(-50);
-    else {
+    if (stamped.type === "moment") {
+      channel.moments = [
+        ...channel.moments,
+        { envelope: stamped, gameId: gameOf(channel.latest), load: channel.load },
+      ].slice(-50);
+      const moment = stamped.data as { id: string; kind: string; targetId?: string };
+      // A void belongs to the latest snapshot's projection: what it voids or restores was not
+      // in that projection's ring either. The real hub filters the ring once per load with the
+      // load's complete correction graph, so moments of the current load (e.g. a re-announced
+      // retraction before the undo's void) are never filtered by a later void of the same load.
+      if (moment.kind === "event.voided" && moment.targetId) {
+        voids.set(moment.id, moment.targetId);
+        const keep = retained(channel.latest);
+        channel.moments = channel.moments.filter((entry) => entry.load === channel.load || keep(entry));
+      }
+    } else {
       channel.latest = stamped;
-      if (stamped.type === "removed") channel.moments = [];
+      channel.load++;
+      channel.moments = stamped.type === "removed" ? [] : channel.moments.filter(retained(stamped));
     }
     for (const connection of connections) if (connection.subscribed.has(name)) control(connection, stamped);
     return stamped;
@@ -203,6 +246,24 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
       publish(slug, { ...fixture("game-live"), type: "snapshot", data }),
     /** A moment: sent to subscribers and kept in the replay ring. */
     moment: (name: string, slug = fixtureProfile) => publish(slug, { ...fixture(name), type: "moment" }),
+    /** Arbitrary moment data, versioned like `moment`. */
+    momentData: (data: unknown, slug = fixtureProfile) => publish(slug, { ...fixture("moment-goal"), type: "moment", data }),
+    /** The ring's moments for a profile (version and id), oldest first. */
+    ring: (slug = fixtureProfile) =>
+      (channels.get(`stream:${slug}:game`)?.moments ?? []).map(({ envelope }) => ({
+        version: envelope.version,
+        id: (envelope.data as { id: string }).id,
+      })),
+    /**
+     * Adverse ordering the real hub never produces: sends an envelope as given (its own version,
+     * e.g. one older than the latest snapshot) to every subscriber, without retaining it.
+     */
+    deliver(envelope: Envelope, slug = fixtureProfile) {
+      const name = `stream:${slug}:game`;
+      const message = { ...envelope, channel: name, serverNow: serverNow() };
+      for (const connection of connections) if (connection.subscribed.has(name)) control(connection, message);
+      return message;
+    },
     /** The profile has nothing to show any more: a `removed` envelope (also served to new subscribers). */
     remove: (slug = fixtureProfile) => publish(slug, { ...fixture("removed"), type: "removed", data: null }),
     /** Revokes a key: its sockets get `error NOT_FOUND` then a 1008 close; later auths are refused. */

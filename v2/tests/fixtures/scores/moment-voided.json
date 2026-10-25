@@ -1,0 +1,14 @@
+{
+  "v": 1,
+  "channel": "stream:w31-fixture:game",
+  "type": "moment",
+  "version": 215,
+  "serverNow": "2026-10-25T13:05:00.000Z",
+  "data": {
+    "id": "00000000-0000-4000-8000-000000000322",
+    "elapsedMs": 1890000,
+    "kind": "event.voided",
+    "targetId": "00000000-0000-4000-8000-000000000302",
+    "targetKind": "goal"
+  }
+}

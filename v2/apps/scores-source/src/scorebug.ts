@@ -1,6 +1,6 @@
 // Pure scorebug view model over the typed game snapshot (no DOM, no network).
 import { clockElapsedMs, formatClock } from "../../../vendor/scores-live-client/live-client.js";
-import type { GameClock, GameSnapshot, GameTeam, Hex, Side } from "./game.ts";
+import type { ClockConfidence, GameClock, GameSnapshot, GameTeam, GameTimeouts, Hex, Side } from "./game.ts";
 import type { SourceUpdate } from "./source.ts";
 
 export interface ScorebugTeam {
@@ -14,6 +14,32 @@ export interface ScorebugTeam {
   /** Null when the timeout log does not cover the game. */
   timeoutsLeft: number | null;
   timeoutLimit: number;
+  timeouts: TimeoutView;
+  /** The team has the disc (`game.possession`); never guessed. */
+  possession: boolean;
+}
+
+/**
+ * Timeouts left of the rule's limit: one dot per timeout up to `maxTimeoutDots`, a `left/limit`
+ * count above that, nothing when the log does not cover them or the rule allows none.
+ */
+export type TimeoutView =
+  | { kind: "dots"; active: number; total: number }
+  | { kind: "count"; text: string }
+  | { kind: "none" };
+export const maxTimeoutDots = 5;
+
+export function timeoutView({ left, limit }: GameTimeouts): TimeoutView {
+  if (left === null || limit === 0) return { kind: "none" };
+  if (limit > maxTimeoutDots) return { kind: "count", text: `${left}/${limit}` };
+  return { kind: "dots", active: Math.min(left, limit), total: limit };
+}
+
+/** Operator-only signals (diag chip and body attributes), never shown on air. */
+export interface OperatorSignals {
+  /** `freshness.ageWarning`: the game is in play but its scorer has been silent. */
+  stale: boolean;
+  clock: ClockConfidence;
 }
 
 export interface ScorebugModel {
@@ -23,6 +49,9 @@ export interface ScorebugModel {
   /** Null is a missing result, never zero. */
   score: { home: number | null; away: number | null; source: "none" | "observed" | "official" };
   clock: GameClock;
+  /** `game` / `half`: the period the timeout limits count over. */
+  timeoutsPer: "game" | "half";
+  operator: OperatorSignals;
 }
 
 /** Placeholder for a missing score; a missing result is never shown as 0. */
@@ -51,6 +80,8 @@ function team(side: Side, value: GameTeam | null, game: GameSnapshot, origin: st
     logoUrl: value?.logo ? resolveLogoUrl(value.logo, origin) : null,
     timeoutsLeft: timeouts.left,
     timeoutLimit: timeouts.limit,
+    timeouts: timeoutView(timeouts),
+    possession: game.possession === side,
   };
 }
 
@@ -61,6 +92,8 @@ export function scorebugModel(game: GameSnapshot, origin: string): ScorebugModel
     away: team("away", game.teams.away, game, origin),
     score: { ...game.score },
     clock: game.clock,
+    timeoutsPer: game.timeouts.per,
+    operator: { stale: game.ageWarning, clock: game.clock.confidence },
   };
 }
 

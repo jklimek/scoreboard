@@ -123,7 +123,89 @@
     },
     "lastPoint": null,
     "points": [],
-    "timeline": [],
+    "timeline": [
+      {
+        "id": "00000000-0000-4000-8000-000000000291",
+        "kind": "goal",
+        "side": "home",
+        "elapsedMs": 60000,
+        "scoreAfter": {
+          "home": 1,
+          "away": 0
+        },
+        "scorer": null,
+        "assist": null,
+        "defender": null,
+        "callahan": false
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000292",
+        "kind": "goal",
+        "side": "away",
+        "elapsedMs": 150000,
+        "scoreAfter": {
+          "home": 1,
+          "away": 1
+        },
+        "scorer": null,
+        "assist": null,
+        "defender": null,
+        "callahan": false
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000293",
+        "kind": "goal",
+        "side": "home",
+        "elapsedMs": 260000,
+        "scoreAfter": {
+          "home": 2,
+          "away": 1
+        },
+        "scorer": null,
+        "assist": null,
+        "defender": null,
+        "callahan": false
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000296",
+        "kind": "timeout",
+        "side": "home",
+        "elapsedMs": 300000,
+        "scoreAfter": null,
+        "scorer": null,
+        "assist": null,
+        "defender": null,
+        "callahan": null
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000294",
+        "kind": "goal",
+        "side": "away",
+        "elapsedMs": 420000,
+        "scoreAfter": {
+          "home": 2,
+          "away": 2
+        },
+        "scorer": null,
+        "assist": null,
+        "defender": null,
+        "callahan": false
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000295",
+        "kind": "goal",
+        "side": "home",
+        "elapsedMs": 540000,
+        "scoreAfter": {
+          "home": 3,
+          "away": 2
+        },
+        "scorer": null,
+        "assist": null,
+        "defender": null,
+        "callahan": false
+      }
+    ],
     "run": {
       "side": null,
       "length": null,
