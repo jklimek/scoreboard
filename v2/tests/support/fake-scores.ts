@@ -52,7 +52,9 @@ interface Connection {
 /** A hub channel: the retained snapshot (or `removed`) and the moment replay ring. */
 interface HubChannel {
   latest: Envelope;
-  moments: { envelope: Envelope; gameId: string | undefined }[];
+  moments: { envelope: Envelope; gameId: string | undefined; load: number }[];
+  /** Snapshots published so far: the moments after a snapshot belong to its load. */
+  load: number;
 }
 
 type GameData = { game?: { id?: string }; timeline?: { id?: string }[] } | null;
@@ -96,7 +98,7 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
   const hubChannel = (name: string) => {
     // A profile with nothing to show streams `removed` (the hub reads stream keys with removed).
     let channel = channels.get(name);
-    if (!channel) channels.set(name, (channel = { latest: stamp({ ...fixture("removed"), data: null }, name), moments: [] }));
+    if (!channel) channels.set(name, (channel = { latest: stamp({ ...fixture("removed"), data: null }, name), moments: [], load: 0 }));
     return channel;
   };
 
@@ -184,16 +186,23 @@ export function createFakeScores(options: FakeScoresOptions = {}) {
     const channel = hubChannel(name);
     const stamped = stamp(envelope, name);
     if (stamped.type === "moment") {
-      channel.moments = [...channel.moments, { envelope: stamped, gameId: gameOf(channel.latest) }].slice(-50);
+      channel.moments = [
+        ...channel.moments,
+        { envelope: stamped, gameId: gameOf(channel.latest), load: channel.load },
+      ].slice(-50);
       const moment = stamped.data as { id: string; kind: string; targetId?: string };
       // A void belongs to the latest snapshot's projection: what it voids or restores was not
-      // in that projection's ring either.
+      // in that projection's ring either. The real hub filters the ring once per load with the
+      // load's complete correction graph, so moments of the current load (e.g. a re-announced
+      // retraction before the undo's void) are never filtered by a later void of the same load.
       if (moment.kind === "event.voided" && moment.targetId) {
         voids.set(moment.id, moment.targetId);
-        channel.moments = channel.moments.filter(retained(channel.latest));
+        const keep = retained(channel.latest);
+        channel.moments = channel.moments.filter((entry) => entry.load === channel.load || keep(entry));
       }
     } else {
       channel.latest = stamped;
+      channel.load++;
       channel.moments = stamped.type === "removed" ? [] : channel.moments.filter(retained(stamped));
     }
     for (const connection of connections) if (connection.subscribed.has(name)) control(connection, stamped);

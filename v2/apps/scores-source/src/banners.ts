@@ -86,7 +86,7 @@ const sameBanner = (a: Banner, b: Banner) => JSON.stringify(a) === JSON.stringif
  * - `event.voided` retracts only its own target (an undo, `targetKind` `event.voided`, retracts and
  *   starts nothing); `event.amended` re-derives its target from the snapshot;
  * - a game switch, `degraded`, every state without a game and `close` cut everything at once,
- *   including a banner still leaving.
+ *   including a banner still leaving; a retraction of the leaving banner cuts its exit too.
  */
 export function createBannerController(view: BannerView, options: BannerOptions = {}) {
   const holdMs = options.holdMs ?? { goal: 6000, timeout: 5000 };
@@ -98,6 +98,8 @@ export function createBannerController(view: BannerView, options: BannerOptions 
   let quiet = new Set<string>();
   /** The banner on air (not while it leaves). */
   let current: Banner | null = null;
+  /** The banner whose exit is still visible (the gap after `leave("exit")`), so a void can cut it. */
+  let leaving: Banner | null = null;
   /** Admitted banners waiting, oldest first. */
   let queue: Banner[] = [];
   /** The hold of `current`; without `current`, the gap while the previous banner leaves. */
@@ -109,6 +111,7 @@ export function createBannerController(view: BannerView, options: BannerOptions 
   };
   function next() {
     stopTimer();
+    leaving = null;
     const banner = queue.shift();
     if (!banner) return;
     current = banner;
@@ -118,6 +121,7 @@ export function createBannerController(view: BannerView, options: BannerOptions 
   function leave(mode: "exit" | "cut") {
     stopTimer();
     if (!current) return;
+    leaving = mode === "exit" ? current : null;
     current = null;
     view.hide(mode);
     timer = setTimeout(next, gapMs);
@@ -128,11 +132,17 @@ export function createBannerController(view: BannerView, options: BannerOptions 
     stopTimer();
     queue = [];
     current = null;
+    leaving = null;
     if (visible) view.hide("cut");
   }
   function retract(id: string) {
     queue = queue.filter((banner) => banner.id !== id);
     if (current?.id === id) leave("cut");
+    else if (leaving?.id === id) {
+      // Review r2: a retraction during the exit cuts it; the gap timer then starts the next one.
+      leaving = null;
+      view.hide("cut");
+    }
   }
   /** Re-derives a banner from the latest snapshot; retracts it when its entry is gone. */
   function rederive(id: string) {
@@ -177,7 +187,7 @@ export function createBannerController(view: BannerView, options: BannerOptions 
       const baseline = !game || shown.gameId !== game.gameId || !liveSnapshot;
       game = shown;
       if (baseline) for (const entry of shown.timeline) quiet.add(entry.id);
-      for (const banner of [...(current ? [current] : []), ...queue]) rederive(banner.id);
+      for (const banner of [current, leaving, ...queue]) if (banner) rederive(banner.id);
     },
     moment({ moment, game: of }: SourceMoment) {
       if (!game || of !== game) return;

@@ -4326,6 +4326,7 @@ function createBannerController(view, options = {}) {
   let game = null;
   let quiet = /* @__PURE__ */ new Set();
   let current = null;
+  let leaving = null;
   let queue = [];
   let timer;
   const stopTimer = () => {
@@ -4334,6 +4335,7 @@ function createBannerController(view, options = {}) {
   };
   function next() {
     stopTimer();
+    leaving = null;
     const banner = queue.shift();
     if (!banner) return;
     current = banner;
@@ -4343,6 +4345,7 @@ function createBannerController(view, options = {}) {
   function leave(mode) {
     stopTimer();
     if (!current) return;
+    leaving = mode === "exit" ? current : null;
     current = null;
     view.hide(mode);
     timer = setTimeout(next, gapMs);
@@ -4352,11 +4355,16 @@ function createBannerController(view, options = {}) {
     stopTimer();
     queue = [];
     current = null;
+    leaving = null;
     if (visible) view.hide("cut");
   }
   function retract(id) {
     queue = queue.filter((banner) => banner.id !== id);
     if (current?.id === id) leave("cut");
+    else if (leaving?.id === id) {
+      leaving = null;
+      view.hide("cut");
+    }
   }
   function rederive(id) {
     const entry = game?.timeline.find((item) => item.id === id);
@@ -4397,7 +4405,7 @@ function createBannerController(view, options = {}) {
       const baseline = !game || shown.gameId !== game.gameId || !liveSnapshot;
       game = shown;
       if (baseline) for (const entry of shown.timeline) quiet.add(entry.id);
-      for (const banner of [...current ? [current] : [], ...queue]) rederive(banner.id);
+      for (const banner of [current, leaving, ...queue]) if (banner) rederive(banner.id);
     },
     moment({ moment, game: of }) {
       if (!game || of !== game) return;

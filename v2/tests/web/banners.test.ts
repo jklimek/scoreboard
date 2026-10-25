@@ -244,6 +244,45 @@ test("event.voided retracts the banner on air at once", async () => {
   board.close();
 });
 
+test("a void or a correcting snapshot cuts its banner while it is still leaving (review r2)", async () => {
+  for (const how of ["void moment", "snapshot"] as const) {
+    const board = setup();
+    board.scores.snapshot("game-standard");
+    await flush();
+    board.scores.snapshot("game-standard-goal");
+    board.scores.moment("moment-goal-named");
+    await advance(6100);
+    assert.deepEqual(board.log, ["show 302", "hide exit"], how);
+    if (how === "void moment") board.scores.moment("moment-voided");
+    else board.scores.snapshot("game-standard");
+    await flush();
+    assert.deepEqual(board.log, ["show 302", "hide exit", "hide cut"], `${how}: the exit is cut`);
+    await advance(10_000);
+    assert.deepEqual(board.log, ["show 302", "hide exit", "hide cut"], how);
+    board.close();
+  }
+});
+
+test("an unrelated void during an exit cuts nothing and keeps the waiting banner", async () => {
+  const board = setup();
+  board.scores.snapshot("game-standard");
+  await flush();
+  const timeoutData = fixture("game-standard-timeout").data as { timeline: unknown[] };
+  const goal = (fixture("game-standard-goal").data as { timeline: unknown[] }).timeline.at(-1);
+  board.scores.snapshotData({ ...timeoutData, timeline: [...timeoutData.timeline, goal] });
+  board.scores.moment("moment-timeout");
+  board.scores.moment("moment-goal-named");
+  await advance(5100);
+  assert.deepEqual(board.log, ["show 304", "hide exit"]);
+  assert.deepEqual(board.banners.queued.map((banner) => banner.id), [id(302)]);
+  // Voids the goal 302 only (not the leaving timeout 304).
+  board.scores.moment("moment-voided");
+  await flush();
+  assert.deepEqual(board.log, ["show 304", "hide exit"], "the leaving timeout is not cut");
+  assert.deepEqual(board.banners.queued, [], "the voided waiting goal is dropped");
+  board.close();
+});
+
 test("a waiting goal is dropped by its void moment", async () => {
   const board = setup();
   board.scores.snapshot("game-standard");
@@ -302,6 +341,8 @@ test("restore (Scores bb5ce05e): only the undo arrives and nothing enters; voidi
   await advance(10_000);
   assert.deepEqual(board.moments.map((event) => event.moment.id.slice(-3)), ["302", "322", "323", "324"]);
   assert.deepEqual(board.log, ["show 302", "hide cut"]);
+  // Review r2 P3: the ring keeps the re-announced retraction and the undo's void, as Scores does.
+  assert.deepEqual(board.scores.ring().map((entry) => entry.id), [id(322), id(324)]);
 
   // Reloaded during the void: the restore brings the goal back without any banner.
   const scores = createFakeScores();
