@@ -6,12 +6,10 @@ import { createScoresSource } from "../../scores-source/src/source.ts";
 import type { ScoresSource, SourceState, SourceUpdate } from "../../scores-source/src/source.ts";
 import { clockText, formatClock, scoreBumps, scoreText, scorebugModel } from "../../scores-source/src/scorebug.ts";
 import type { ScorebugTeam } from "../../scores-source/src/scorebug.ts";
-import { ScoreboardAnimator } from "./scoreboard-animations";
 
 const config = parseScoresFragment(location.hash);
 const origin = config.ok ? config.config.origin : "";
 const diag = config.ok ? config.config.diag : config.diag;
-const animator = new ScoreboardAnimator();
 const byId = (id: string) => document.getElementById(id);
 const overlay = document.querySelector<HTMLElement>(".overlay-scoreboard");
 const clock = byId("game-clock");
@@ -74,11 +72,30 @@ function renderTeam(team: ScorebugTeam): void {
   }
 }
 
+const bumps = new Map<HTMLElement, gsap.core.Timeline>();
+
+/** The Touchline score bump (ScoreboardAnimator.animateScoreChange), tracked so it can be stopped. */
+function bump(element: HTMLElement, text: string): void {
+  const timeline = gsap.timeline({
+    onComplete: () => {
+      bumps.delete(element);
+    },
+  });
+  timeline.to(element, { scale: 1.22, duration: 0.11, ease: "power2.out" });
+  timeline.add(() => {
+    element.textContent = text;
+  });
+  timeline.to(element, { scale: 1.0, duration: 0.42, ease: "power3.out" });
+  bumps.set(element, timeline);
+}
+
 /** Stops running bumps so an older animation never writes a stale digit. */
 function stopScoreAnimations(): void {
-  const elements = [scores.home, scores.away].filter((element): element is HTMLElement => element !== null);
-  gsap.killTweensOf(elements);
-  gsap.set(elements, { scale: 1 });
+  for (const [element, timeline] of bumps) {
+    timeline.kill();
+    gsap.set(element, { scale: 1 });
+  }
+  bumps.clear();
 }
 
 function clear(): void {
@@ -93,7 +110,7 @@ function clear(): void {
   }
 }
 
-function render(state: SourceState, bumps = { home: false, away: false }): void {
+function render(state: SourceState, changed = { home: false, away: false }): void {
   document.body.dataset.sourceStatus = state.status;
   if (chip) {
     chip.dataset.status = state.status;
@@ -114,7 +131,7 @@ function render(state: SourceState, bumps = { home: false, away: false }): void 
     const text = scoreText(model.score[side]);
     if (!element) continue;
     element.classList.toggle("is-missing", model.score[side] === null);
-    if (bumps[side] && state.status === "live") animator.animateScoreChange(element, text);
+    if (changed[side] && state.status === "live") bump(element, text);
     else element.textContent = text;
   }
 }
