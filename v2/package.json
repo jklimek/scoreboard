@@ -8,12 +8,15 @@
     "watch:web": "node scripts/build-web.mjs --watch",
     "test": "node --test \"tests/web/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.scorebug.json",
-    "pin:live-client": "node scripts/pin-live-client.mjs"
+    "pin:live-client": "node scripts/pin-live-client.mjs",
+    "test:browser": "node tests/browser/scorebug-browser.mjs"
   },
   "devDependencies": {
     "@types/node": "24.19.2",
     "esbuild": "^0.25.1",
-    "typescript": "^5.8.2"
+    "playwright-core": "1.64.0",
+    "typescript": "^5.8.2",
+    "ws": "8.22.0"
   },
   "dependencies": {
     "gsap": "^3.14.2"
