@@ -14,6 +14,7 @@ const byId = (id: string) => document.getElementById(id);
 const overlay = document.querySelector<HTMLElement>(".overlay-scoreboard");
 const clock = byId("game-clock");
 const scores = { home: byId("home-score"), away: byId("away-score") };
+const scoreElements = [scores.home, scores.away].filter((element) => element !== null);
 const chip = diag ? createChip() : null;
 let source: ScoresSource | undefined;
 
@@ -45,7 +46,7 @@ function renderTeam(team: ScorebugTeam): void {
   if (name) name.textContent = team.name ?? (team.side === "home" ? "Home" : "Away");
   document.documentElement.style.setProperty(
     team.side === "home" ? "--team-h-color" : "--team-a-color",
-    team.colours.primary ?? "var(--accent-neutral)",
+    team.colour ?? "var(--accent-neutral)",
   );
   const logo = byId(`${prefix}-logo`) as HTMLImageElement | null;
   if (logo) {
@@ -72,30 +73,21 @@ function renderTeam(team: ScorebugTeam): void {
   }
 }
 
-const bumps = new Map<HTMLElement, gsap.core.Timeline>();
-
-/** The Touchline score bump (ScoreboardAnimator.animateScoreChange), tracked so it can be stopped. */
-function bump(element: HTMLElement, text: string): void {
-  const timeline = gsap.timeline({
-    onComplete: () => {
-      bumps.delete(element);
-    },
+/** The Touchline score bump (ScoreboardAnimator.animateScoreChange), scale only. */
+function bump(element: HTMLElement): void {
+  gsap.to(element, {
+    keyframes: [
+      { scale: 1.22, duration: 0.11, ease: "power2.out" },
+      { scale: 1, duration: 0.42, ease: "power3.out" },
+    ],
   });
-  timeline.to(element, { scale: 1.22, duration: 0.11, ease: "power2.out" });
-  timeline.add(() => {
-    element.textContent = text;
-  });
-  timeline.to(element, { scale: 1.0, duration: 0.42, ease: "power3.out" });
-  bumps.set(element, timeline);
 }
 
-/** Stops running bumps so an older animation never writes a stale digit. */
+/** Stops running bumps; the digits are always written at once, so none can go stale. */
 function stopScoreAnimations(): void {
-  for (const [element, timeline] of bumps) {
-    timeline.kill();
-    gsap.set(element, { scale: 1 });
-  }
-  bumps.clear();
+  if (!scoreElements.length) return;
+  gsap.killTweensOf(scoreElements);
+  gsap.set(scoreElements, { scale: 1 });
 }
 
 function clear(): void {
@@ -131,8 +123,8 @@ function render(state: SourceState, changed = { home: false, away: false }): voi
     const text = scoreText(model.score[side]);
     if (!element) continue;
     element.classList.toggle("is-missing", model.score[side] === null);
-    if (changed[side] && state.status === "live") bump(element, text);
-    else element.textContent = text;
+    element.textContent = text;
+    if (changed[side]) bump(element);
   }
 }
 

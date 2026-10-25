@@ -7,9 +7,9 @@ export interface ScorebugTeam {
   side: Side;
   /** Null when the side has no team yet (render a neutral placeholder). */
   name: string | null;
-  abbreviation: string | null;
-  colours: { primary: Hex | null; secondary: Hex | null; text: Hex | null };
-  /** Absolute logo URL (relative Scores paths resolve against the configured origin). */
+  /** Null falls back to the neutral accent. */
+  colour: Hex | null;
+  /** Logo URL on the configured Scores origin, or null (no logo, or one elsewhere). */
   logoUrl: string | null;
   /** Null when the timeout log does not cover the game. */
   timeoutsLeft: number | null;
@@ -28,10 +28,15 @@ export interface ScorebugModel {
 /** Placeholder for a missing score; a missing result is never shown as 0. */
 export const missingScore = "-";
 
+/**
+ * A logo loads only from the configured Scores origin: relative paths resolve against it; another
+ * origin (absolute or protocol-relative), credentials or a non-http(s) scheme mean no logo.
+ */
 export function resolveLogoUrl(url: string, origin: string): string | null {
   try {
     const resolved = new URL(url, `${origin}/`);
-    return resolved.protocol === "https:" || resolved.protocol === "http:" ? resolved.href : null;
+    if (resolved.origin !== origin || !/^https?:$/.test(resolved.protocol)) return null;
+    return resolved.username || resolved.password ? null : resolved.href;
   } catch {
     return null;
   }
@@ -42,9 +47,8 @@ function team(side: Side, value: GameTeam | null, game: GameSnapshot, origin: st
   return {
     side,
     name: value?.displayName.trim() || null,
-    abbreviation: value?.abbreviation ?? null,
-    colours: value ? { ...value.colours } : { primary: null, secondary: null, text: null },
-    logoUrl: value?.logo ? resolveLogoUrl(value.logo.small, origin) : null,
+    colour: value?.primary ?? null,
+    logoUrl: value?.logo ? resolveLogoUrl(value.logo, origin) : null,
     timeoutsLeft: timeouts.left,
     timeoutLimit: timeouts.limit,
   };
@@ -52,7 +56,7 @@ function team(side: Side, value: GameTeam | null, game: GameSnapshot, origin: st
 
 export function scorebugModel(game: GameSnapshot, origin: string): ScorebugModel {
   return {
-    gameId: game.game.id,
+    gameId: game.gameId,
     home: team("home", game.teams.home, game, origin),
     away: team("away", game.teams.away, game, origin),
     score: { ...game.score },
@@ -69,12 +73,12 @@ export const clockText = (clock: GameClock, serverNowMs: number) =>
 
 /**
  * Which score digits may bump: only a changed, known score of the same game in a live snapshot.
- * Never on the first render, a resync after a reconnect, a game switch or after unavailable.
+ * Never on the first render, the first snapshot after a reconnect, a game switch or after unavailable.
  */
 export function scoreBumps(update: SourceUpdate): { home: boolean; away: boolean } {
   const before = update.previous.game;
   const after = update.state.game;
-  if (!update.liveSnapshot || !before || !after || before.game.id !== after.game.id)
+  if (!update.liveSnapshot || !before || !after || before.gameId !== after.gameId)
     return { home: false, away: false };
   const bump = (side: Side) => after.score[side] !== null && after.score[side] !== before.score[side];
   return { home: bump("home"), away: bump("away") };

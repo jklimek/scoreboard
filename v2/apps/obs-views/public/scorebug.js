@@ -4739,33 +4739,24 @@ var isString = (value) => typeof value === "string";
 var isHexOrNull = (value) => value === null || isString(value) && /^#[0-9a-f]{6}$/.test(value);
 function readTeam(value) {
   if (value === null) return null;
-  if (!isObject(value) || !isString(value.displayName) || !isString(value.abbreviation)) return void 0;
-  const colours = value.colours;
-  if (!isObject(colours) || ![colours.primary, colours.secondary, colours.text].every(isHexOrNull))
-    return void 0;
-  const logo = value.logo;
-  if (logo !== null && (!isObject(logo) || !isString(logo.small) || !isString(logo.large) || !isString(logo.version)))
-    return void 0;
+  if (!isObject(value) || !isString(value.displayName)) return void 0;
+  const { colours, logo } = value;
+  if (!isObject(colours) || !isHexOrNull(colours.primary)) return void 0;
+  if (logo !== null && (!isObject(logo) || !isString(logo.small))) return void 0;
   return {
     displayName: value.displayName,
-    abbreviation: value.abbreviation,
-    colours: {
-      primary: colours.primary,
-      secondary: colours.secondary,
-      text: colours.text
-    },
-    logo: logo === null ? null : { small: logo.small, large: logo.large, version: logo.version }
+    primary: colours.primary,
+    logo: logo === null ? null : logo.small
   };
 }
 function readTimeouts(value) {
-  if (!isObject(value) || !isCountOrNull(value.used) || !isCountOrNull(value.left) || !isCount(value.limit))
-    return void 0;
-  return { used: value.used, left: value.left, limit: value.limit };
+  if (!isObject(value) || !isCountOrNull(value.left) || !isCount(value.limit)) return void 0;
+  return { left: value.left, limit: value.limit };
 }
 function readGameSnapshot(data) {
   if (!isObject(data)) return null;
   const { game, teams, score, timeouts, clock: clock2 } = data;
-  if (!isObject(game) || !isString(game.id) || !isString(game.name) || !isString(game.status)) return null;
+  if (!isObject(game) || !isString(game.id)) return null;
   if (!isObject(teams) || !isObject(score) || !isObject(timeouts) || !isObject(clock2)) return null;
   const home = readTeam(teams.home);
   const away = readTeam(teams.away);
@@ -4780,7 +4771,7 @@ function readGameSnapshot(data) {
     return null;
   if (!isString(anchorServerTs) || !Number.isFinite(Date.parse(anchorServerTs))) return null;
   return {
-    game: { id: game.id, name: game.name, status: game.status },
+    gameId: game.id,
     teams: { home, away },
     score: { home: score.home, away: score.away, source: score.source },
     timeouts: { home: homeTimeouts, away: awayTimeouts },
@@ -4819,6 +4810,10 @@ function createScoresSource(config4, options = {}) {
     resyncing = false;
     set({ status, game: null, problem });
   };
+  const degrade = (problem) => {
+    if (state.status === "live" || state.status === "connecting" || state.status === "degraded")
+      set({ status: "degraded", game: state.game, problem: problem ?? state.problem });
+  };
   const client = createLiveClient({
     baseUrl: config4.config.origin,
     channels: [channel],
@@ -4837,10 +4832,7 @@ function createScoresSource(config4, options = {}) {
           resyncing = state.game !== null;
           set({ status: state.game ? "live" : "connecting", game: state.game, problem: null });
         }
-      } else if (status.state === "reconnecting" && opened) {
-        if (state.status === "live" || state.status === "connecting")
-          set({ status: "degraded", game: state.game, problem: null });
-      }
+      } else if (status.state === "reconnecting" && opened) degrade(null);
     },
     onSnapshot(name, data) {
       if (closed || name !== channel) return;
@@ -4857,11 +4849,24 @@ function createScoresSource(config4, options = {}) {
       if (!closed && name === channel) clear2("unavailable");
     },
     onError(error) {
-      if (closed) return;
-      if (error.code === "NOT_FOUND" && (error.channel === void 0 || error.channel === channel))
-        clear2("unavailable");
-      else if (error.code === "VALIDATION_ERROR" && state.game === null && state.status !== "unavailable")
-        clear2("error", "protocol");
+      if (closed || error.channel !== void 0 && error.channel !== channel) return;
+      switch (error.code) {
+        // A key refused at auth or while connected (revoked, expired, archived: B06-UP) arrives
+        // without a channel, a refused channel names it. Never a transport loss.
+        case "NOT_FOUND":
+          return clear2("unavailable");
+        // Transient: the client closes or retries and resumes; the board keeps its data.
+        case "LIMIT":
+          return degrade("limit");
+        case "RATE_LIMITED":
+          return degrade("rate-limited");
+        case "NOT_READY":
+          return degrade("not-ready");
+        // A protocol mismatch: surfaced to the operator, the last game stays on air (Q77).
+        case "VALIDATION_ERROR":
+          if (state.game) return degrade("protocol");
+          if (state.status !== "unavailable") clear2("error", "protocol");
+      }
     }
   });
   return {
@@ -4883,7 +4888,8 @@ var missingScore = "-";
 function resolveLogoUrl(url, origin2) {
   try {
     const resolved = new URL(url, `${origin2}/`);
-    return resolved.protocol === "https:" || resolved.protocol === "http:" ? resolved.href : null;
+    if (resolved.origin !== origin2 || !/^https?:$/.test(resolved.protocol)) return null;
+    return resolved.username || resolved.password ? null : resolved.href;
   } catch {
     return null;
   }
@@ -4893,16 +4899,15 @@ function team(side, value, game, origin2) {
   return {
     side,
     name: value?.displayName.trim() || null,
-    abbreviation: value?.abbreviation ?? null,
-    colours: value ? { ...value.colours } : { primary: null, secondary: null, text: null },
-    logoUrl: value?.logo ? resolveLogoUrl(value.logo.small, origin2) : null,
+    colour: value?.primary ?? null,
+    logoUrl: value?.logo ? resolveLogoUrl(value.logo, origin2) : null,
     timeoutsLeft: timeouts.left,
     timeoutLimit: timeouts.limit
   };
 }
 function scorebugModel(game, origin2) {
   return {
-    gameId: game.game.id,
+    gameId: game.gameId,
     home: team("home", game.teams.home, game, origin2),
     away: team("away", game.teams.away, game, origin2),
     score: { ...game.score },
@@ -4914,7 +4919,7 @@ var clockText = (clock2, serverNowMs) => formatClock(clockElapsedMs(clock2, serv
 function scoreBumps(update) {
   const before = update.previous.game;
   const after = update.state.game;
-  if (!update.liveSnapshot || !before || !after || before.game.id !== after.game.id)
+  if (!update.liveSnapshot || !before || !after || before.gameId !== after.gameId)
     return { home: false, away: false };
   const bump2 = (side) => after.score[side] !== null && after.score[side] !== before.score[side];
   return { home: bump2("home"), away: bump2("away") };
@@ -4928,6 +4933,7 @@ var byId = (id) => document.getElementById(id);
 var overlay = document.querySelector(".overlay-scoreboard");
 var clock = byId("game-clock");
 var scores = { home: byId("home-score"), away: byId("away-score") };
+var scoreElements = [scores.home, scores.away].filter((element) => element !== null);
 var chip = diag ? createChip() : null;
 var source;
 async function applyObsBgColor() {
@@ -4954,7 +4960,7 @@ function renderTeam(team2) {
   if (name) name.textContent = team2.name ?? (team2.side === "home" ? "Home" : "Away");
   document.documentElement.style.setProperty(
     team2.side === "home" ? "--team-h-color" : "--team-a-color",
-    team2.colours.primary ?? "var(--accent-neutral)"
+    team2.colour ?? "var(--accent-neutral)"
   );
   const logo = byId(`${prefix}-logo`);
   if (logo) {
@@ -4980,26 +4986,18 @@ function renderTeam(team2) {
       }
   }
 }
-var bumps = /* @__PURE__ */ new Map();
-function bump(element, text) {
-  const timeline2 = gsapWithCSS.timeline({
-    onComplete: () => {
-      bumps.delete(element);
-    }
+function bump(element) {
+  gsapWithCSS.to(element, {
+    keyframes: [
+      { scale: 1.22, duration: 0.11, ease: "power2.out" },
+      { scale: 1, duration: 0.42, ease: "power3.out" }
+    ]
   });
-  timeline2.to(element, { scale: 1.22, duration: 0.11, ease: "power2.out" });
-  timeline2.add(() => {
-    element.textContent = text;
-  });
-  timeline2.to(element, { scale: 1, duration: 0.42, ease: "power3.out" });
-  bumps.set(element, timeline2);
 }
 function stopScoreAnimations() {
-  for (const [element, timeline2] of bumps) {
-    timeline2.kill();
-    gsapWithCSS.set(element, { scale: 1 });
-  }
-  bumps.clear();
+  if (!scoreElements.length) return;
+  gsapWithCSS.killTweensOf(scoreElements);
+  gsapWithCSS.set(scoreElements, { scale: 1 });
 }
 function clear() {
   stopScoreAnimations();
@@ -5031,8 +5029,8 @@ function render3(state, changed = { home: false, away: false }) {
     const text = scoreText(model.score[side]);
     if (!element) continue;
     element.classList.toggle("is-missing", model.score[side] === null);
-    if (changed[side] && state.status === "live") bump(element, text);
-    else element.textContent = text;
+    element.textContent = text;
+    if (changed[side]) bump(element);
   }
 }
 if (!config3.ok) console.warn(`scorebug: Scores setup error (${config3.problem})`);

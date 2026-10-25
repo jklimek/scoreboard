@@ -1,6 +1,7 @@
 // One Scores live client per document for a stream profile, reduced to typed presentation state.
-// Q77 policy: a lost connection keeps the last game (degraded, clock keeps running locally), a
-// removal or refusal clears it at once (unavailable); the two are never confused.
+// Q77 policy: a lost connection or a transient refusal keeps the last game (degraded, clock keeps
+// running locally), a removal or refusal clears it at once (unavailable); the two are never
+// confused. The status follows the client's `open` callback (W31-D13).
 import { createClockTicker, createLiveClient } from "../../../vendor/scores-live-client/live-client.js";
 import type { LiveClient, LiveClientOptions } from "../../../vendor/scores-live-client/live-client.js";
 import type { ConfigResult, SetupProblem } from "./config.ts";
@@ -8,7 +9,8 @@ import { readGameSnapshot } from "./game.ts";
 import type { GameSnapshot } from "./game.ts";
 
 export type SourceStatus = "setup-error" | "connecting" | "live" | "degraded" | "unavailable" | "error";
-export type SourceProblem = SetupProblem | "invalid-snapshot" | "protocol";
+/** Why the status is `error` or `degraded` (`limit`, `rate-limited`, `not-ready`: transient). */
+export type SourceProblem = SetupProblem | "invalid-snapshot" | "protocol" | "limit" | "rate-limited" | "not-ready";
 
 export interface SourceState {
   readonly status: SourceStatus;
@@ -20,7 +22,7 @@ export interface SourceState {
 export interface SourceUpdate {
   readonly previous: SourceState;
   readonly state: SourceState;
-  /** A snapshot that arrived while live (not the first one, not a resync after a reconnect). */
+  /** A snapshot that arrived while live (not the first one, not the first after a reconnect). */
   readonly liveSnapshot: boolean;
 }
 
@@ -78,6 +80,11 @@ export function createScoresSource(config: ConfigResult, options: ScoresSourceOp
     resyncing = false;
     set({ status, game: null, problem });
   };
+  /** Keeps whatever is shown (Q77); never revives a cleared or failed state. */
+  const degrade = (problem: SourceProblem | null) => {
+    if (state.status === "live" || state.status === "connecting" || state.status === "degraded")
+      set({ status: "degraded", game: state.game, problem: problem ?? state.problem });
+  };
 
   const client: LiveClient = createLiveClient({
     baseUrl: config.config.origin,
@@ -97,10 +104,7 @@ export function createScoresSource(config: ConfigResult, options: ScoresSourceOp
           resyncing = state.game !== null;
           set({ status: state.game ? "live" : "connecting", game: state.game, problem: null });
         }
-      } else if (status.state === "reconnecting" && opened) {
-        if (state.status === "live" || state.status === "connecting")
-          set({ status: "degraded", game: state.game, problem: null });
-      }
+      } else if (status.state === "reconnecting" && opened) degrade(null);
     },
     onSnapshot(name, data) {
       if (closed || name !== channel) return;
@@ -118,12 +122,24 @@ export function createScoresSource(config: ConfigResult, options: ScoresSourceOp
       if (!closed && name === channel) clear("unavailable");
     },
     onError(error) {
-      if (closed) return;
-      // A refused key arrives without a channel; a refused channel names it. Never a transport loss.
-      if (error.code === "NOT_FOUND" && (error.channel === undefined || error.channel === channel))
-        clear("unavailable");
-      else if (error.code === "VALIDATION_ERROR" && state.game === null && state.status !== "unavailable")
-        clear("error", "protocol");
+      if (closed || (error.channel !== undefined && error.channel !== channel)) return;
+      switch (error.code) {
+        // A key refused at auth or while connected (revoked, expired, archived: B06-UP) arrives
+        // without a channel, a refused channel names it. Never a transport loss.
+        case "NOT_FOUND":
+          return clear("unavailable");
+        // Transient: the client closes or retries and resumes; the board keeps its data.
+        case "LIMIT":
+          return degrade("limit");
+        case "RATE_LIMITED":
+          return degrade("rate-limited");
+        case "NOT_READY":
+          return degrade("not-ready");
+        // A protocol mismatch: surfaced to the operator, the last game stays on air (Q77).
+        case "VALIDATION_ERROR":
+          if (state.game) return degrade("protocol");
+          if (state.status !== "unavailable") clear("error", "protocol");
+      }
     },
   });
 

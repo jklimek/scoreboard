@@ -6,7 +6,7 @@ import { parseScoresFragment } from "../../apps/scores-source/src/config.ts";
 import { createScoresSource } from "../../apps/scores-source/src/source.ts";
 import type { ScoresSource, SourceUpdate } from "../../apps/scores-source/src/source.ts";
 import { clockText, formatClock, scoreBumps, scoreText, scorebugModel } from "../../apps/scores-source/src/scorebug.ts";
-import { createFakeScores, fakeWebSocket, fixtureKey, fixtureProfile } from "../support/fake-scores.ts";
+import { createFakeScores, fakeWebSocket, fixture, fixtureKey, fixtureProfile } from "../support/fake-scores.ts";
 
 const origin = "https://scores.example.invalid";
 const channel = `stream:${fixtureProfile}:game`;
@@ -69,10 +69,7 @@ test("a snapshot becomes the scorebug model: names, colours, logo, score source 
   await flush();
   const bug = model(source);
   assert.equal(bug.gameId, "00000000-0000-4000-8000-000000000011");
-  assert.deepEqual(
-    { name: bug.home.name, abbreviation: bug.home.abbreviation, colours: bug.home.colours },
-    { name: "W31 Fixture Home", abbreviation: "W3H", colours: { primary: "#1b6f7d", secondary: "#ffffff", text: "#ffffff" } },
-  );
+  assert.deepEqual({ name: bug.home.name, colour: bug.home.colour }, { name: "W31 Fixture Home", colour: "#1b6f7d" });
   // A relative Scores logo path resolves against the configured origin; no logo stays null.
   assert.equal(bug.home.logoUrl, `${origin}/api/public/v1/broadcast/logos/00000000-0000-4000-8000-000000000201/128?v=1`);
   assert.equal(bug.away.logoUrl, null);
@@ -95,8 +92,8 @@ test("a missing result is never 0:0, a missing team is neutral, and a stopped cl
   assert.deepEqual(bug.score, { home: null, away: null, source: "none" });
   assert.deepEqual([scoreText(bug.score.home), scoreText(bug.score.away)], ["-", "-"]);
   assert.equal(bug.away.name, null);
-  assert.equal(bug.away.abbreviation, null);
-  assert.deepEqual(bug.home.colours, { primary: null, secondary: null, text: null });
+  assert.equal(bug.away.colour, null);
+  assert.equal(bug.home.colour, null);
   assert.equal(bug.home.timeoutsLeft, null);
   assert.equal(clockText(bug.clock, source.serverNow()), "0:00");
 
@@ -123,8 +120,10 @@ test("Q77: a lost connection keeps the score and the running clock, then resyncs
   await advance(30_000);
   assert.equal(source.state.status, "degraded");
   assert.equal(clockText(source.state.game!.clock, source.serverNow()), "10:30");
-  // A goal happened during the outage; the reconnect brings it as a resync snapshot.
-  scores.snapshotQuietly("game-live-goal");
+  // A goal happened during the outage: the hub versions the snapshot and buffers the moment.
+  scores.snapshot("game-live-goal");
+  const missed = scores.moment("moment-goal");
+  const before = scores.sent.length;
   control.down = false;
   await advance(30_000);
   assert.equal(source.state.status, "live");
@@ -132,18 +131,23 @@ test("Q77: a lost connection keeps the score and the running clock, then resyncs
   const resync = updates.findLast((update) => update.state.game !== update.previous.game)!;
   assert.equal(resync.liveSnapshot, false);
   assert.deepEqual(scoreBumps(resync), { home: false, away: false });
-  // The reopened socket authenticated first again and resumed by version.
+  // The reopened socket authenticated first again and resumed by version; the hub sent the
+  // retained snapshot restamped with the current server time, then replayed the missed moment.
   const last = frames(control.sockets.at(-1)!.sent);
   assert.equal(last[0]!.op, "auth");
   assert.deepEqual(Object.keys((last[1]!.resume ?? {}) as object), [channel]);
-  // The next live snapshot of the same game may bump the changed digits.
+  const answer = scores.sent.slice(before).filter((frame) => frame.v === 1);
+  assert.deepEqual(answer.map((frame) => [frame.type, frame.replay]), [["snapshot", undefined], ["moment", true]]);
+  assert.equal(answer[1]!.version, missed.version);
+  assert.ok(Date.parse(String(answer[0]!.serverNow)) > Date.parse(missed.serverNow), "restamped on resubscribe");
+  // The first live snapshot after the resync may bump the changed digits.
   scores.snapshot("game-official");
   await flush();
   assert.deepEqual(scoreBumps(updates.at(-1)!), { home: true, away: true });
   source.close();
 });
 
-test("animations: never on the first render, a game switch, or a resync; a live moment ends the resync", async () => {
+test("animations: never on the first render, a game switch, or the first snapshot after a reconnect", async () => {
   const { scores, source, updates } = setup();
   scores.snapshot("game-live");
   await flush();
@@ -154,14 +158,26 @@ test("animations: never on the first render, a game switch, or a resync; a live 
   assert.deepEqual(scoreBumps(updates.at(-1)!), { home: false, away: false }, "another game");
   scores.snapshot("game-live");
   await flush();
-  // Reconnect with nothing missed: no snapshot, back to live, still resyncing until news arrives.
+  // Nothing missed: the client's resume cursor trails (snapshots do not advance it), so the hub
+  // resends the retained snapshot, which the client drops as already applied. Same game, live.
+  const shown = source.state.game;
+  const done = updates.length;
   scores.dropAll();
   await advance(2000);
   assert.equal(source.state.status, "live");
-  scores.moment("moment-goal");
+  assert.deepEqual(updates.slice(done).map((update) => [update.state.status, update.state.game === shown]), [
+    ["degraded", true],
+    ["live", true],
+  ]);
+  // Whether a snapshot is the resync answer or news is not visible to the source: the first one
+  // after a reconnect never animates (conservative); a live moment or snapshot ends the resync.
   scores.snapshot("game-live-goal");
+  scores.moment("moment-goal");
   await flush();
-  assert.deepEqual(scoreBumps(updates.at(-1)!), { home: true, away: false });
+  assert.deepEqual(scoreBumps(updates.at(-1)!), { home: false, away: false });
+  scores.snapshot("game-official");
+  await flush();
+  assert.deepEqual(scoreBumps(updates.at(-1)!), { home: true, away: true });
   source.close();
 });
 
@@ -183,19 +199,46 @@ test("Q77: removed clears the game at once; a later outage is not degraded; a ne
   source.close();
 });
 
-test("Q77: a revoked key clears the game on the refused reconnect and never shows it again", async () => {
+test("Q77: a key revoked while connected clears the game at once, before any reconnect", async () => {
   const { scores, control, source, updates } = setup();
   scores.snapshot("game-live");
   await flush();
+  let socketsAtClear = 0;
+  const done = updates.length;
   scores.revoke();
-  // The server closes keyed sockets (1008) without a reason frame; the next auth is refused.
-  await advance(2000);
+  // The server says `error NOT_FOUND` (no channel) before its 1008 close (B06-UP).
+  assert.deepEqual(scores.sent.at(-1), { op: "error", code: "NOT_FOUND", message: "Unknown stream key" });
+  await flush();
   assert.deepEqual(source.state, { status: "unavailable", game: null, problem: null });
-  const cleared = updates.length;
+  socketsAtClear = control.sockets.length;
+  assert.equal(socketsAtClear, 1, "cleared on the frame, not on a refused reconnect");
+  assert.deepEqual(
+    updates.slice(done).map((update) => update.state.status),
+    ["unavailable"],
+    "never degraded on the way",
+  );
   await advance(10 * 60_000, 5000);
   assert.ok(control.sockets.length > 2, "the client keeps retrying with backoff");
   assert.equal(source.state.status, "unavailable");
-  assert.ok(updates.slice(cleared).every((update) => update.state.game === null));
+  assert.ok(updates.slice(done).every((update) => update.state.game === null));
+  source.close();
+});
+
+test("Q77: the verification-failure bound closes without a frame: degraded, data kept, then live", async () => {
+  const { scores, control, source, updates } = setup();
+  scores.snapshot("game-live");
+  await flush();
+  const shown = source.state.game;
+  const done = updates.length;
+  scores.overdue();
+  await flush();
+  assert.equal(source.state.status, "degraded");
+  assert.equal(source.state.game, shown);
+  await advance(2000);
+  assert.equal(control.sockets.length, 2);
+  assert.equal(source.state.status, "live");
+  assert.equal(source.state.game, shown, "unchanged resume: the same game, no resync snapshot");
+  assert.ok(updates.slice(done).every((update) => update.state.game === shown));
   source.close();
 });
 
@@ -208,6 +251,100 @@ test("Q77: an unknown key is unavailable from the start, never live", async () =
   assert.ok(updates.every((update) => update.state.status !== "live" && update.state.game === null));
   source.close();
 });
+
+for (const fault of ["LIMIT", "NOT_READY"] as const)
+  test(`a transient auth refusal (${fault}) on reconnect is degraded and never clears the board`, async () => {
+    const { scores, control, source, updates } = setup();
+    scores.snapshot("game-live");
+    await flush();
+    const shown = source.state.game;
+    const done = updates.length;
+    scores.faults.auth = fault;
+    scores.dropAll();
+    await advance(2 * 60_000, 1000);
+    assert.ok(control.sockets.length > 3, "the client retries with backoff");
+    assert.deepEqual(source.state, { status: "degraded", game: shown, problem: fault === "LIMIT" ? "limit" : "not-ready" });
+    assert.equal(clockText(source.state.game!.clock, source.serverNow()), "12:00", "the clock keeps running");
+    assert.ok(updates.slice(done).every((update) => update.state.game === shown && update.state.status !== "unavailable"));
+    scores.faults.auth = undefined;
+    await advance(31_000);
+    assert.deepEqual(source.state, { status: "live", game: shown, problem: null });
+    source.close();
+  });
+
+test("RATE_LIMITED is degraded with the last game kept, then the reconnect resumes", async () => {
+  const { scores, source } = setup();
+  scores.snapshot("game-live");
+  await flush();
+  const shown = source.state.game;
+  scores.rateLimit();
+  await flush();
+  assert.deepEqual(source.state, { status: "degraded", game: shown, problem: "rate-limited" });
+  await advance(2000);
+  assert.deepEqual(source.state, { status: "live", game: shown, problem: null });
+  source.close();
+});
+
+test("a VALIDATION_ERROR with data on air is surfaced as degraded (protocol) and keeps the game", async () => {
+  const { scores, control, source } = setup();
+  scores.snapshot("game-live");
+  await flush();
+  const shown = source.state.game;
+  // A protocol mismatch on the reopened socket: the subscribe is rejected and never acknowledged.
+  scores.faults.invalidChannels = true;
+  scores.dropAll();
+  await advance(2000);
+  assert.deepEqual(source.state, { status: "degraded", game: shown, problem: "protocol" });
+  // W31-D13: the client's 30 s ack timeout bounds the stalled subscription, then it reconnects.
+  scores.faults.invalidChannels = false;
+  await advance(32_000);
+  assert.ok(control.sockets.length >= 3);
+  assert.deepEqual(source.state, { status: "live", game: shown, problem: null });
+  source.close();
+});
+
+test("a VALIDATION_ERROR before any data is an explicit error with nothing shown", async () => {
+  const scores = createFakeScores();
+  scores.faults.invalidChannels = true;
+  const { source } = setup({ scores });
+  await flush();
+  assert.deepEqual(source.state, { status: "error", game: null, problem: "protocol" });
+  source.close();
+});
+
+for (const [label, skewMs] of [["2 minutes ahead", 120_000], ["1 minute behind", -60_000]] as const)
+  test(`an OBS host clock ${label} never moves the running clock across an unchanged reconnect`, async () => {
+    // The host (mocked Date) differs from Scores time by `skewMs`.
+    const scores = createFakeScores({ now: () => Date.now() - skewMs });
+    const { control, source, updates } = setup({ scores });
+    const data = structuredClone(fixture("game-live").data) as { clock: { anchorServerTs: string } };
+    data.clock.anchorServerTs = new Date(Date.now() - skewMs).toISOString();
+    scores.snapshotData(data);
+    await flush();
+    const ticks: number[] = [];
+    const stop = source.tickClock((ms) => ticks.push(ms), 1000);
+    await advance(5000);
+    assert.equal(formatClock(ticks.at(-1)!), "10:05");
+    const snapshots = updates.length;
+    const before = scores.sent.length;
+    scores.dropAll();
+    await advance(2000);
+    assert.equal(control.sockets.length, 2);
+    assert.equal(source.state.status, "live");
+    // Unchanged resume: no envelope at all on the new connection, so no new `serverNow` sample.
+    assert.deepEqual(scores.sent.slice(before).map((frame) => frame.op ?? frame.type), ["subscribed"]);
+    assert.equal(updates.length, snapshots + 2, "degraded, then live: no resync snapshot");
+    assert.equal(formatClock(ticks.at(-1)!), "10:07", "the estimate survives the reopen");
+    // The new connection's first pong (15 s keep-alive) replaces the estimate without a jump.
+    await advance(20_000);
+    assert.equal(formatClock(ticks.at(-1)!), "10:27");
+    for (let index = 1; index < ticks.length; index++) {
+      const step = ticks[index]! - ticks[index - 1]!;
+      assert.ok(step >= 0 && step <= 1000, `tick ${index} moved by ${step} ms`);
+    }
+    stop();
+    source.close();
+  });
 
 test("connectivity loss is never refusal: a long outage stays degraded and recovers", async () => {
   const { scores, control, source, requests } = setup();
@@ -274,8 +411,8 @@ test("two profiles in two documents never share state", async () => {
   scores.snapshot("game-live");
   scores.snapshot("game-no-result", "w31-other");
   await flush();
-  assert.equal(first.source.state.game!.game.id, "00000000-0000-4000-8000-000000000011");
-  assert.equal(second.source.state.game!.game.id, "00000000-0000-4000-8000-000000000012");
+  assert.equal(first.source.state.game!.gameId, "00000000-0000-4000-8000-000000000011");
+  assert.equal(second.source.state.game!.gameId, "00000000-0000-4000-8000-000000000012");
   scores.remove("w31-other");
   await flush();
   assert.equal(second.source.state.status, "unavailable");

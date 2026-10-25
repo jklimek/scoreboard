@@ -88,7 +88,7 @@ const check = async (name, run) => {
   console.log(results.at(-1));
 };
 
-async function openPage(params) {
+async function openPage(params, { skewMs = 0 } = {}) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   const requests = [];
   const sockets = [];
@@ -101,13 +101,34 @@ async function openPage(params) {
     log.external.push(url.origin);
     return route.abort();
   });
-  await page.addInitScript(() => {
+  await page.addInitScript((skew) => {
+    // An OBS host whose clock is off by `skew` ms.
+    if (skew) {
+      const realNow = Date.now.bind(Date);
+      Date.now = () => realNow() + skew;
+    }
     window.__bumps = 0;
+    // Status transitions with the number of sockets opened so far and whether the bug was empty.
+    window.__sockets = 0;
+    window.__statuses = [];
+    const Native = window.WebSocket;
+    window.WebSocket = class extends Native {
+      constructor(...args) {
+        super(...args);
+        window.__sockets++;
+      }
+    };
     new MutationObserver((records) => {
       for (const record of records)
-        if (/scale\(1\.[1-9]/.test(record.target.getAttribute("style") ?? "")) window.__bumps++;
-    }).observe(document, { subtree: true, attributes: true, attributeFilter: ["style"] });
-  });
+        if (record.attributeName === "data-source-status")
+          window.__statuses.push({
+            status: document.body.dataset.sourceStatus,
+            sockets: window.__sockets,
+            empty: document.querySelector(".overlay-scoreboard").classList.contains("is-empty"),
+          });
+        else if (/scale\(1\.[1-9]/.test(record.target.getAttribute("style") ?? "")) window.__bumps++;
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ["style", "data-source-status"] });
+  }, skewMs);
   const fragment = new URLSearchParams(params).toString();
   await page.goto(`http://127.0.0.1:${scoreboardPort}/ui/obs/scoreboard.html#${fragment}`);
   return { page, requests, sockets };
@@ -123,6 +144,8 @@ const clockSeconds = async (page) => {
   return minutes * 60 + seconds;
 };
 const settle = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const statuses = (page) => page.evaluate(() => window.__statuses);
+const socketCount = (page) => page.evaluate(() => window.__sockets);
 const profile = { scores: scoresOrigin, profile: fixtureProfile, key: fixtureKey, diag: "1" };
 
 let main;
@@ -147,6 +170,11 @@ try {
     const after = await clockSeconds(main.page);
     assert.ok(after >= before + 2, `the clock runs locally (${before} -> ${after})`);
     assert.equal(await bumps(main.page), 0, "no animation on the first render");
+    // Slice 2 banners stay in the markup but never show in S1.
+    const banners = await main.page.evaluate(() =>
+      ["scorer-rail", "info-rail", "player-rail"].map((id) => getComputedStyle(document.getElementById(id)).visibility),
+    );
+    assert.deepEqual(banners, ["hidden", "hidden", "hidden"]);
   });
 
   await check("degraded: a dropped server keeps the score and the clock advancing", async () => {
@@ -172,8 +200,9 @@ try {
     assert.equal(await bumps(main.page), 0, "a resync never animates");
     assert.ok(main.sockets.length >= 2 && main.sockets.every((url) => url === `ws://127.0.0.1:${scoresPort}/api/live/ws`));
     hub.snapshotData(live("game-official"));
+    // The digits are written at once; the bump only scales them.
     await main.page.waitForFunction(() => document.getElementById("home-score").textContent === "15");
-    assert.ok((await bumps(main.page)) > 0, "a live snapshot of the same game bumps the digits");
+    await main.page.waitForFunction(() => window.__bumps > 0, null, { timeout: 2000 });
     assert.equal(await text(main.page, "game-clock"), "90:00", "a stopped official clock");
   });
 
@@ -199,12 +228,57 @@ try {
     assert.equal(await text(main.page, "game-clock"), "0:00");
   });
 
-  await check("unavailable: a revoked key clears the scorebug on the refused reconnect", async () => {
+  await check("the verification-failure bound (silent 1008 close) is degraded with the data kept", async () => {
+    const seen = (await statuses(main.page)).length;
+    hub.overdue();
+    await main.page.waitForFunction((from) => window.__statuses.slice(from).some((entry) => entry.status === "degraded"), seen);
+    await waitStatus(main.page, "live", 20_000);
+    const path = (await statuses(main.page)).slice(seen);
+    assert.deepEqual(path.map((entry) => entry.status), ["degraded", "live"]);
+    assert.ok(path.every((entry) => !entry.empty), "the scorebug stays on air");
+    assert.equal(await text(main.page, "home-name"), "W31 Fixture Next");
+  });
+
+  await check("an OBS host clock 2 minutes ahead: an unchanged reconnect does not move the clock", async () => {
+    const published = Date.now();
+    hub.snapshotData(live("game-live"));
+    const { page } = await openPage(profile, { skewMs: 120_000 });
+    await waitStatus(page, "live");
+    const expected = () => 600 + Math.floor((Date.now() - published) / 1000);
+    assert.ok(Math.abs((await clockSeconds(page)) - expected()) <= 1, "server time, not the host clock");
+    const seen = (await statuses(page)).length;
+    hub.dropAll();
+    await page.waitForFunction(
+      (from) => window.__statuses.slice(from).some((entry) => entry.status === "live") && window.__sockets === 2,
+      seen,
+      { timeout: 20_000 },
+    );
+    // Before the new connection's first pong (15 s keep-alive) nothing has resampled server time.
+    let previous = await clockSeconds(page);
+    for (let sample = 0; sample < 12; sample++) {
+      await settle(250);
+      const value = await clockSeconds(page);
+      assert.ok(value >= previous && value <= previous + 1, `the clock moved ${previous} -> ${value}`);
+      previous = value;
+    }
+    assert.ok(Math.abs(previous - expected()) <= 1, `${previous} s vs ${expected()} s`);
+    assert.equal(await socketCount(page), 2);
+    await page.close();
+  });
+
+  await check("unavailable: a key revoked while connected clears the scorebug before any reconnect", async () => {
+    await waitStatus(main.page, "live", 20_000);
+    const seen = (await statuses(main.page)).length;
+    const sockets = await socketCount(main.page);
     hub.revoke();
     await waitStatus(main.page, "unavailable", 20_000);
     assert.equal(await empty(main.page), true);
+    const path = (await statuses(main.page)).slice(seen);
+    assert.deepEqual(path[0], { status: "unavailable", sockets, empty: true }, "cleared on the frame, same socket");
     await settle(3000);
     assert.equal(await status(main.page), "unavailable", "retries never bring old data back");
+    assert.ok((await socketCount(main.page)) > sockets, "the client kept retrying");
+    assert.ok((await statuses(main.page)).slice(seen).every((entry) => entry.empty));
     assert.equal(await text(main.page, "home-name"), "");
   });
 
