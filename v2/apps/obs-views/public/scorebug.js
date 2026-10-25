@@ -4372,6 +4372,7 @@ function createBannerController(view, options = {}) {
     const banner = bannerFor(entry, game);
     queue = queue.map((item) => item.id === id ? banner : item);
     if (current?.id === id && !sameBanner(current, banner)) view.refresh(current = banner);
+    else if (leaving?.id === id && !sameBanner(leaving, banner)) view.refresh(leaving = banner);
   }
   function admit(kind, id) {
     if (!game || quiet.has(id)) return;

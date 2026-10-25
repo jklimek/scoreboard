@@ -151,6 +151,8 @@ export function createBannerController(view: BannerView, options: BannerOptions 
     const banner = bannerFor(entry, game);
     queue = queue.map((item) => (item.id === id ? banner : item));
     if (current?.id === id && !sameBanner(current, banner)) view.refresh((current = banner));
+    // Review r3: a correction (e.g. a name no longer public) also reaches a banner still leaving.
+    else if (leaving?.id === id && !sameBanner(leaving, banner)) view.refresh((leaving = banner));
   }
   function admit(kind: "goal" | "timeout", id: string) {
     if (!game || quiet.has(id)) return;

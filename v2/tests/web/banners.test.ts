@@ -263,6 +263,22 @@ test("a void or a correcting snapshot cuts its banner while it is still leaving 
   }
 });
 
+test("a correcting snapshot during the exit refreshes the leaving banner without a new entrance (review r3)", async () => {
+  const board = setup();
+  board.scores.snapshot("game-standard");
+  await flush();
+  board.scores.snapshot("game-standard-goal");
+  board.scores.moment("moment-goal-named");
+  await advance(6100);
+  assert.deepEqual(board.log, ["show 302", "hide exit"]);
+  board.scores.snapshot("game-standard-amended");
+  await flush();
+  assert.deepEqual(board.log, ["show 302", "hide exit", "refresh 302 Assist: W31 Handler"]);
+  await advance(10_000);
+  assert.deepEqual(board.log, ["show 302", "hide exit", "refresh 302 Assist: W31 Handler"], "no second entrance");
+  board.close();
+});
+
 test("an unrelated void during an exit cuts nothing and keeps the waiting banner", async () => {
   const board = setup();
   board.scores.snapshot("game-standard");
