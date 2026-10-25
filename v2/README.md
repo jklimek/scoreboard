@@ -67,6 +67,11 @@ does not use this server's `/ws`, `/api/v1/snapshot` or UltiScores (only the one
   The origin must be `https:` (or `http:` on localhost/127.0.0.1/[::1]); the key goes only to the
   WebSocket auth frame and is never logged, rendered, stored or sent in a URL (the fragment stays
   in the browser). Add `&diag=1` for an operator status chip (not for air).
+- On air: names, colours, logos, score, clock, possession (from `game.possession` only) and
+  timeouts left of each side's limit; a goal or timeout banner on a live moment of the shown game
+  (content from the snapshot; never on load, replay, resync, while degraded or for a restored
+  goal; retracted at once by a void, a switch or a refusal). Operator-only:
+  `data-source-freshness`, `data-source-clock` and the diag chip.
 - Status: `<body data-source-status>` is `setup-error`, `connecting`, `live`, `degraded`
   (connection lost or a transient refusal: last score stays and the clock keeps running locally),
   `unavailable` (removed, or the key refused at auth or while connected: cleared at once) or
