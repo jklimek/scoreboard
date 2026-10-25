@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "build:web": "node scripts/build-web.mjs",
-    "watch:web": "node scripts/build-web.mjs --watch"
+    "watch:web": "node scripts/build-web.mjs --watch",
+    "test": "node --test \"tests/web/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.scorebug.json",
+    "pin:live-client": "node scripts/pin-live-client.mjs"
   },
   "devDependencies": {
+    "@types/node": "24.19.2",
     "esbuild": "^0.25.1",
     "typescript": "^5.8.2"
   },
