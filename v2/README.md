@@ -69,8 +69,9 @@ does not use this server's `/ws`, `/api/v1/snapshot` or UltiScores (only the one
   in the browser). Add `&diag=1` for an operator status chip (not for air).
 - On air: names, colours, logos, score, clock, possession (from `game.possession` only) and
   timeouts left of each side's limit; a goal or timeout banner on a live moment of the shown game
-  (content from the snapshot; never on load, replay, resync, while degraded or for a restored
-  goal; retracted at once by a void, a switch or a refusal). Operator-only:
+  (content from the snapshot; every live goal plays in order; never for what a first, switch or
+  resync snapshot already holds, on replay, while degraded or for a restored goal on Scores
+  `bb5ce05e` or later; retracted at once by its own void, a switch or a refusal). Operator-only:
   `data-source-freshness`, `data-source-clock` and the diag chip.
 - Status: `<body data-source-status>` is `setup-error`, `connecting`, `live`, `degraded`
   (connection lost or a transient refusal: last score stays and the clock keeps running locally),

@@ -16,7 +16,8 @@ B01 moments, a `removed` message). All names, ids and colours are invented (`W31
 | `game-no-logos` | no logos and no colours |
 | `game-asymmetric-timeouts` | per half, limits 3 and 1 |
 | `game-official`, `game-no-result` | official result; a scheduled game without a result or away team |
-| `moment-*` | goal (`…301` unnamed, `…302` named, `…303` Callahan, `…306` no assist, `…307` hidden names), timeout, `event.amended`, `event.voided`, a void of the void (restore), `result.official` |
+| `moment-*` | goal (`…301` unnamed, `…302` named, `…303` Callahan, `…306` no assist, `…307` hidden names), timeout, `event.amended`, `event.voided` (`…322`), its undo (restore, `…323`) and the undo's void (`…324`), `result.official` |
 
 They were validated against the Scores contracts (`broadcastEnvelopeSchema`, `broadcastGameSchema`,
-`broadcastMomentSchema` at Scores `257fb74b`, W31 B06-UP). Re-validate after editing.
+`broadcastMomentSchema` at Scores `bb5ce05e`, W31 B06-UP). Re-validate after editing. The restore
+sequence follows `bb5ce05e`: a restore is the snapshot and the undo only, never the goal again.

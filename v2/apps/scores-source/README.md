@@ -35,26 +35,38 @@ DOM-free TypeScript module shared by scoreboard views that follow a Scores strea
 
 ## Banners (goal, timeout)
 
-- A banner enters only on a **live** `goal` or `timeout` moment of the shown game (W31-D7 below),
-  after a 300 ms settle window, one at a time (goal 6 s, timeout 5 s, at most two waiting).
+- A banner is admitted only on a **live** `goal` or `timeout` moment of the shown game (W31-D7
+  below) whose entry of that kind is in the latest snapshot's timeline. Every admitted banner plays,
+  in order, one at a time (goal 6 s, timeout 5 s, 0.4 s gap); at most three wait behind the one on
+  air, and beyond that the oldest waiting one is dropped (never the one on air). Two goals synced
+  in one snapshot both play. No timing window decides what is correct.
 - Its content is the moment's entry in the latest snapshot's timeline: a goal shows the scorer
   (display name, else first and last name, else short name, else `#number`; `#0` is a number),
   `Assist: …` or `Callahan`, and the score after the goal; a missing or hidden scorer shows the
   team, and a null assist (none, unknown or not public) shows nothing. A timeout shows the team
   and `n of limit left` when covered. Colours are the side's.
-- It enters only when that entry is the newest of its kind in the snapshot and its id was not in
-  an earlier snapshot of this game: an administrative restore (an undone void re-announces the
-  goal's id), a backlog synced at once or a duplicate never celebrates. A void of a void (the undo
-  that accompanies a restore) also retracts whatever entered since the latest snapshot, so a
-  restore seen by a board reloaded during the void is cancelled inside the settle window.
-- Corrections: every snapshot re-derives the waiting and shown banners (an amended assist updates
-  the banner on air without a new entrance); a banner whose entry is gone (a voided goal) is
-  retracted at once, and `event.voided` retracts its target, shown or waiting. The score always
-  follows snapshots.
-- Never animated: the initial snapshot and its history, replayed moments (`onReplay` is not used),
-  anything while `degraded`; a game switch, `degraded` and every state without a game cancel the
-  banner and the queue at once.
-- A fresh live moment after a reconnect may enter its banner (it is not a replay).
+- **Baseline**: every goal and timeout id in a baseline snapshot is history and never admitted.
+  Baselines are the document's first snapshot, the first snapshot of a switched game and the first
+  snapshot after a reconnect (the resync, or one that cannot be told apart from it). This covers
+  the hub delivering a new subscriber's retained snapshot (already holding the goal) and then that
+  goal's moment live, not as a replay. An id is also admitted at most once (at-least-once delivery).
+- Corrections are targeted: every snapshot re-derives the waiting and shown banners (an amended
+  assist updates the banner on air without a new entrance) and one whose entry is gone (a voided
+  goal) is retracted at once; `event.voided` retracts only its own target, shown or waiting;
+  an undo (`event.voided` whose `targetKind` is `event.voided`) retracts and starts nothing.
+- Restores (Scores `bb5ce05e`, B06-UP): undoing a void restores the goal in the snapshot and
+  announces only the undo, never the goal again, so nothing enters; voiding the undo announces the
+  original retraction again and the undo's void, and the snapshot retracts the goal.
+- Cancellation (a game switch, `degraded`, every state without a game, `close`) cuts at once the
+  banner on air, one still leaving (its exit is cut) and the queue.
+- Never animated: baseline history, replayed moments (`onReplay` is not used), anything while
+  `degraded`.
+- Residuals: a goal or timeout scored in the first snapshot after any reconnect is never
+  celebrated, even after an unchanged reconnect (no resync came, so the next live snapshot is the
+  baseline; its score does not bump either). Against a Scores API older than `bb5ce05e` (staging
+  until it is deployed) a restored goal is announced again as a new `goal` moment: a board that has
+  not seen that goal before (loaded or resynced while it was voided) shows its banner. There is no
+  client workaround.
 
 ### W31-D7: moment identity
 
