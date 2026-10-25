@@ -98,6 +98,43 @@ th {
   justify-items: center;
 }
 
+/* Scorebug without displayable Scores data: nothing on air. */
+.overlay-scoreboard.is-empty {
+  visibility: hidden;
+}
+
+.team-card.is-placeholder .name,
+.score.is-missing {
+  color: var(--text-2);
+}
+
+/* Operator-only Scores status chip (scoreboard.html#...&diag=1). */
+.source-status-chip {
+  position: fixed;
+  left: 8px;
+  bottom: 8px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.72);
+  color: var(--text-1);
+  font: 600 12px/1.3 "Barlow Semi Condensed", "Segoe UI", sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.source-status-chip[data-status="live"] {
+  color: #7ee2a8;
+}
+
+.source-status-chip[data-status="degraded"] {
+  color: #ffcf66;
+}
+
+.source-status-chip[data-status="unavailable"],
+.source-status-chip[data-status="setup-error"],
+.source-status-chip[data-status="error"] {
+  color: #ff8a7a;
+}
+
 .scoreboard-shell {
   --bar-h: 68px;
   display: inline-flex;
