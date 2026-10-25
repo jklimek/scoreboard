@@ -18,6 +18,11 @@ const entries = [
     outdir: "apps/obs-views/public",
     outfile: "main.js",
   },
+  {
+    entry: "apps/obs-views/src/scorebug.ts",
+    outdir: "apps/obs-views/public",
+    outfile: "scorebug.js",
+  },
 ];
 
 const commonConfig = {

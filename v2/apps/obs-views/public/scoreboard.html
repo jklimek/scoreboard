@@ -12,27 +12,27 @@
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body data-view-type="scoreboard">
-    <div class="overlay overlay-scoreboard">
+  <body data-view-type="scoreboard" data-source-status="connecting">
+    <div class="overlay overlay-scoreboard is-empty">
       <section class="scoreboard-shell">
         <article class="team-card team-home-accent" id="home-team-card">
           <img class="team-logo" id="home-logo" alt="" hidden />
-          <div class="name" id="home-name">HOME</div>
+          <div class="name" id="home-name"></div>
         </article>
         <div class="score-wrap" id="home-score-wrap">
-          <div class="score" id="home-score">0</div>
+          <div class="score" id="home-score"></div>
           <div class="timeout-dots" id="home-timeouts" aria-label="Home timeouts left"></div>
         </div>
         <article class="timer-card card">
-          <div class="timer-value" id="game-clock">00:00</div>
+          <div class="timer-value" id="game-clock"></div>
         </article>
         <div class="score-wrap" id="away-score-wrap">
-          <div class="score" id="away-score">0</div>
+          <div class="score" id="away-score"></div>
           <div class="timeout-dots" id="away-timeouts" aria-label="Away timeouts left"></div>
         </div>
         <article class="team-card team-away-accent" id="away-team-card">
           <img class="team-logo" id="away-logo" alt="" hidden />
-          <div class="name" id="away-name">AWAY</div>
+          <div class="name" id="away-name"></div>
         </article>
       </section>
       <section class="event-stack">
@@ -66,6 +66,7 @@
         </article>
       </section>
     </div>
-    <script type="module" src="./main.js"></script>
+    <!-- Scores stream profile: scoreboard.html#scores=<origin>&profile=<slug>&key=<key>[&diag=1] -->
+    <script type="module" src="./scorebug.js"></script>
   </body>
 </html>
