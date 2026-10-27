@@ -1,5 +1,8 @@
 # Scoreboard V2
 
+> **Moved to PSGU Scores (2026-10):** see the notice in the [root README](../README.md). This
+> branch is a frozen reference.
+
 V2 is a full rewrite of the scoreboard platform with a modern, typed, realtime-first architecture.
 
 ## Goals
