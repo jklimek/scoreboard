@@ -1,12 +1,7 @@
 # Scoreboard V2
 
-> **Moved to PSGU Scores (2026-10).** The OBS broadcast graphics for PSGU Scores now live inside
-> Scores itself: the overlay pages are served at `/broadcast/obs/<view>` (`scorebug`, `roster`,
-> `stats`, `leaders`, `matches`, `commentator`) with an operator panel and per-profile operate keys
-> in the Scores app. See `docs/broadcast-overlays.md` in the Scores repository
-> (`ultimatepolska/scores`). This `version2-overhaul` branch is a frozen reference (S1/S2 scorebug
-> slices with the pinned live client); legacy broadcasts keep using `master`. The repository will
-> be archived once legacy broadcasts end.
+> **Moved to PSGU Scores (2026-10):** see the notice in the [root README](../README.md). This
+> branch is a frozen reference.
 
 V2 is a full rewrite of the scoreboard platform with a modern, typed, realtime-first architecture.
 

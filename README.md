@@ -4,9 +4,9 @@
 > Scores itself: the overlay pages are served at `/broadcast/obs/<view>` (`scorebug`, `roster`,
 > `stats`, `leaders`, `matches`, `commentator`) with an operator panel and per-profile operate keys
 > in the Scores app. See `docs/broadcast-overlays.md` in the Scores repository
-> (`ultimatepolska/scores`). This `version2-overhaul` branch is a frozen reference (S1/S2 scorebug
-> slices with the pinned live client); legacy broadcasts keep using `master`. The repository will
-> be archived once legacy broadcasts end.
+> (`ultimatepolska/scores`, private; access required). This `version2-overhaul` branch is a frozen
+> reference (S1/S2 scorebug slices with the pinned live client); legacy broadcasts keep using
+> `master`.
 
 _AI generated README lol_
 
